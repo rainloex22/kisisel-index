@@ -38,22 +38,30 @@ body {
     -webkit-backdrop-filter: blur(0px);
 }
 
-/* 3. BAŞLIK STİLİ - YUMUŞATILMIŞ NEON ETKİSİ */
+/* 3. BAŞLIK STİLİ - FARE İLE PARLAMA */
 .title {
     font-size: 6.5em; 
     font-weight: 800;
     letter-spacing: 7px;
     margin-bottom: 40px;
     
-    /* Neon Gölge Efekti azaltıldı, daha yumuşak */
+    /* Neon Gölge Efekti kaldırıldı (Normal durum) */
+    text-shadow: none; 
+    transition: text-shadow 0.4s ease-in-out; /* Yumuşak geçiş */
+    
+    animation: fadeInDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+}
+
+/* Fare Üzerine Gelince Parlaklık Ekle */
+.title:hover {
     text-shadow: 
         0 0 5px #00FFFF,   
         0 0 10px #00FFFF,
         0 0 15px #00FFFF,
-        0 0 30px #00A9A9; /* Parlaklık yumuşatıldı */
-    
-    animation: fadeInDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+        0 0 40px #00A9A9; /* Parlaklık burada aktive olur */
+    cursor: default;
 }
+
 @keyframes fadeInDown {
     0% { opacity: 0; transform: translateY(-50px); }
     100% { opacity: 1; transform: translateY(0); }
@@ -83,7 +91,7 @@ body {
     border-radius: 50%;
     margin-right: 15px;
     position: relative;
-    border: 3px solid #1e2024; /* Kartın arkaplanı ile uyumlu kalın border */
+    border: 3px solid #1e2024; 
 }
 
 /* Kullanıcı İsimleri */
@@ -113,7 +121,7 @@ body {
     height: 12px;
     border-radius: 50%;
     margin-right: 10px;
-    border: 3px solid #1e2024; /* Avatar border'ı ile uyumlu */
+    border: 3px solid #1e2024;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
@@ -186,13 +194,13 @@ body {
 }
 
 .music-button.paused #volume-icon {
-    color: #f04747; /* Kırmızı, kapalı olduğunu belirtir */
+    color: #f04747; 
 }
 
 #volume-slider {
     width: 100px;
     margin-left: 10px;
-    /* Slider görünümünü özelleştirme (Tarayıcıya göre farklılık gösterebilir) */
+    /* Slider görünümünü özelleştirme */
     -webkit-appearance: none;
     appearance: none;
     height: 5px;
