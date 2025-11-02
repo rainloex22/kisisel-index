@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAKİ S2 | 5 DAKİKAYA HER YERDE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="video-background">
+        <video id="bg-video" autoplay muted loop playsinline poster="poster.jpg">
+            <source src="your_video.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="content">
+        
+        <h1 class="title">BAKİ S2</h1>
+        
+        <div id="discord-card" class="discord-info loading" style="display: none;">
+            <div class="loader"></div> 
+        </div>
+
+        <div class="music-controls">
+            <button id="music-toggle" class="music-button paused" aria-label="Sesi Aç/Kapat">
+                <span class="icon">🔇</span>
+            </button>
+        </div>
+
+    </div>
+    
+    <audio id="background-music" loop>
+        <source src="your_music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
