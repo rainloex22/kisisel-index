@@ -167,8 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sayaç için CountAPI.xyz entegrasyonu
     // Kendi namespace'inizi ve key'inizi belirlemeniz önemlidir.
     // Örnek: `https://api.countapi.xyz/hit/YOUR_GITHUB_USERNAME.github.io/BAKI-S2`
-    const COUNT_API_NAMESPACE = 'your_github_username.github.io'; // Burayı kendi GitHub kullanıcı adınız.github.io ile değiştirin!
-    const COUNT_API_KEY = 'BAKI-S2'; // Burayı projenizin adı (repo adı) ile değiştirin
+    const COUNT_API_NAMESPACE = 'https://bak1kara.github.io/bakikara/'; // Burayı kendi GitHub kullanıcı adınız.github.io ile değiştirin!
+    const COUNT_API_KEY = 'bakikara'; // Burayı projenizin adı (repo adı) ile değiştirin
 
     const fetchVisitorCount = () => {
         fetch(`https://api.countapi.xyz/hit/${COUNT_API_NAMESPACE}/${COUNT_API_KEY}`)
@@ -194,3 +194,4 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchDiscordStatus, 10000); 
     // Sayaç değeri her sayfa yüklendiğinde bir artar, yenilemeye gerek yok.
 });
+
