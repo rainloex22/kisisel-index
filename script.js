@@ -94,7 +94,8 @@ async function fetchDiscordData() {
 }
 
 function updateDiscordCard(user) {
-    let activityText = 'Şu an boşta...';
+    // İstenen değişiklik: Varsayılan aktivite metni
+    let activityText = 'Şu anda oynamıyor...'; 
     let statusColor = '#99aab5'; // Varsayılan: Gri (Çevrimdışı)
 
     // Durum rengini ayarla
@@ -113,19 +114,24 @@ function updateDiscordCard(user) {
     if (spotifyActivity) {
         activityText = `Spotify'da ${spotifyActivity.details}`;
     } else if (mainActivity) {
-        if (mainActivity.state && mainActivity.details) {
-            activityText = `${mainActivity.details} (${mainActivity.state})`;
-        } else if (mainActivity.details) {
-            activityText = mainActivity.details;
+        // İstenen değişiklik: Ne oynuyorsa onu yazsın (details, state veya name)
+        if (mainActivity.details) {
+            if (mainActivity.state) {
+                 activityText = `${mainActivity.details} (${mainActivity.state})`;
+            } else {
+                 activityText = mainActivity.details;
+            }
+        } else if (mainActivity.name) {
+            activityText = mainActivity.name;
         } else {
-            activityText = `Şu an ${mainActivity.name}`;
+             // Aktivite var ama detay yoksa, varsayılan metin kalır.
         }
     }
     
     // Discord CDN'den avatar çekme
     let avatarUrl = `https://cdn.discordapp.com/avatars/${user.discord_user.id}/${user.discord_user.avatar}.png?size=256`;
     
-    // Kartın HTML içeriğini oluştur (Yeni status-indicator-wrapper içerir)
+    // Kartın HTML içeriğini oluştur
     cardElement.innerHTML = `
         <div class="discord-header">
             <img src="${avatarUrl}" alt="${user.discord_user.username}" class="discord-avatar">
