@@ -1,12 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const mainTitleElement = document.getElementById('main-title-username');
     const discordCard = document.getElementById('discord-card');
     const backgroundMusic = document.getElementById('background-music');
     const musicToggle = document.getElementById('music-toggle');
     const volumeSlider = document.getElementById('volume-slider');
     const volumeIcon = document.getElementById('volume-icon');
     const visitorCountTextElement = document.getElementById('visitor-count-text'); 
-    
+
     // Müzik Kontrolleri
     let isPlaying = false;
 
@@ -28,19 +27,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // İlk tıklamada müziği başlat
             backgroundMusic.play().catch(error => {
-                console.log("Oynatma hatası: Tarayıcı kısıtlamaları nedeniyle kullanıcı etkileşimi gerekiyor.", error);
+                console.log("Oynatma hatası:", error);
             });
             isPlaying = true;
             musicToggle.classList.remove('paused');
             
-            // Eğer slider 0'da ise, varsayılan sesi (0.5) ayarla
+            // Eğer slider 0'da değilse, sesi aç (varsayılan: 0.5)
             if (volumeSlider.value == 0) {
                 backgroundMusic.volume = 0.5;
                 volumeSlider.value = 0.5;
             }
-            
             // Sesi açtıktan sonra ikonu kontrol et
-            volumeIcon.textContent = (backgroundMusic.volume > 0) ? '🔊' : '🔉'; // Ses açık ikonu
+            volumeIcon.textContent = (backgroundMusic.volume > 0) ? '🔊' : '🔇';
             musicToggle.setAttribute('aria-label', 'Sesi Kapat');
         }
     });
@@ -55,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             volumeIcon.textContent = '🔇'; // Sessiz
             musicToggle.classList.add('paused');
         } else {
-            volumeIcon.textContent = '🔉'; // Sesli
+            volumeIcon.textContent = '🔊'; // Sesli
             musicToggle.classList.remove('paused');
         }
 
@@ -70,8 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Discord API'den verileri çekme 
-    // LÜTFEN KENDİ DİSCORD ID'NİZİ BURAYA YAZIN
-    const DISCORD_ID = '1252284892457468026'; 
+    const DISCORD_ID = '1252284892457468026';
     const LANYARD_API_URL = `https://api.lanyard.rest/v1/users/${DISCORD_ID}`;
 
     const fetchDiscordStatus = () => {
@@ -83,16 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!user || user.listening_to_spotify === undefined) {
                     throw new Error("Discord verileri alınamadı.");
                 }
-                
-                // Discord kullanıcı adını al (global_name tercih edilir)
-                const discordUsername = user.discord_user.global_name || user.discord_user.username || 'KULLANICI';
 
-                // 1. Ana Başlığı Güncelle
-                if (mainTitleElement) {
-                    mainTitleElement.textContent = discordUsername.toUpperCase(); 
-                }
-
-                // 2. Durum Rengi
+                // 1. Durum Rengi
                 const status = user.discord_status || 'offline';
                 let statusColor;
                 switch (status) {
@@ -109,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         statusColor = '#747F8D'; // Gri (çevrimdışı/görünmez)
                 }
 
-                // 3. Aktivite
+                // 2. Aktivite
                 let activityText;
                 let activityDotColor = 'transparent'; 
                 let activityDotVisible = false;
@@ -118,15 +107,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const activity = user.activities[0];
                     activityDotVisible = true;
                     
-                    if (activity.type === 0) { // Oynuyor
+                    if (activity.type === 0) { 
                         activityText = `Oynuyor: <strong>${activity.name}</strong>`;
                         activityDotColor = '#1DB954'; 
-                    } else if (activity.type === 1) { // Yayın yapıyor
+                    } else if (activity.type === 1) { 
                         activityText = `Yayın yapıyor: <strong>${activity.name}</strong>`;
                         activityDotColor = '#9400D3'; 
-                    } else if (activity.type === 2 && user.spotify) { // Dinliyor (Spotify)
-                        activityText = `Dinliyor: <strong>${user.spotify.song}</strong> - ${user.spotify.artist}`;
-                        activityDotColor = '#1DB954'; 
+                    } else if (activity.type === 2) { 
+                        if (user.spotify) {
+                            activityText = `Dinliyor: <strong>${user.spotify.song}</strong> - ${user.spotify.artist}`;
+                            activityDotColor = '#1DB954'; 
+                        } else {
+                            activityText = 'Şu anda bir aktivite yok...';
+                            activityDotVisible = false;
+                        }
                     } else {
                         activityText = 'Şu anda bir aktivite yok...';
                         activityDotVisible = false;
@@ -137,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     activityDotVisible = false;
                 }
 
-                // 4. Kartı HTML ile güncelleme
+                // 3. Kartı HTML ile güncelleme
                 discordCard.innerHTML = `
                     <div class="discord-header">
                         <div style="position: relative;">
@@ -146,10 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         
                         <div>
-                            <!-- Dinamik İsim Kullanımı -->
-                            <span class="discord-username">${discordUsername}</span>
-                            <!-- Etiket (#) alanı boş bırakıldı -->
-                            <span class="discord-tag"></span>
+                            <span class="discord-username">${user.discord_user.username}</span>
+                            <span class="discord-tag">#${user.discord_user.discriminator === '0' ? '' : user.discord_user.discriminator}</span>
                         </div>
                     </div>
 
@@ -164,9 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error("Discord verileri çekilirken hata oluştu:", error);
-                if (mainTitleElement) {
-                     mainTitleElement.textContent = 'BAKİ S2'; 
-                }
                 discordCard.innerHTML = `<span style="color: #f04747;">Discord verileri yüklenemedi.</span>`;
                 discordCard.style.display = 'block';
                 discordCard.classList.remove('loading');
@@ -175,28 +164,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Sayaç için CountAPI.xyz entegrasyonu
-    // LÜTFEN KENDİ DOMAIN'İNİZİ BURAYA YAZIN
-    const COUNT_API_NAMESPACE = 'your_github_username.github.io'; 
-    const COUNT_API_KEY = 'BAKI-S2'; 
+    // ❗ BURAYI KENDİNİZE GÖRE DÜZENLEYİN ❗
+    const COUNT_API_NAMESPACE = 'https://bak1kara.github.io/bakikara/'; 
+    const COUNT_API_KEY = 'bakikara'; 
 
     const fetchVisitorCount = () => {
         fetch(`https://api.countapi.xyz/hit/${COUNT_API_NAMESPACE}/${COUNT_API_KEY}`)
             .then(response => response.json())
             .then(data => {
                 if (visitorCountTextElement) {
+                    // Sadece sayıyı yerleştiriyoruz (etiket/metin yok)
                     visitorCountTextElement.textContent = data.value;
                 }
             })
             .catch(error => {
                 console.error("Sayaç verileri çekilirken hata oluştu:", error);
                 if (visitorCountTextElement) {
-                    visitorCountTextElement.textContent = '0'; // Hata durumunda da 0 göster
+                    visitorCountTextElement.textContent = '...'; // Hata durumunda sadece üç nokta
                 }
             });
     };
 
+    // İlk yüklemede Discord ve Sayaç verilerini çek
     fetchDiscordStatus();
     fetchVisitorCount(); 
-    setInterval(fetchDiscordStatus, 10); // Discord verilerini 10 saniyede bir güncelle
-});
 
+    // Ardından her 10 saniyede bir Discord verilerini güncelle
+    setInterval(fetchDiscordStatus, 100); 
+});
