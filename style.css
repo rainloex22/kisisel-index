@@ -50,29 +50,46 @@ body {
     letter-spacing: 7px;
     margin-bottom: 40px;
     
-    /* Normalde KIRMIZI parlama */
+    /* Normal hali: Kırmızı parlama */
     text-shadow: 
         0 0 7px rgba(255, 0, 0, 0.7), 
         0 0 15px rgba(255, 0, 0, 0.5);
         
-    transition: text-shadow 0.4s ease-in-out;
+    transition: all 0.4s ease-in-out; /* Hem shadow hem de background için geçiş */
     animation: fadeInDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
     
-    position: static; 
-    display: inline-block; 
-    padding: 0;
-    overflow: visible; 
+    /* Gökkuşağı efekti için gerekli */
+    background: transparent; /* Varsayılan arka plan yok */
+    -webkit-background-clip: text; /* Metni kliple */
+    background-clip: text; /* Metni kliple */
+    -webkit-text-fill-color: transparent; /* Metin rengini şeffaf yap */
+    color: transparent; /* Fallback için */
+    
+    position: relative; /* Gökkuşağı animasyonunun başlangıç pozisyonu için */
+    overflow: hidden; /* Gökkuşağının metin dışına taşmaması için */
 }
 
-/* Fare gelince MAVİ/CYAN parlama */
+/* YENİLENDİ: Fare gelince rengarenk (gökkuşağı) parlama */
 .title:hover {
-    text-shadow: 
-        0 0 8px #00FFFF, 
-        0 0 15px #00FFFF,
-        0 0 25px #00FFFF,
-        0 0 60px #00A9A9; 
     cursor: default; 
+    /* Gökkuşağı gradyanı, daha canlı ve büyük */
+    background: linear-gradient(45deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);
+    background-size: 400% 400%; /* Büyük boyutta akıcı geçişler */
+    animation: gradientText 6s ease infinite; /* Sadece fare üstündeyken animasyon */
+    
+    /* Text-shadow'u hafifçe artırarak parlaklığı destekle */
+    text-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.8),
+        0 0 20px rgba(0, 0, 0, 0.5); /* Hafif gölge ekleyerek okunabilirliği artır */
 }
+
+/* YENİ KEYFRAMES: Sadece BAKI S2 yazısı için gökkuşağı animasyonu */
+@keyframes gradientText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 
 @keyframes fadeInDown {
     0% { opacity: 0; transform: translateY(-50px); }
@@ -112,13 +129,13 @@ body {
     right: -2px; 
     bottom: -2px; 
     background: linear-gradient(45deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);
-    /* Yılan hareketini daha belirgin yapmak için boyut 600% 600% */
-    background-size: 600% 600%; 
+    /* Yılan hareketini daha belirgin ve akıcı yapmak için boyut 800% 800% */
+    background-size: 800% 800%; 
     border-radius: 17px; 
     z-index: -1; 
-    /* Yavaş yılan hareketi */
-    animation: gradientBorder 12s ease infinite; 
-    filter: blur(0px); 
+    /* Yavaş ve sürekli yılan hareketi */
+    animation: gradientBorder 15s ease infinite; /* Süre 15 saniyeye çıkarıldı */
+    filter: blur(0px); /* Bulanıklık yok */
 }
 
 /* HOVER'DA KENARLIĞIN PARLAKLIĞI */
