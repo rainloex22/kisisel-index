@@ -99,22 +99,28 @@ async function fetchDiscordData() {
 
 function updateDiscordCard(user) {
     let activityText = 'Şu anda oynamıyor...'; 
-    let statusColor = '#99aab5'; 
+    let statusColor = '#99aab5'; // Varsayılan: Gri (Çevrimdışı)
+    let activityDotColor = '#99aab5'; // Varsayılan: Gri (Aktivite yok)
 
+    // Discord Durum Rengini Ayarla
     if (user.discord_status === 'online') {
-        statusColor = '#43b581'; 
+        statusColor = '#43b581'; // Yeşil
     } else if (user.discord_status === 'idle') {
-        statusColor = '#faa61a'; 
+        statusColor = '#faa61a'; // Sarı
     } else if (user.discord_status === 'dnd') {
-        statusColor = '#f04747'; 
+        statusColor = '#f04747'; // Kırmızı
     }
-
+    
+    // Aktivite Kontrolü: Spotify ve Diğer aktiviteler (Oyun/Stream)
     const spotifyActivity = user.activities.find(act => act.name === 'Spotify' && act.type === 2);
     const mainActivity = user.activities.find(act => act.type === 0 || act.type === 1); 
 
     if (spotifyActivity) {
         activityText = `Spotify'da ${spotifyActivity.details}`;
+        activityDotColor = '#1DB954'; // Spotify Yeşili
     } else if (mainActivity) {
+        // Oyun/Stream varsa
+        activityDotColor = '#43b581'; // Genel Aktivite Yeşili
         if (mainActivity.details) {
             if (mainActivity.state) {
                  activityText = `${mainActivity.details} (${mainActivity.state})`;
@@ -124,10 +130,21 @@ function updateDiscordCard(user) {
         } else if (mainActivity.name) {
             activityText = mainActivity.name;
         } 
+    } else {
+        // Aktif değilse (Boşta/Çevrimiçi ama bir şey yapmıyorsa)
+        activityDotColor = '#99aab5'; // Gri
+        // Kullanıcının online olduğu ama bir şey oynamadığı durumlarda metni biraz değiştiriyoruz.
+        if (user.discord_status === 'offline') {
+            activityText = 'Kullanıcı aktif değil (Çevrimdışı)';
+        } else {
+            activityText = 'Şu anda bir aktivite yok...';
+        }
     }
     
+    // Discord CDN'den avatar çekme
     let avatarUrl = `https://cdn.discordapp.com/avatars/${user.discord_user.id}/${user.discord_user.avatar}.png?size=256`;
     
+    // Kartın HTML içeriğini oluştur
     cardElement.innerHTML = `
         <div class="discord-header">
             <img src="${avatarUrl}" alt="${user.discord_user.username}" class="discord-avatar">
@@ -141,6 +158,7 @@ function updateDiscordCard(user) {
             Durum: <strong>${user.discord_status === 'online' ? 'Çevrimiçi' : user.discord_status === 'idle' ? 'Boşta' : user.discord_status === 'dnd' ? 'Rahatsız Etmeyin' : 'Çevrimdışı'}</strong>
         </div>
         <div class="discord-status">
+            <span class="activity-dot" style="background-color: ${activityDotColor};"></span>
             Aktivite: <strong>${activityText}</strong>
         </div>
     `;
@@ -159,7 +177,7 @@ function showOfflineState() {
             Durum: <strong>Çevrimdışı</strong>
         </div>
         <div class="discord-status">
-            Aktivite: <strong>Lütfen Discord ID'nizi ve Lanyard servisini kontrol edin.</strong>
+            Aktivite: <span class="activity-dot" style="background-color: #99aab5;"></span> <strong>Kullanıcı aktif değil (Çevrimdışı)</strong>
         </div>
     `;
     cardElement.style.display = 'block';
