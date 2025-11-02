@@ -11,6 +11,8 @@ body {
     cursor: default;
     animation: fadeInPage 1.5s ease-out forwards;
     opacity: 0; 
+    /* TEST AMAÇLI GÜNCELLEME İŞARETİ: Bu rengi sitede görürseniz, CSS güncellenmiştir. */
+    background-color: #0d0d0d; 
 }
 
 /* Sayfa Görünür Olma Animasyonu */
@@ -78,7 +80,7 @@ body {
 }
 
 
-/* 4. DİSCORD BİLGİ KARTI (ULTRA ŞEFFAF VE KUSURSUZ) */
+/* 4. DİSCORD BİLGİ KARTI (ULTRA ŞEFFAF VE KUSURSUZ YAZI ODAKLI) */
 .discord-info {
     /* ULTRA ŞEFFAFLIK: Neredeyse tamamen şeffaf */
     background: rgba(0, 0, 0, 0.2); 
@@ -134,7 +136,7 @@ body {
 }
 .discord-avatar {
     position: relative;
-    top: -5px; /* Kart sınırından hafif dışarı */
+    top: -5px; 
     width: 65px; 
     height: 65px;
     border-radius: 50%;
@@ -277,4 +279,43 @@ body {
     height: 30px;
     animation: spin 1s linear infinite;
     margin: 10px auto;
+}
+
+/* 8. MOBİL UYUMLULUK (RESPONSIVE DESIGN) */
+@media (max-width: 768px) {
+    
+    .title {
+        font-size: 3.5em; /* Mobil için başlık küçültüldü */
+        letter-spacing: 5px;
+    }
+    
+    .discord-info {
+        padding: 20px 25px; /* Mobil için padding azaltıldı */
+        min-width: 90vw; /* Ekranın %90'ını kapla */
+        max-width: 90vw;
+    }
+    
+    .discord-avatar {
+        width: 50px; /* Mobil için avatar küçültüldü */
+        height: 50px;
+        margin-right: 15px;
+    }
+    
+    .discord-username {
+        font-size: 1.5em; 
+    }
+    
+    .social-icon {
+        font-size: 2em; /* Mobil için ikon küçültüldü */
+        padding: 10px;
+    }
+
+    #music-controls-wrapper {
+        top: 20px;
+        left: 20px;
+    }
+    
+    #music-controls-wrapper:hover #volume-slider {
+        width: 80px; /* Mobil hover genişliği azaltıldı */
+    }
 }
