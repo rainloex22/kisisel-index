@@ -129,37 +129,16 @@ body {
     color: #b9bbbe;
 }
 
-/* Durum Noktaları - İkon Simülasyon Kapsayıcısı */
-.status-dot, .activity-dot {
+/* Durum Noktaları - SADECE RENKLİ YUVARLAK NOKTA */
+.status-dot {
     width: 18px; 
     height: 18px;
-    border-radius: 50%; 
+    border-radius: 50%; /* KESİNLİKLE YUVARLAK */
     border: 5px solid #1e2024; 
     box-shadow: 0 0 10px rgba(0, 0, 0, 1.0);
     position: relative;
-    display: flex; 
-    justify-content: center;
-    align-items: center;
     overflow: hidden; 
 }
-
-/* Durum ikonlarının içindeki Font Awesome ikonları için stil */
-.status-dot i, .activity-dot i {
-    color: #1e2024; /* İkonun rengini koyu yapıyoruz (Discord'daki gibi) */
-    font-size: 10px; 
-    line-height: 1;
-    text-shadow: none; 
-}
-
-/* Rahatsız Etme (DND - Tire) İkonu için özel ayar */
-.dnd-sim {
-    /* Tire ikonu için karemsi hale getirildi */
-    border-radius: 20%;
-}
-.dnd-sim i {
-    font-size: 14px !important; /* Tire ikonu için boyut artışı */
-}
-
 
 /* AKTİVİTE METNİ */
 .status-indicator-wrapper {
