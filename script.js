@@ -133,12 +133,10 @@ function updateDiscordCard(user) {
     } else {
         // Aktif değilse (Boşta/Çevrimiçi ama bir şey yapmıyorsa)
         activityDotColor = '#99aab5'; // Gri
-        // Kullanıcının online olduğu ama bir şey oynamadığı durumlarda metni biraz değiştiriyoruz.
-        if (user.discord_status === 'offline') {
-            activityText = 'Kullanıcı aktif değil (Çevrimdışı)';
-        } else {
-            activityText = 'Şu anda bir aktivite yok...';
-        }
+        
+        // **DÜZELTME BURADA**
+        // Kullanıcı online olsa bile aktif bir şey yapmıyorsa
+        activityText = 'Şu anda bir aktivite yok...';
     }
     
     // Discord CDN'den avatar çekme
@@ -168,6 +166,8 @@ function updateDiscordCard(user) {
 }
 
 function showOfflineState() {
+     // **DÜZELTME BURADA**
+     // showOfflineState fonksiyonunda da parantezli ifadeyi kaldırıyoruz.
      cardElement.innerHTML = `
         <div class="discord-header">
             <img src="avatar_placeholder.png" alt="Çevrimdışı" class="discord-avatar">
@@ -177,7 +177,7 @@ function showOfflineState() {
             Durum: <strong>Çevrimdışı</strong>
         </div>
         <div class="discord-status">
-            Aktivite: <span class="activity-dot" style="background-color: #99aab5;"></span> <strong>Kullanıcı aktif değil (Çevrimdışı)</strong>
+            Aktivite: <span class="activity-dot" style="background-color: #99aab5;"></span> <strong>Kullanıcı aktif değil</strong>
         </div>
     `;
     cardElement.style.display = 'block';
