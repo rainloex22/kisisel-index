@@ -77,7 +77,8 @@ body {
 .discord-info {
     width: 550px; 
     min-height: 200px;
-    background: rgba(47, 49, 54, 0.98); 
+    /* BURASI DEĞİŞTİ: Şeffaflık 0.98'den 0.8'e düşürüldü */
+    background: rgba(47, 49, 54, 0.8); 
     border-radius: 15px;
     padding: 30px; 
     margin: 0 auto 15px; 
@@ -129,11 +130,11 @@ body {
     color: #b9bbbe;
 }
 
-/* Durum Noktaları - SADECE RENKLİ YUVARLAK NOKTA */
+/* Durum Noktaları */
 .status-dot {
     width: 18px; 
     height: 18px;
-    border-radius: 50%; /* KESİNLİKLE YUVARLAK */
+    border-radius: 50%; 
     border: 5px solid #1e2024; 
     box-shadow: 0 0 10px rgba(0, 0, 0, 1.0);
     position: relative;
@@ -180,23 +181,17 @@ body {
 }
 
 .social-icon.discord {
-    animation: neon-pulse 2s infinite alternate; 
+    /* BURASI DEĞİŞTİ: Animasyon kaldırıldı. Sadece hover efekti kaldı. */
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
 .social-icon.discord:hover {
     color: #5865f2;
     filter: drop-shadow(0 0 30px #5865f2); 
-    animation-play-state: paused; 
+    /* Animasyon artık burada tanımlanmadığı için bu satır gereksiz ama bırakılabilir. */
 }
 
-@keyframes neon-pulse {
-    0% {
-        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 10px rgba(88, 101, 242, 0.3));
-    }
-    100% {
-        filter: drop-shadow(0 0 15px rgba(255, 255, 255, 1.0)) drop-shadow(0 0 25px rgba(88, 101, 242, 0.8));
-    }
-}
+/* @keyframes neon-pulse kaldırıldı */
 
 
 /* ========================= */
