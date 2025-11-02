@@ -76,7 +76,7 @@ body {
     background: rgba(47, 49, 54, 0.9); /* Discord Koyu Arkaplan rengi */
     border-radius: 10px;
     padding: 15px;
-    margin: 0 auto 30px; /* Alttan boşluğu azalttık */
+    margin: 0 auto 30px; 
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.1);
     
@@ -179,35 +179,44 @@ body {
     color: #5865f2;
 }
 
-/* 7. ZİYARETÇİ SAYACI STİLİ (Font Awesome Göz İkonu) */
+/* 7. ZİYARETÇİ SAYACI STİLİ (TAM ŞEFFAF VE İSTENİLEN GÖRÜNÜM) */
 .visitor-counter-display {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -15px; /* Discord kartına daha yakın */
-    margin-bottom: 20px; /* Sosyal ikonlardan ayırma */
+    margin-top: -15px; 
+    margin-bottom: 20px; 
     font-size: 0.95em;
     color: #b9bbbe;
-    background: rgba(47, 49, 54, 0.7); /* Discord kartı gibi hafif şeffaf arka plan */
+    
+    /* ARKA PLAN ŞEFFAF YAPILDI */
+    background: transparent; 
     border-radius: 8px;
     padding: 8px 15px;
     width: fit-content;
     margin-left: auto;
     margin-right: auto;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: none; /* Gölge kaldırıldı */
     transition: all 0.3s ease;
 }
 
 .visitor-counter-display:hover {
-    background: rgba(47, 49, 54, 0.9); /* Hover'da biraz daha koyu */
-    transform: translateY(-2px); /* Hafifçe yukarı kaydırma */
+    background: transparent; /* Hover'da bile şeffaf kalsın */
+    transform: none; /* Hover efekti kaldırıldı */
 }
 
 .visitor-icon {
-    font-size: 1.1em; /* Göz ikonunu boyutu */
+    font-size: 1.1em; 
     margin-right: 8px;
     vertical-align: middle;
-    color: #fff; /* İkon rengini beyaz yap */
+    /* İKON RENGİ ŞEFFAF YAPILDI */
+    color: rgba(255, 255, 255, 0.0); /* Tamamen şeffaf beyaz */
+    transition: color 0.3s; 
+}
+
+/* Göz ikonunun üzerine gelince rengi beyaz olsun */
+.visitor-counter-display:hover .visitor-icon {
+    color: #fff; /* Hover'da beyaz */
 }
 
 #visitor-count-text {
