@@ -190,5 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchVisitorCount(); 
 
     // Ardından her 10 saniyede bir Discord verilerini güncelle
-    setInterval(fetchDiscordStatus, 10000); 
+    setInterval(fetchDiscordStatus, 1000); 
 });
+
