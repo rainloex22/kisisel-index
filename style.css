@@ -49,46 +49,33 @@ body {
     font-weight: 800;
     letter-spacing: 7px;
     margin-bottom: 40px;
-    /* Başlangıçta hafif beyaz gölge */
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); 
+    
+    /* YENİLENDİ: Normalde KIRMIZI parlama */
+    text-shadow: 
+        0 0 7px rgba(255, 0, 0, 0.7), 
+        0 0 15px rgba(255, 0, 0, 0.5);
+        
     transition: text-shadow 0.4s ease-in-out;
     animation: fadeInDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
-    position: relative; 
+    
+    /* Çerçeve kaldığı için bu stiller temizlendi */
+    position: static; 
     display: inline-block; 
-    padding: 0 10px; /* Kenarlık için boşluk */
-    overflow: hidden; 
+    padding: 0;
+    overflow: visible; 
 }
 
-/* BAŞLIK ANİMASYONU BAŞLANGIÇ */
+/* YENİLENDİ: Fare gelince MAVİ/CYAN parlama */
 .title:hover {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8); /* Daha belirgin beyaz gölge */
+    text-shadow: 
+        0 0 8px #00FFFF, 
+        0 0 15px #00FFFF,
+        0 0 25px #00FFFF,
+        0 0 60px #00A9A9; 
     cursor: default; 
 }
 
-/* BAŞLIK İÇİN ANİMASYONLU KENARLIK (Gizli) */
-.title::before {
-    content: '';
-    position: absolute;
-    top: -5px; 
-    left: -5px; 
-    right: -5px; 
-    bottom: -5px; 
-    background: linear-gradient(45deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);
-    background-size: 400% 400%; 
-    border-radius: 15px; 
-    z-index: -1; 
-    filter: blur(0px); 
-    opacity: 0; /* Normalde görünmez */
-    transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
-}
-
-/* BAŞLIK ÜZERİNE FARE GELİNCE KENARLIĞI GÖRÜNÜR VE PARLAK YAP */
-.title:hover::before {
-    animation: gradientBorder 8s ease infinite; 
-    filter: blur(8px); 
-    opacity: 1; 
-}
-/* BAŞLIK ANİMASYONU BİTİŞ */
+/* BAŞLIK ÇERÇEVE KODLARI BURADAN KALDIRILDI (.title::before, .title:hover::before) */
 
 
 @keyframes fadeInDown {
@@ -103,7 +90,7 @@ body {
 .discord-info {
     width: 550px; 
     min-height: 200px;
-    /* Hafif şeffaf arka plan */
+    /* Hafif şeffaf arka plan korunuyor */
     background: rgba(47, 49, 54, 0.8); 
     border-radius: 15px;
     padding: 30px; 
@@ -129,11 +116,13 @@ body {
     right: -2px; 
     bottom: -2px; 
     background: linear-gradient(45deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3);
-    background-size: 400% 400%; 
+    /* Yılan gibi dolaşması için boyut 600% 600% yapıldı */
+    background-size: 600% 600%; 
     border-radius: 17px; 
     z-index: -1; 
-    animation: gradientBorder 8s ease infinite; /* Sürekli dönen animasyon */
-    filter: blur(0px); /* Bulanıklık yok */
+    /* Yavaş yılan hareketi için süre 12 saniyeye çıkarıldı */
+    animation: gradientBorder 12s ease infinite; 
+    filter: blur(0px); 
 }
 
 /* HOVER'DA KENARLIĞIN PARLAKLIĞI */
@@ -141,7 +130,12 @@ body {
     filter: blur(8px); 
 }
 
-/* GENEL KENARLIK ANİMASYONU */
+.discord-info:hover {
+    transform: scale(1.02); 
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 1.0);
+}
+
+/* YENİLENDİ: KENARLIK ANİMASYONU (Yavaş ve Dolaşan) */
 @keyframes gradientBorder {
     0% {
         background-position: 0% 50%;
@@ -154,12 +148,9 @@ body {
     }
 }
 
-.discord-info:hover {
-    transform: scale(1.02); 
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 1.0);
-}
 
 .discord-header {
+/* ... (Diğer Discord stilleri aynı kalır) ... */
     display: flex;
     align-items: center;
     margin-bottom: 30px; 
@@ -192,7 +183,7 @@ body {
     color: #b9bbbe;
 }
 
-/* Durum Noktaları (Sadece yuvarlak ve renkli nokta) */
+/* Durum Noktaları */
 .status-dot {
     width: 18px; 
     height: 18px;
@@ -243,7 +234,6 @@ body {
 }
 
 .social-icon.discord {
-    /* Parlama animasyonu kaldırıldı, hafif gölge kaldı */
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
