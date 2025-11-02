@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Discord API'den verileri çekme 
-    const DISCORD_ID = '1252284892457468026';
+    const DISCORD_ID = '1252284892457468026'; // Discord ID'niz
     const LANYARD_API_URL = `https://api.lanyard.rest/v1/users/${DISCORD_ID}`;
 
     const fetchDiscordStatus = () => {
@@ -190,6 +190,3 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchVisitorCount(); 
     setInterval(fetchDiscordStatus, 10000); 
 });
-```eof
-
-Bu kod, CSS dosyanızdaki (sizin ilk gönderdiğiniz) göz ikonunun şeffaf/hover efektli ayarıyla düzgün çalışmaya devam edecektir.
