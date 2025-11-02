@@ -9,13 +9,13 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
     
-    <link rel="stylesheet" href="style.css?v=111"> 
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
     
     <div id="music-controls-wrapper">
-        <button id="music-toggle" class="music-button paused" aria-label="Sesi Aç/Kapat">
-            <span id="volume-icon">🔇</span>
+        <button id="music-toggle" class="music-button" aria-label="Sesi Aç/Kapat">
+            <span id="volume-icon">🔊</span>
         </button>
         <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0" aria-label="Ses seviyesi">
     </div>
@@ -30,21 +30,19 @@
         
         <h1 class="title">BAKİ S2</h1>
         
-        <div id="discord-card" class="discord-info loading" style="display: none;">
-            <div class="loader"></div> 
-        </div>
-
+        <div id="discord-card" class="discord-info">
+             </div>
         
         <div id="visitor-counter-display" class="visitor-counter-display" title="Profil görüntülenmesi">
              <i class="fas fa-eye visitor-icon"></i> 
-             <span id="visitor-count-text">?</span> 
+             <span id="visitor-count-text">Yükleniyor...</span> 
         </div>
         
         <div class="social-links">
-            <a href="https://discord.com/users/1252284892457468026" target="_blank" class="social-icon discord" aria-label="Discord">
+            <a href="https://discord.com/users/1252284892457468026" target="_blank" class="social-icon discord" aria-label="Discord Profili">
                 <i class="fab fa-discord"></i>
             </a>
-        </div>
+            </div>
 
     </div>
     
@@ -52,7 +50,7 @@
         <source src="your_music.mp3" type="audio/mpeg">
     </audio>
 
-    <script src="script.js?v=111"></script> 
+    <script src="script.js"></script> 
 
 </body>
 </html>
