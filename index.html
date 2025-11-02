@@ -3,28 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baki S2 - Site</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>BAKİ S2 | Kişisel Indexi</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
+    
+    <link rel="stylesheet" href="style.css?v=111"> 
 </head>
 <body>
-
-    <div class="background-color"></div>
-
-    <div class="content">
-        <h1 class="title">BAKİ S2</h1>
-        
-        <div class="visitor-counter-display">
-            <span class="visitor-icon"><i class="fas fa-eye"></i></span>
-            <span id="visitor-count-text">0</span>
-        </div>
-
-        <div class="social-links">
-            <a href="https://discord.gg/yourinvite" target="_blank" class="social-icon discord" aria-label="Discord"><i class="fab fa-discord"></i></a>
-            </div>
+    
+    <div id="music-controls-wrapper">
+        <button id="music-toggle" class="music-button paused" aria-label="Sesi Aç/Kapat">
+            <span id="volume-icon">🔇</span>
+        </button>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0" aria-label="Ses seviyesi">
     </div>
 
-    <script src="script.js"></script>
+    <div class="video-background">
+        <video id="bg-video" autoplay muted loop playsinline poster="poster.jpg">
+            <source src="your_video.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="content">
+        
+        <h1 class="title">BAKİ S2</h1>
+        
+        <div id="discord-card" class="discord-info loading" style="display: none;">
+            <div class="loader"></div> 
+        </div>
+
+        
+        <div id="visitor-counter-display" class="visitor-counter-display" title="Profil görüntülenmesi">
+             <i class="fas fa-eye visitor-icon"></i> 
+             <span id="visitor-count-text">?</span> 
+        </div>
+        
+        <div class="social-links">
+            <a href="https://discord.com/users/1252284892457468026" target="_blank" class="social-icon discord" aria-label="Discord">
+                <i class="fab fa-discord"></i>
+            </a>
+        </div>
+
+    </div>
+    
+    <audio id="background-music" loop>
+        <source src="your_music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="script.js?v=111"></script> 
+
 </body>
 </html>
