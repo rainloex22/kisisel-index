@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ====================================
     // DISCORD LANYARD API ENTEGRASYONU
     // ====================================
-    // Kendi Discord ID'nizle değiştirin
     const DISCORD_ID = '1252284892457468026'; 
     const LANYARD_API_URL = `https://api.lanyard.rest/v1/users/${DISCORD_ID}`;
 
@@ -90,56 +89,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error("Discord verileri alınamadı.");
                 }
 
-                // 1. Durum Rengi, CSS Sınıfı ve İkon HTML'i
+                // 1. Durum Rengi (Sadece nokta rengi için kullanılır)
                 const status = user.discord_status || 'offline';
                 let statusColor;
-                let statusClass = ''; 
-                let statusIconHtml = ''; 
                 
                 switch (status) {
                     case 'online': 
-                        statusColor = '#43B581'; 
-                        // İkon yok (Düz nokta)
+                        statusColor = '#43B581'; // Yeşil 
                         break; 
                     case 'idle': 
                         statusColor = '#FAA61A';   // Turuncu (Ay)
-                        statusClass = 'idle-sim'; 
-                        statusIconHtml = '<i class="fas fa-moon"></i>'; // Font Awesome Ay
                         break;
                     case 'dnd': 
                         statusColor = '#F04747';    // Kırmızı (Rahatsız Etme)
-                        statusClass = 'dnd-sim'; 
-                        statusIconHtml = '<i class="fas fa-minus"></i>'; // Font Awesome Çizgi
                         break;
                     case 'invisible':
                     case 'offline':
                     default: 
                         statusColor = '#747F8D'; // Gri 
-                        // İkon yok (Düz nokta)
                         break;
                 }
 
-                // 2. Aktivite
+                // 2. Aktivite Metni
                 let activityText = 'Şu anda bir aktivite yok...';
-                let activityDotColor = statusColor;
-                let activityDotVisible = false;
-                let activityDotClass = statusClass; 
-                let activityIconHtml = statusIconHtml; 
                 
                 // Spotify'ı kontrol et 
                 if (user.listening_to_spotify) {
                     activityText = `Dinliyor: <strong>${user.spotify.song}</strong> - ${user.spotify.artist}`;
-                    activityDotColor = '#1DB954'; // Spotify Yeşil (Durum rengini ezer)
-                    activityDotVisible = true;
-                    activityDotClass = ''; 
-                    activityIconHtml = ''; 
                 } 
                 // Diğer aktiviteler
                 else if (user.activities && user.activities.length > 0) {
                     const activity = user.activities.find(act => act.type === 0 || act.type === 1 || act.type === 4); 
                     
                     if (activity) {
-                        activityDotVisible = true;
                         if (activity.type === 0) {
                             activityText = `Oynuyor: <strong>${activity.name}</strong>`;
                         } else if (activity.type === 1) {
@@ -150,26 +132,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 
-                // Eğer özel aktivite yoksa ama online/idle/dnd ise, sadece durumu göster
-                if (!activityDotVisible && status !== 'offline' && status !== 'invisible') {
-                    activityDotVisible = true;
-                } else if (status === 'invisible' || status === 'offline') {
-                    activityDotVisible = false;
-                }
-                
                 
                 const avatarUrl = `https://cdn.discordapp.com/avatars/${DISCORD_ID}/${user.discord_user.avatar}.png?size=1024`;
                 const tag = user.discord_user.discriminator === '0' ? '' : `#${user.discord_user.discriminator}`;
                 const displayName = user.discord_user.global_name || user.discord_user.username;
 
 
-                // 3. KARTIN YENİ HTML YAPISI İLE GÜNCELLEMESİ
+                // 3. KARTIN HTML YAPISI İLE GÜNCELLEMESİ (Aktivite dotu kaldırıldı)
                 discordCard.innerHTML = `
                     <div class="discord-header">
                         <div style="position: relative;">
                             <img src="${avatarUrl}" alt="Avatar" class="discord-avatar">
-                            <span class="status-dot ${statusClass}" style="background-color: ${statusColor}; position: absolute; bottom: 0; right: 0;">
-                                ${statusIconHtml}
+                            <span class="status-dot" style="background-color: ${statusColor}; position: absolute; bottom: 0; right: 0;">
                             </span>
                         </div>
                         
@@ -180,11 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
 
                     <div class="status-indicator-wrapper">
-                        ${activityDotVisible ? `
-                            <span class="activity-dot ${activityDotClass}" style="background-color: ${activityDotColor};">
-                                ${activityIconHtml}
-                            </span>
-                        ` : ''}
                         <span class="discord-status">${activityText}</span>
                     </div>
                 `;
