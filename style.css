@@ -8,7 +8,8 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden; /* Taşmayı önler */
+    overflow: hidden;
+    background-color: #000; 
 }
 
 /* 1. VİDEO ARKA PLAN */
@@ -31,10 +32,10 @@ body {
 .content {
     z-index: 1;
     text-align: center;
-    background-color: rgba(0, 0, 0, 0.0); /* Ultra Şeffaf arkaplan */
+    background-color: rgba(0, 0, 0, 0.0);
     padding: 20px;
     border-radius: 15px;
-    backdrop-filter: blur(0px); /* Arka plan bulanıklığı yok */
+    backdrop-filter: blur(0px); 
     -webkit-backdrop-filter: blur(0px);
 }
 
@@ -50,7 +51,7 @@ body {
         0 0 5px rgba(255, 0, 0, 0.5),   
         0 0 10px rgba(255, 0, 0, 0.3);
     
-    transition: text-shadow 0.4s ease-in-out; /* Yumuşak geçiş için */
+    transition: text-shadow 0.4s ease-in-out; 
     
     animation: fadeInDown 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
 }
@@ -61,7 +62,7 @@ body {
         0 0 5px #00FFFF,   
         0 0 10px #00FFFF,
         0 0 15px #00FFFF,
-        0 0 40px #00A9A9; /* Mavi/Cyan parlaklık burada aktive olur */
+        0 0 40px #00A9A9;
     cursor: default; 
 }
 
@@ -73,7 +74,7 @@ body {
 /* 4. DİSCORD KARTI STİLİ */
 .discord-info {
     width: 300px;
-    background: rgba(47, 49, 54, 0.9); /* Discord Koyu Arkaplan rengi */
+    background: rgba(47, 49, 54, 0.9); 
     border-radius: 10px;
     padding: 15px;
     margin: 0 auto 30px; 
@@ -86,8 +87,8 @@ body {
 
 /* Kartın Üzerine Gelince Büyütme Efekti */
 .discord-info:hover {
-    transform: scale(1.05); /* %5 oranında yakınlaştırma */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6); /* Gölgeyi de belirginleştiriyoruz */
+    transform: scale(1.05); 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6); 
 }
 
 /* Discord Header ve Avatar */
@@ -99,11 +100,11 @@ body {
 .discord-avatar {
     width: 50px;
     height: 50px;
-    /* AVATAR ŞEKLİ KARE/HAFİF YUVARLAK YAPILDI */
-    border-radius: 10px; 
+    /* AVATAR ŞEKLİ YUVARLAK */
+    border-radius: 50%; 
     margin-right: 15px;
     position: relative;
-    border: 3px solid #1e2024; /* Kartın arkaplanı ile uyumlu kalın border */
+    border: 3px solid #1e2024; 
 }
 
 /* Kullanıcı İsimleri */
@@ -114,8 +115,9 @@ body {
     display: block;
 }
 .discord-tag {
-    /* Etiket (#) alanı boş bırakıldığı için gizlendi */
-    display: none;
+    font-size: 0.85em;
+    color: #b9bbbe;
+    display: block; 
 }
 
 /* Durum Noktası (Çevrimiçi, Boşta vb.) */
@@ -132,7 +134,7 @@ body {
     height: 12px;
     border-radius: 50%;
     margin-right: 10px;
-    border: 3px solid #1e2024; /* Avatar border'ı ile uyumlu */
+    border: 3px solid #1e2024; 
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
@@ -165,7 +167,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 25px;
-    margin-top: 20px; /* Sayacın altına biraz boşluk */
+    margin-top: 20px; 
 }
 .social-icon {
     font-size: 30px;
@@ -179,7 +181,7 @@ body {
     color: #5865f2;
 }
 
-/* 7. ZİYARETÇİ SAYACI STİLİ (ARKA PLANSIZ VE HER ZAMAN GÖRÜNÜR İKON) */
+/* 7. ZİYARETÇİ SAYACI STİLİ (Şeffaf/Hover efekti) */
 .visitor-counter-display {
     display: flex;
     align-items: center;
@@ -187,22 +189,35 @@ body {
     margin-top: -15px; 
     margin-bottom: 20px; 
     font-size: 0.95em;
-    color: #fff;
+    color: #b9bbbe;
     
-    /* ARKA PLAN VE GÖLGE KALDIRILDI */
+    /* ARKA PLAN ŞEFFAF */
     background: transparent; 
-    padding: 0; /* Boşluk kaldırıldı */
+    border-radius: 8px;
+    padding: 8px 15px;
     width: fit-content;
     margin-left: auto;
     margin-right: auto;
     box-shadow: none; 
+    transition: all 0.3s ease;
+}
+
+.visitor-counter-display:hover {
+    background: transparent; 
+    transform: none; 
 }
 
 .visitor-icon {
     font-size: 1.1em; 
     margin-right: 8px;
     vertical-align: middle;
-    /* İKON HER ZAMAN BEYAZ VE GÖRÜNÜR */
+    /* İKON RENGİ ŞEFFAF (Normalde görünmez) */
+    color: rgba(255, 255, 255, 0.0); 
+    transition: color 0.3s; 
+}
+
+/* Göz ikonunun üzerine gelince rengi beyaz olsun */
+.visitor-counter-display:hover .visitor-icon {
     color: #fff; 
 }
 
@@ -284,4 +299,23 @@ body {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Mobil Cihazlar İçin Ayarlar (Başlık küçültülür) */
+@media (max-width: 600px) {
+    .title {
+        font-size: 3.5em; 
+        letter-spacing: 5px;
+        margin-bottom: 20px;
+    }
+    .discord-info {
+        width: 90%; 
+    }
+    #music-controls-wrapper {
+        top: 10px;
+        left: 10px;
+    }
+    #volume-slider {
+        width: 70px;
+    }
 }
