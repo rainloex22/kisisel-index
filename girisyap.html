@@ -108,6 +108,20 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
+        // --- DOM Elementlerini Başlat (FIXED: showMessage'dan önce olmalı) ---
+        const messageBox = document.getElementById('messageBox');
+        
+        // --- Mesaj Gösterme Fonksiyonu ---
+        function showMessage(message, type = 'success') {
+            if (!messageBox) return; // Element yoksa hata vermemek için ek güvenlik
+            messageBox.textContent = message;
+            messageBox.className = type === 'success' ? 'message-success' : 'message-error';
+            messageBox.classList.add('message-show');
+            setTimeout(() => {
+                messageBox.classList.remove('message-show');
+            }, 3000);
+        }
+
         // Firebase Uygulamasını Başlat
         let app;
         let auth;
@@ -119,19 +133,10 @@
             setPersistence(auth, browserLocalPersistence); 
         } catch (error) {
             console.error("Firebase başlatma hatası:", error);
-            showMessage("Hata: Firebase servisleri başlatılamadı.", "error");
+            // showMessage artık burada güvenle çağrılabilir
+            showMessage("Hata: Firebase servisleri başlatılamadı.", "error"); 
         }
 
-        // --- Mesaj Gösterme Fonksiyonu ---
-        const messageBox = document.getElementById('messageBox');
-        function showMessage(message, type = 'success') {
-            messageBox.textContent = message;
-            messageBox.className = type === 'success' ? 'message-success' : 'message-error';
-            messageBox.classList.add('message-show');
-            setTimeout(() => {
-                messageBox.classList.remove('message-show');
-            }, 3000);
-        }
 
         // --- Oturum Açma Kontrolü (Gerekirse Anonim Giriş) ---
         onAuthStateChanged(auth, (user) => {
