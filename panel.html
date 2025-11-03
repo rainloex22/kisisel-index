@@ -75,6 +75,27 @@
             padding: 20px;
             color: #ccc;
         }
+        /* DİNAMİK NAV STİLLERİ */
+        .profile-avatar-nav {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: var(--purple);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .card-dropdown { 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(5px); 
+            border-radius: 0.5rem; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+            border: 1px solid rgba(108, 92, 231, 0.1);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -90,17 +111,53 @@
             
             <!-- Navigasyon Linkleri -->
             <nav class="hidden md:flex space-x-6 text-lg">
-                <!-- KULLANICI PANELİ EKLENDİ -->
-                <a href="kullanicipaneli.html" class="text-gray-300 hover:text-purple transition duration-200">Kullanıcı Paneli</a>
+                <!-- PANEL LINKI GUNCELlendi -->
+                <a href="panel.html" class="text-gray-300 hover:text-purple transition duration-200">Kullanıcı Paneli</a>
                 <a href="yardim.html" class="text-gray-300 hover:text-purple transition duration-200">Yardım Merkezi</a>
                 <a href="discord.html" class="text-gray-300 hover:text-purple transition duration-200">Discord</a>
                 <a href="fiyatlandirma.html" class="text-gray-300 hover:text-purple transition duration-200">Fiyatlandırma</a>
             </nav>
             
-            <!-- CTA Butonları -->
-            <div class="flex space-x-3">
-                <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-gray-300 hover:text-white transition duration-200 rounded-lg">Giriş Yap</a>
-                <a href="kaydol.html" class="main-cta-button px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
+            <!-- DİNAMİK CTA / KULLANICI BİLGİSİ ALANI -->
+            <div class="flex space-x-3 items-center">
+                <!-- 1. Oturum Kapalı Durumu (Varsayılan olarak gösterilir, JS ile gizlenir) -->
+                <div id="loggedOutNav" class="flex space-x-3 items-center">
+                    <span class="text-red-400 font-medium hidden sm:inline-block">Giriş Yapılmamış</span>
+                    <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-gray-300 hover:text-white transition duration-200 rounded-lg">Giriş Yap</a>
+                    <a href="kaydol.html" class="main-cta-button px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
+                </div>
+
+                <!-- 2. Oturum Açık Durumu (Varsayılan olarak gizlenir, JS ile gösterilir) -->
+                <div id="loggedInNav" class="relative hidden">
+                    <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
+                        <!-- Profil Baş Harfleri -->
+                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span>
+                        
+                        <div class="hidden sm:flex flex-col items-start">
+                            <!-- Kullanıcı Adı -->
+                            <span class="text-sm font-semibold" id="nav_profile_display_name">...</span>
+                            <!-- Kullanıcı Durumu (Premium/Standart) -->
+                            <span class="text-xs font-medium" id="nav_profile_status"></span>
+                        </div>
+                        <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                    </button>
+                    
+                    <!-- Dropdown Menü -->
+                    <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-48 card-dropdown bg-gray-800 rounded-lg shadow-xl py-1 z-30 hidden">
+                        <!-- Önizleme Alanı -->
+                        <div class="px-4 py-2 text-sm text-gray-400 border-b border-gray-700">
+                            <p class="font-bold text-white truncate" id="dropdown_email_preview">email@yok.com</p>
+                            <p class="text-xs font-medium" id="dropdown_status_preview">Standart</p>
+                        </div>
+                        <a href="panel.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition duration-150">
+                            <i class="fas fa-chart-line mr-2 w-4"></i> Kontrol Paneli
+                        </a>
+                        <div class="border-t border-gray-700 my-1"></div>
+                        <button id="logoutBtnNav" class="w-full text-left block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition duration-150">
+                            <i class="fas fa-sign-out-alt mr-2 w-4"></i> Çıkış Yap
+                        </button>
+                    </div>
+                </div>
             </div>
             
         </div>
@@ -154,5 +211,141 @@
     <footer class="bg-gray-900 text-gray-500 text-center p-4">
         © 2025 BAKİ S2 Yönetim Hizmetleri. Tüm hakları saklıdır.
     </footer>
+
+    <!-- Firebase Kodu ve Dinamik Navigasyon Kontrolü -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // --- Ortamdan Gelen Değişkenler ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- DOM Elementleri ---
+        const loggedOutNav = document.getElementById('loggedOutNav');
+        const loggedInNav = document.getElementById('loggedInNav');
+        const profileMenuButton = document.getElementById('profileMenuButton');
+        const profileDropdownMenu = document.getElementById('profileDropdownMenu');
+
+        // --- Firebase Başlatma ---
+        let auth;
+        try {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            // Başlangıçta custom token varsa oturum açmayı dene
+            if (initialAuthToken) {
+                signInWithCustomToken(auth, initialAuthToken).catch(e => {
+                    console.error("Custom Token ile giriş hatası:", e);
+                    // Hata durumunda anonim olarak devam et
+                    signInAnonymously(auth);
+                });
+            } else {
+                 // Custom token yoksa anonim olarak giriş yap (geliştirme ortamı için)
+                signInAnonymously(auth);
+            }
+
+        } catch (e) {
+            console.error("Firebase başlatma hatası:", e);
+        }
+
+        // --- Kullanıcı Profil Bilgilerini Türetme ve Gösterme ---
+        function renderUserProfile(user) {
+            const email = user.email;
+            let displayName = 'Kullanıcı';
+            let initials = 'K';
+            let userStatus = 'Standart Üye'; 
+            let statusColor = 'text-yellow-400';
+
+            if (email) {
+                const emailLocalPart = email.split('@')[0];
+                const nameParts = emailLocalPart.split(/[\._-]/); 
+                
+                if (nameParts.length > 1 && nameParts[0] && nameParts[1]) {
+                    initials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+                    displayName = nameParts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+                } else {
+                    initials = emailLocalPart.charAt(0).toUpperCase();
+                    displayName = emailLocalPart.charAt(0).toUpperCase() + emailLocalPart.slice(1);
+                }
+
+                // Fictional Status Logic: E-posta "premium" içeriyorsa Premium yap
+                if (email.toLowerCase().includes('premium')) {
+                    userStatus = 'Premium Üye';
+                    statusColor = 'text-green-400';
+                }
+            } else if (user.isAnonymous) {
+                 displayName = 'Anonim';
+                 initials = 'A';
+                 userStatus = 'Misafir Oturumu';
+                 statusColor = 'text-gray-500';
+            }
+            
+            // --- Navbar Güncelleme ---
+            document.getElementById('nav_profile_initials').textContent = initials;
+            document.getElementById('nav_profile_display_name').textContent = displayName.split(' ')[0]; // Navbar'da sadece ilk kelimeyi göster
+            
+            const navStatusElement = document.getElementById('nav_profile_status');
+            navStatusElement.textContent = userStatus;
+            navStatusElement.className = `text-xs font-medium ${statusColor}`; 
+            
+            // --- Dropdown Güncelleme ---
+            document.getElementById('dropdown_email_preview').textContent = email || 'Misafir Oturumu';
+            const dropdownStatusElement = document.getElementById('dropdown_status_preview');
+            dropdownStatusElement.textContent = userStatus;
+            dropdownStatusElement.className = `text-xs font-medium ${statusColor}`; 
+        }
+
+        // --- Oturum Durumu Kontrolü ---
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // Kullanıcı giriş yapmışsa (anonim veya değil)
+                    renderUserProfile(user);
+                    loggedOutNav.classList.add('hidden');
+                    loggedInNav.classList.remove('hidden');
+                } else {
+                    // Kesinlikle oturum açılmamışsa
+                    loggedOutNav.classList.remove('hidden');
+                    loggedInNav.classList.add('hidden');
+                }
+            });
+        }
+
+
+        // --- Çıkış Yapma İşlemi ---
+        const handleLogout = async () => {
+            if (auth) {
+                try {
+                    profileDropdownMenu.classList.add('hidden');
+                    await signOut(auth);
+                } catch (error) {
+                    console.error("Çıkış yapma hatası:", error);
+                }
+            }
+        };
+
+        // --- Dropdown Toggle İşlemi ---
+        if (profileMenuButton) {
+            profileMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                profileDropdownMenu.classList.toggle('hidden');
+            });
+        }
+
+
+        // Dropdown menü dışına tıklanınca gizle
+        document.addEventListener('click', (e) => {
+            if (profileDropdownMenu && profileMenuButton && !profileMenuButton.contains(e.target) && !profileDropdownMenu.contains(e.target)) {
+                profileDropdownMenu.classList.add('hidden');
+            }
+        });
+
+        // Çıkış düğmesine event listener ekle
+        if (document.getElementById('logoutBtnNav')) {
+            document.getElementById('logoutBtnNav').addEventListener('click', handleLogout);
+        }
+
+    </script>
 </body>
 </html>
