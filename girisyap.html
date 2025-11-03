@@ -63,20 +63,21 @@
     <!-- İçerik Alanı -->
     <main class="flex-grow flex flex-col items-center justify-center py-12 px-4">
         <div class="form-card p-8 md:p-10 w-full max-w-md">
-            <h1 class="text-3xl font-extrabold mb-6 text-white text-center">Hesabınıza Giriş Yapın</h1>
+            <h1 class="text-3xl font-extrabold mb-6 text-white text-center">Giriş Yapın</h1>
             
             <form id="loginForm" class="space-y-4">
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-400 text-left mb-1">E-posta</label>
-                    <input type="email" id="email" required class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple focus:ring focus:ring-purple focus:ring-opacity-50 text-white" placeholder="ornek@mail.com">
+                    <label for="login_email" class="block text-sm font-medium text-gray-400 text-left mb-1">E-posta</label>
+                    <input type="email" id="login_email" required class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple focus:ring focus:ring-purple focus:ring-opacity-50 text-white" placeholder="ornek@mail.com">
                 </div>
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-400 text-left mb-1">Şifre</label>
-                    <input type="password" id="password" required class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple focus:ring focus:ring-purple focus:ring-opacity-50 text-white" placeholder="Şifreniz">
+                    <label for="login_password" class="block text-sm font-medium text-gray-400 text-left mb-1">Şifre</label>
+                    <input type="password" id="login_password" required class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple focus:ring focus:ring-purple focus:ring-opacity-50 text-white" placeholder="Şifreniz">
                 </div>
                 
-                <div class="flex justify-between items-center text-sm">
-                    <a href="#" class="text-purple hover:underline">Şifremi Unuttum</a>
+                <!-- Şifremi Unuttum Bağlantısı Eklendi -->
+                <div class="text-right">
+                    <a href="sifremiunuttum.html" class="text-sm text-purple hover:underline font-medium">Şifremi Unuttum?</a>
                 </div>
 
                 <button type="submit" id="loginButton" class="w-full btn-login py-3 rounded-lg font-bold text-white text-lg mt-4">
@@ -86,7 +87,7 @@
             
             <p class="text-center text-sm text-gray-400 mt-4">
                 Hesabınız yok mu? 
-                <a href="kaydol.html" class="text-purple hover:underline font-semibold">Hemen Kaydolun</a>
+                <a href="kaydol.html" class="text-purple hover:underline font-semibold">Kaydolun</a>
             </p>
         </div>
     </main>
@@ -109,11 +110,14 @@
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // --- DOM Elementlerini Başlat ---
-        const messageBox = document.getElementById('messageBox');
+        let messageBox = document.getElementById('messageBox');
         
         // --- Mesaj Gösterme Fonksiyonu ---
         function showMessage(message, type = 'success') {
-            if (!messageBox) return; 
+            if (!messageBox) {
+                messageBox = document.getElementById('messageBox');
+                if (!messageBox) return; 
+            }
             messageBox.textContent = message;
             messageBox.className = type === 'success' ? 'message-success' : 'message-error';
             messageBox.classList.add('message-show');
@@ -124,33 +128,30 @@
 
         // Firebase Uygulamasını Başlat
         let app;
-        let auth = null; // Başlangıçta null olarak ayarla
+        let auth = null; 
 
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
-            // Oturumun tarayıcıda kalıcı olmasını sağla
             setPersistence(auth, browserLocalPersistence); 
         } catch (error) {
-            console.error("Firebase başlatma hatası:", error);
-            showMessage("Hata: Firebase servisleri başlatılamadı. Uygulama çalışmayabilir.", "error"); 
-            // Hata durumunda auth null kalır
+            console.error("Firebase başlatma hatası (API Anahtarı / Yapılandırma):", error);
+            showMessage("KRİTİK HATA: Firebase sunucuları başlatılamadı. API anahtarınızı kontrol edin.", "error"); 
         }
 
         // --- AUTH Kontrolleri ve İşlemler (Sadece auth tanımlıysa çalışır) ---
         if (auth) {
             
-            // Oturum Açma Kontrolü (Gerekirse Anonim Giriş)
+            // Oturum Açma Kontrolü (Canvas Gereksinimi)
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     console.log("Kullanıcı durumu kontrol edildi. UID:", user.uid);
                 } else if (!initialAuthToken) {
-                    // Özel token yoksa anonim olarak oturum aç (canvas gereksinimi)
                     signInAnonymously(auth).catch(e => console.error("Anonim giriş hatası:", e));
                 }
             });
 
-            // Custom Token ile Giriş (Canvas Ortamında Zorunlu)
+            // Custom Token ile Giriş
             if (initialAuthToken) {
                 signInWithCustomToken(auth, initialAuthToken).catch(e => {
                     console.error("Custom token ile giriş hatası:", e);
@@ -158,19 +159,18 @@
                 });
             }
 
-
             // --- Giriş İşlemi ---
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
+                const email = document.getElementById('login_email').value;
+                const password = document.getElementById('login_password').value;
 
                 const button = document.getElementById('loginButton');
                 button.disabled = true;
                 button.textContent = 'Giriş Yapılıyor...';
 
                 try {
-                    // Firebase Auth ile oturum aç
+                    // Firebase Auth ile giriş yap
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     
                     // Başarılı olursa kullanıcıyı ana sayfaya yönlendir
@@ -188,18 +188,20 @@
                     // Firebase hata kodlarına göre mesajları özelleştirme
                     switch (error.code) {
                         case 'auth/invalid-email':
+                            errorMessage = "Geçersiz e-posta adresi formatı.";
+                            break;
                         case 'auth/user-not-found':
                         case 'auth/wrong-password':
-                            errorMessage = "E-posta veya şifre yanlış.";
+                            errorMessage = "Hatalı e-posta veya şifre.";
                             break;
-                        case 'auth/too-many-requests':
-                            errorMessage = "Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.";
-                            break;
+                        case 'auth/operation-not-allowed':
+                             errorMessage = "Bu kimlik doğrulama yöntemi (E-posta/Şifre) Firebase projesinde etkin değil. Lütfen Firebase konsolundan etkinleştirin.";
+                             break;
                         default:
                             errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.";
                     }
                     
-                    showMessage("Hata: " + errorMessage, "error");
+                    showMessage("Giriş hatası: " + errorMessage, "error");
 
                 } finally {
                     button.disabled = false;
@@ -210,7 +212,7 @@
         } else {
             // auth nesnesi yoksa, formu ve butonu devre dışı bırak.
              document.getElementById('loginButton').disabled = true;
-             document.getElementById('loginButton').textContent = 'Servis Kullanılamıyor';
+             document.getElementById('loginButton').textContent = 'Servis Kullanılamıyor (Firebase Hatası)';
              console.error("Kimlik doğrulama işlemleri atlandı, çünkü Firebase Auth başlatılamadı.");
         }
 
