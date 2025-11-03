@@ -102,18 +102,18 @@
     <!-- Firebase Kodu -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
         // Globallerden Firebase yapılandırmasını alma
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // --- DOM Elementlerini Başlat (FIXED: showMessage'dan önce olmalı) ---
+        // --- DOM Elementlerini Başlat ---
         const messageBox = document.getElementById('messageBox');
         
         // --- Mesaj Gösterme Fonksiyonu ---
         function showMessage(message, type = 'success') {
-            if (!messageBox) return; // Element yoksa hata vermemek için ek güvenlik
+            if (!messageBox) return; 
             messageBox.textContent = message;
             messageBox.className = type === 'success' ? 'message-success' : 'message-error';
             messageBox.classList.add('message-show');
@@ -124,7 +124,7 @@
 
         // Firebase Uygulamasını Başlat
         let app;
-        let auth;
+        let auth = null; // Başlangıçta null olarak ayarla
 
         try {
             app = initializeApp(firebaseConfig);
@@ -133,77 +133,86 @@
             setPersistence(auth, browserLocalPersistence); 
         } catch (error) {
             console.error("Firebase başlatma hatası:", error);
-            // showMessage artık burada güvenle çağrılabilir
-            showMessage("Hata: Firebase servisleri başlatılamadı.", "error"); 
+            showMessage("Hata: Firebase servisleri başlatılamadı. Uygulama çalışmayabilir.", "error"); 
+            // Hata durumunda auth null kalır
         }
 
-
-        // --- Oturum Açma Kontrolü (Gerekirse Anonim Giriş) ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("Kullanıcı durumu kontrol edildi. UID:", user.uid);
-            } else if (!initialAuthToken) {
-                // Özel token yoksa anonim olarak oturum aç (canvas gereksinimi)
-                signInAnonymously(auth).catch(e => console.error("Anonim giriş hatası:", e));
-            }
-        });
-
-        // Custom Token ile Giriş (Canvas Ortamında Zorunlu)
-        if (initialAuthToken) {
-            signInWithCustomToken(auth, initialAuthToken).catch(e => {
-                console.error("Custom token ile giriş hatası:", e);
-                showMessage("Hata: Oturum tokeni ile giriş yapılamadı.", "error");
-            });
-        }
-
-
-        // --- Giriş İşlemi ---
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            const button = document.getElementById('loginButton');
-            button.disabled = true;
-            button.textContent = 'Giriş Yapılıyor...';
-
-            try {
-                // Firebase Auth ile oturum aç
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                
-                // Başarılı olursa kullanıcıyı ana sayfaya yönlendir
-                showMessage("Başarılı! Giriş yapıldı. Yönlendiriliyorsunuz...", "success");
-                
-                // Başarılı giriş sonrası 2 saniye bekleyip yönlendir
-                setTimeout(() => {
-                    window.location.href = 'panel.html'; 
-                }, 2000);
-
-            } catch (error) {
-                console.error("Giriş hatası:", error);
-                let errorMessage = "Giriş işlemi sırasında bir hata oluştu.";
-
-                // Firebase hata kodlarına göre mesajları özelleştirme
-                switch (error.code) {
-                    case 'auth/invalid-email':
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                        errorMessage = "E-posta veya şifre yanlış.";
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = "Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.";
-                        break;
-                    default:
-                        errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.";
+        // --- AUTH Kontrolleri ve İşlemler (Sadece auth tanımlıysa çalışır) ---
+        if (auth) {
+            
+            // Oturum Açma Kontrolü (Gerekirse Anonim Giriş)
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log("Kullanıcı durumu kontrol edildi. UID:", user.uid);
+                } else if (!initialAuthToken) {
+                    // Özel token yoksa anonim olarak oturum aç (canvas gereksinimi)
+                    signInAnonymously(auth).catch(e => console.error("Anonim giriş hatası:", e));
                 }
-                
-                showMessage("Hata: " + errorMessage, "error");
+            });
 
-            } finally {
-                button.disabled = false;
-                button.textContent = 'Giriş Yap';
+            // Custom Token ile Giriş (Canvas Ortamında Zorunlu)
+            if (initialAuthToken) {
+                signInWithCustomToken(auth, initialAuthToken).catch(e => {
+                    console.error("Custom token ile giriş hatası:", e);
+                    showMessage("Hata: Oturum tokeni ile giriş yapılamadı.", "error");
+                });
             }
-        });
+
+
+            // --- Giriş İşlemi ---
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                const button = document.getElementById('loginButton');
+                button.disabled = true;
+                button.textContent = 'Giriş Yapılıyor...';
+
+                try {
+                    // Firebase Auth ile oturum aç
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    
+                    // Başarılı olursa kullanıcıyı ana sayfaya yönlendir
+                    showMessage("Başarılı! Giriş yapıldı. Yönlendiriliyorsunuz...", "success");
+                    
+                    // Başarılı giriş sonrası 2 saniye bekleyip yönlendir
+                    setTimeout(() => {
+                        window.location.href = 'panel.html'; 
+                    }, 2000);
+
+                } catch (error) {
+                    console.error("Giriş hatası:", error);
+                    let errorMessage = "Giriş işlemi sırasında bir hata oluştu.";
+
+                    // Firebase hata kodlarına göre mesajları özelleştirme
+                    switch (error.code) {
+                        case 'auth/invalid-email':
+                        case 'auth/user-not-found':
+                        case 'auth/wrong-password':
+                            errorMessage = "E-posta veya şifre yanlış.";
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage = "Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.";
+                            break;
+                        default:
+                            errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.";
+                    }
+                    
+                    showMessage("Hata: " + errorMessage, "error");
+
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Giriş Yap';
+                }
+            });
+            
+        } else {
+            // auth nesnesi yoksa, formu ve butonu devre dışı bırak.
+             document.getElementById('loginButton').disabled = true;
+             document.getElementById('loginButton').textContent = 'Servis Kullanılamıyor';
+             console.error("Kimlik doğrulama işlemleri atlandı, çünkü Firebase Auth başlatılamadı.");
+        }
 
     </script>
 </body>
