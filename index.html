@@ -12,20 +12,19 @@
     <link rel="stylesheet" href="style.css"> 
     
     <style>
-        /* YÖNETİCİ BUTONU KALDIRILDI. STİL BLOĞU SADELEŞTİRİLDİ */
+        /* CSS stili bloğu temiz ve sade kaldı */
     </style>
 </head>
 <body>
     
     <!-- SAĞ ÜST KÖŞE BUTON KAPSAYICISI -->
     <div id="top-right-links">
-        <!-- 1. Sırada: Video İndirici butonu (Sağdan birinci, yani Panel'in solunda) -->
+        <!-- 1. Sırada: Video İndirici butonu -->
         <a href="video-indir.html" class="video-download-link" aria-label="Video İndirme Sayfasına Git">
             <i class="fas fa-download"></i> Video İndirici
         </a>
-        <!-- 2. Sırada: Panel Butonu (Erişim Kontrolü artık Firestore ile yapılıyor) -->
-        <!-- "onclick" kaldırıldı, JavaScript event listener ile bağlanacak -->
-        <a href="javascript:void(0)" id="panel-button" class="video-download-link panel-link" aria-label="Yönetim Paneline Git">
+        <!-- 2. Sırada: Panel Butonu - ARTIK DOĞRUDAN PANEL.HTML'E YÖNLENDİRİYOR -->
+        <a href="panel.html" class="video-download-link panel-link" aria-label="Yönetim Paneline Git">
             <i class="fas fa-tools"></i> Panel
         </a>
     </div>
@@ -47,8 +46,6 @@
     <div class="content">
         
         <h1 class="title">BAKİ S2</h1>
-        
-        <!-- YÖNETİCİ YAP BUTONU KALDIRILDI -->
         
         <div id="discord-card" class="discord-info">
              <!-- Discord Kart içeriği script.js tarafından doldurulur -->
@@ -77,164 +74,5 @@
     
     <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script> 
     
-    <!-- YÖNETİCİ ERİŞİM KONTROLÜ İÇİN FIREBASE ENTEGRASYONU -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setLogLevel, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
-
-        // Global Canvas değişkenlerini kullanma
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        
-        // DÜZELTME: Config'in boş veya eksik gelme riskine karşı daha güçlü yedekleme yapıldı.
-        const firebaseConfig = JSON.parse(
-            typeof __firebase_config !== 'undefined' && __firebase_config.length > 2 
-            ? __firebase_config 
-            : '{"projectId": "placeholder-baki-s2", "apiKey": "placeholder-api-key"}' 
-        );
-
-        let db;
-        let auth;
-        let userId = null;
-        let isAuthReady = false;
-
-        // Hata ayıklama için (isteğe bağlı)
-        setLogLevel('Debug');
-
-        // Firebase Başlatma
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-
-
-        // Kimlik doğrulama dinleyicisi
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-            } else {
-                // Kullanıcı yoksa anonim olarak oturum açmayı dene
-                try {
-                    const anonUserCredential = await signInAnonymously(auth);
-                    userId = anonUserCredential.user.uid;
-                } catch (error) {
-                    console.error("Anonim giriş başarısız:", error);
-                    userId = crypto.randomUUID(); // Yedek: Anonim giriş de olmazsa rastgele ID kullan
-                }
-            }
-            isAuthReady = true;
-            console.log("Firebase Auth Hazır. Kullanıcı ID:", userId);
-            
-            // YENİ: Yönetici atama işlemi otomatik olarak yapılır (Sadece sizin için)
-            const adminDocRef = doc(db, `artifacts/${appId}/public/data/admins`, userId);
-            
-            // setDoc, belge yoksa oluşturur, varsa günceller. Bu, kullanıcının her zaman yönetici olmasını sağlar.
-            try {
-                await setDoc(adminDocRef, { 
-                    role: 'admin',
-                    addedBy: 'initial-setup-code', 
-                    createdAt: new Date().toISOString() 
-                });
-                console.log("Kullanıcı otomatik olarak yönetici olarak ayarlandı.");
-            } catch (error) {
-                console.error("Otomatik yönetici ataması başarısız oldu:", error);
-            }
-        });
-
-        // Custom Token ile oturum açma (Canvas ortamı için zorunlu)
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            signInWithCustomToken(auth, __initial_auth_token)
-                .catch(error => {
-                    console.error("Custom token ile giriş başarısız, anonim giriş denenecek:", error);
-                });
-        }
-        
-        /**
-         * Panel butonuna tıklandığında Firestore üzerinden yönetici erişimini kontrol eder.
-         */
-        async function checkPanelAccess() {
-            if (!isAuthReady || !db || !userId) {
-                // Auth hazır değilse kullanıcıyı beklet
-                showAccessMessage("Lütfen bekleyin, kimlik doğrulanıyor...", false);
-                return;
-            }
-            
-            // YÖNETİCİ KONTROL YOLU: /artifacts/{appId}/public/data/admins/{userId}
-            const adminDocRef = doc(db, `artifacts/${appId}/public/data/admins`, userId);
-
-            try {
-                showAccessMessage("Yönetici yetkisi kontrol ediliyor...", true); // Artık otomatik yönetici olduğunuz için başarılı mesajı gösterilebilir
-
-                // Firestore'dan yönetici belgesini oku
-                const adminDoc = await getDoc(adminDocRef);
-
-                if (adminDoc.exists()) {
-                    // Yönetici doğrulandı
-                    showAccessMessage("Erişim Onaylandı! Panele yönlendiriliyor...", true);
-                    setTimeout(() => {
-                        window.location.href = 'panel.html';
-                    }, 100); // Yönlendirme süresi 100ms'ye düşürüldü
-                } else {
-                    // Yönetici değil (Bu durumda sadece otomatik atama başarısız olursa görünür)
-                    showAccessMessage("Erişim Reddedildi. Buraya sadece yöneticiler girebilir.", false);
-                }
-            } catch (error) {
-                console.error("Firestore Yönetici Kontrol Hatası:", error);
-                showAccessMessage("Bir veritabanı hatası oluştu. Konsolu kontrol edin.", false);
-            }
-        }
-
-        // Panel Butonunu JavaScript ile bağlama
-        document.addEventListener('DOMContentLoaded', () => {
-            const panelButton = document.getElementById('panel-button');
-            if (panelButton) {
-                panelButton.addEventListener('click', checkPanelAccess);
-            }
-        });
-
-    </script>
-    
-    <!-- YÖNETİCİ ERİŞİM KONTROLÜ (Mesaj Kutusu Fonksiyonu) -->
-    <script>
-        // Simülasyon mesaj kutusu için basit bir fonksiyon
-        function showAccessMessage(message, isSuccess) {
-            let toast = document.getElementById('panel-access-toast');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'panel-access-toast';
-                // Konum: SAĞ ALT KÖŞE
-                toast.style.cssText = `
-                    position: fixed; 
-                    bottom: 20px; 
-                    right: 20px; 
-                    transform: none; 
-                    background-color: ${isSuccess ? 'rgba(67, 181, 129, 0.9)' : 'rgba(255, 0, 0, 0.9)'}; 
-                    color: white; 
-                    padding: 15px 25px; 
-                    border-radius: 10px; 
-                    z-index: 9999; 
-                    box-shadow: 0 0 15px ${isSuccess ? 'rgba(67, 181, 129, 0.7)' : 'rgba(255, 0, 0, 0.7)'};
-                    font-family: 'Poppins', sans-serif; 
-                    font-size: 1.1em; 
-                    font-weight: 600;
-                    text-align: center; 
-                    opacity: 0; 
-                    transition: opacity 0.5s ease;
-                `;
-                document.body.appendChild(toast);
-            }
-            
-            // Eğer başarı mesajı gelirse arka planı yeşil yap
-            toast.style.backgroundColor = isSuccess ? 'rgba(67, 181, 129, 0.9)' : 'rgba(255, 0, 0, 0.9)';
-            toast.style.boxShadow = `0 0 15px ${isSuccess ? 'rgba(67, 181, 129, 0.7)' : 'rgba(255, 0, 0, 0.7)'}`;
-            
-            toast.textContent = message;
-            toast.style.opacity = 1;
-            
-            setTimeout(() => {
-                toast.style.opacity = 0;
-            }, 4000); 
-        }
-    </script>
-
 </body>
 </html>
