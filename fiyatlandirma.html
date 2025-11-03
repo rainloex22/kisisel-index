@@ -23,10 +23,19 @@
             background-color: #5c4cd9;
             transform: translateY(-1px);
         }
+        /* Modal Arka Planı */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            transition: opacity 0.3s ease;
+        }
+        /* Modal İçeriği */
+        .modal-content {
+            background-color: #1a0e21;
+            border: 1px solid var(--purple);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Navbar -->
     <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
         <div class="w-full max-w-6xl flex justify-between items-center">
             <a href="index.html" class="text-3xl font-extrabold text-white flex items-center">
@@ -44,17 +53,14 @@
         </div>
     </header>
 
-    <!-- İçerik Alanı -->
     <main class="flex-grow flex flex-col items-center py-20 px-4">
         <h1 class="text-4xl md:text-5xl font-extrabold mb-12 text-white text-center">Size Uygun Bir Plan Bulun</h1>
         
         <div class="grid md:grid-cols-3 gap-8 w-full max-w-6xl">
             
-            <!-- Temel Plan (Güncellendi) -->
             <div class="price-card p-8 flex flex-col items-center text-center">
                 <h2 class="text-3xl font-bold mb-4 text-white">Temel</h2>
                 <p class="text-gray-400 mb-6">Başlangıç için mükemmel.</p>
-                <!-- Fiyat formatı Premium ile uyumlu hale getirildi -->
                 <p class="text-5xl font-extrabold mb-8 text-purple">
                     ₺84.99
                     <span class="text-xl text-gray-400 font-normal">/ay</span>
@@ -64,11 +70,9 @@
                     <li class="flex items-center"><i class="fas fa-check mr-3 text-green-400"></i> Sınırsız Link</li>
                     <li class="flex items-center"><i class="fas fa-times mr-3 text-red-400"></i> Özel Alan Adı</li>
                 </ul>
-                <!-- Buton rengi mor olarak değiştirildi -->
-                <a href="kaydol.html" class="btn-purple w-full py-3 rounded-lg font-semibold transition">Hemen Başlayın</a>
+                <button onclick="openPurchaseModal('Temel', '₺84.99')" class="btn-purple w-full py-3 rounded-lg font-semibold transition">Hemen Başlayın</button>
             </div>
 
-            <!-- Premium Plan -->
             <div class="price-card price-card-premium p-8 flex flex-col items-center text-center relative">
                 <span class="absolute top-0 right-0 bg-purple text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">POPÜLER</span>
                 <h2 class="text-3xl font-bold mb-4 text-white">Premium</h2>
@@ -82,10 +86,9 @@
                     <li class="flex items-center"><i class="fas fa-check mr-3 text-green-400"></i> Özel Alan Adı Desteği</li>
                     <li class="flex items-center"><i class="fas fa-check mr-3 text-green-400"></i> Gelişmiş İstatistikler</li>
                 </ul>
-                <a href="kaydol.html" class="bg-purple w-full py-3 rounded-lg font-semibold hover:bg-white hover:text-purple transition">Şimdi Yükseltin</a>
+                <button onclick="openPurchaseModal('Premium', '₺119.99')" class="bg-purple w-full py-3 rounded-lg font-semibold hover:bg-white hover:text-purple transition">Şimdi Yükseltin</button>
             </div>
 
-            <!-- Kurumsal Plan -->
             <div class="price-card p-8 flex flex-col items-center text-center">
                 <h2 class="text-3xl font-bold mb-4 text-white">Kurumsal</h2>
                 <p class="text-gray-400 mb-6">Büyük ekipler ve markalar için.</p>
@@ -95,7 +98,7 @@
                     <li class="flex items-center"><i class="fas fa-check mr-3 text-green-400"></i> Öncelikli Destek</li>
                     <li class="flex items-center"><i class="fas fa-check mr-3 text-green-400"></i> Özel Entegrasyonlar</li>
                 </ul>
-                <a href="yardim.html" class="bg-gray-700 w-full py-3 rounded-lg font-semibold hover:bg-gray-600 transition">İletişime Geçin</a>
+                <button onclick="openPurchaseModal('Kurumsal', 'Özel Fiyat')" class="bg-gray-700 w-full py-3 rounded-lg font-semibold hover:bg-gray-600 transition">İletişime Geçin</button>
             </div>
 
         </div>
@@ -104,9 +107,91 @@
             <i class="fas fa-arrow-left mr-2"></i> Ana Sayfaya Dön
         </a>
     </main>
-    <!-- Footer -->
+    
     <footer class="bg-gray-900 text-gray-500 text-center p-4">
         © 2025 BAKİ S2 Yönetim Hizmetleri.
     </footer>
+
+    <div id="purchaseModal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="modal-content bg-gray-900 rounded-xl shadow-2xl w-full max-w-md p-6 relative">
+            
+            <button onclick="closePurchaseModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white transition">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <h3 class="text-3xl font-bold mb-4 text-purple">Satın Alma İşlemi</h3>
+            <p class="text-gray-300 mb-6">Seçtiğiniz planın detayları aşağıdadır. Ödeme aşamasına geçmek için lütfen giriş yapın veya kaydolun.</p>
+
+            <div class="bg-gray-800 p-4 rounded-lg mb-8">
+                <p class="text-lg font-semibold text-white">Seçilen Plan:</p>
+                <p id="modalPlanName" class="text-2xl font-extrabold text-purple mb-2">...</p>
+                <p class="text-lg font-semibold text-white">Fiyat:</p>
+                <p id="modalPlanPrice" class="text-3xl font-bold text-white">...</p>
+            </div>
+            
+            <div class="space-y-3">
+                <a id="modalLoginBtn" href="girisyap.html" class="btn-purple w-full text-center py-3 rounded-lg font-semibold block transition">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Giriş Yap & Satın Al
+                </a>
+                <a id="modalRegisterBtn" href="kaydol.html" class="secondary-cta-button border border-purple text-purple hover:bg-purple hover:text-white w-full text-center py-3 rounded-lg font-semibold block transition">
+                    <i class="fas fa-user-plus mr-2"></i> Yeni Hesap Oluştur
+                </a>
+            </div>
+
+            <p class="text-xs text-gray-500 mt-4 text-center">Kurumsal plan için doğrudan iletişim sayfamıza yönlendirileceksiniz.</p>
+
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('purchaseModal');
+        const modalPlanName = document.getElementById('modalPlanName');
+        const modalPlanPrice = document.getElementById('modalPlanPrice');
+        const modalLoginBtn = document.getElementById('modalLoginBtn');
+        const modalRegisterBtn = document.getElementById('modalRegisterBtn');
+
+        function openPurchaseModal(planName, planPrice) {
+            
+            // Modal içeriğini güncelle
+            modalPlanName.textContent = planName;
+            modalPlanPrice.textContent = planPrice;
+            
+            // Kurumsal plan için özel yönlendirme
+            if (planName === 'Kurumsal') {
+                modalLoginBtn.href = 'yardim.html'; // İletişim sayfasını kullan
+                modalLoginBtn.innerHTML = '<i class="fas fa-envelope mr-2"></i> Kurumsal Teklif Alın';
+                modalRegisterBtn.style.display = 'none'; // Kayıt butonunu gizle
+            } else {
+                // Diğer planlar için varsayılan linkler
+                modalLoginBtn.href = `girisyap.html?plan=${planName.toLowerCase()}`;
+                modalLoginBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Giriş Yap & Satın Al';
+                modalRegisterBtn.href = `kaydol.html?plan=${planName.toLowerCase()}`;
+                modalRegisterBtn.style.display = 'block';
+            }
+
+            // Modal'ı göster
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+            }, 10);
+            document.body.style.overflow = 'hidden'; // Kaydırmayı engelle
+        }
+
+        function closePurchaseModal() {
+            // Modal'ı gizle
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+            document.body.style.overflow = ''; // Kaydırmayı aç
+        }
+        
+        // Modal dışına tıklayınca kapatma
+        modal.addEventListener('click', (e) => {
+            if (e.target.id === 'purchaseModal') {
+                closePurchaseModal();
+            }
+        });
+    </script>
 </body>
 </html>
