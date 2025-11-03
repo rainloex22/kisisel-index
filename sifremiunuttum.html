@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifre Sıfırlama | BAKİ S2</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --purple: #6c5ce7; }
+        body { font-family: 'Poppins', sans-serif; background-color: #1a0e21; color: #ffffff; }
+        .header-bg { background-color: rgba(26, 14, 33, 0.9); backdrop-filter: blur(5px); }
+        .form-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); border-radius: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .btn-reset {
+            background-color: var(--purple);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-reset:hover {
+            background-color: #5c4cd9;
+            transform: translateY(-1px);
+        }
+        /* Özel Mesaj Kutusu Stili */
+        #messageBox {
+            visibility: hidden;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            padding: 15px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .message-success { background-color: #10b981; }
+        .message-error { background-color: #ef4444; }
+        .message-show { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
+        <div class="w-full max-w-6xl flex justify-between items-center">
+            <a href="panel.html" class="text-3xl font-extrabold text-white flex items-center">
+                <i class="fas fa-terminal mr-2 text-purple"></i> BAKİ S2
+            </a>
+            <nav class="hidden md:flex space-x-6 text-lg">
+                <a href="yardim.html" class="text-gray-300 hover:text-purple transition duration-200">Yardım Merkezi</a>
+                <a href="discord.html" class="text-gray-300 hover:text-purple transition duration-200">Discord</a>
+                <a href="fiyatlandirma.html" class="text-gray-300 hover:text-purple transition duration-200">Fiyatlandırma</a>
+            </nav>
+            <div class="flex space-x-3">
+                <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-purple transition duration-200 rounded-lg">Giriş Yap</a>
+                <a href="kaydol.html" class="bg-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- İçerik Alanı -->
+    <main class="flex-grow flex flex-col items-center justify-center py-12 px-4">
+        <div class="form-card p-8 md:p-10 w-full max-w-md">
+            <h1 class="text-3xl font-extrabold mb-4 text-white text-center">Şifremi Sıfırla</h1>
+            <p class="text-center text-gray-400 mb-6">Hesabınızla ilişkili e-posta adresini girin. Size şifrenizi sıfırlamanız için bir bağlantı göndereceğiz.</p>
+            
+            <form id="resetForm" class="space-y-4">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-400 text-left mb-1">E-posta</label>
+                    <input type="email" id="email" required class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple focus:ring focus:ring-purple focus:ring-opacity-50 text-white" placeholder="ornek@mail.com">
+                </div>
+
+                <button type="submit" id="resetButton" class="w-full btn-reset py-3 rounded-lg font-bold text-white text-lg mt-4">
+                    Şifre Sıfırlama Bağlantısı Gönder
+                </button>
+            </form>
+            
+            <p class="text-center text-sm text-gray-400 mt-4">
+                <a href="girisyap.html" class="text-purple hover:underline font-semibold">Giriş Sayfasına Geri Dön</a>
+            </p>
+        </div>
+    </main>
+    
+    <!-- Mesaj Kutusu -->
+    <div id="messageBox"></div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-500 text-center p-4">
+        © 2025 BAKİ S2 Yönetim Hizmetleri.
+    </footer>
+
+    <!-- Firebase Kodu -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // Globallerden Firebase yapılandırmasını alma
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- DOM Elementlerini Başlat ---
+        let messageBox = document.getElementById('messageBox');
+        
+        // --- Mesaj Gösterme Fonksiyonu ---
+        function showMessage(message, type = 'success') {
+            if (!messageBox) {
+                messageBox = document.getElementById('messageBox');
+                if (!messageBox) return; 
+            }
+
+            messageBox.textContent = message;
+            messageBox.className = type === 'success' ? 'message-success' : 'message-error';
+            messageBox.classList.add('message-show');
+            setTimeout(() => {
+                messageBox.classList.remove('message-show');
+            }, 5000); // 5 saniye göster
+        }
+
+        // Firebase Uygulamasını Başlat
+        let app;
+        let auth = null; 
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            // Anonim/Token ile Giriş burada gereksiz, kullanıcı sadece e-posta gönderecek.
+        } catch (error) {
+            console.error("Firebase başlatma hatası (API Anahtarı / Yapılandırma):", error);
+            showMessage("KRİTİK HATA: Firebase sunucuları başlatılamadı. API anahtarınızı kontrol edin.", "error"); 
+        }
+
+        // --- Şifre Sıfırlama İşlemi ---
+        if (auth) {
+            document.getElementById('resetForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+
+                const button = document.getElementById('resetButton');
+                button.disabled = true;
+                button.textContent = 'Gönderiliyor...';
+
+                try {
+                    // Firebase Auth ile şifre sıfırlama e-postası gönder
+                    await sendPasswordResetEmail(auth, email);
+                    
+                    // Başarılı olursa kullanıcıya bilgilendirme yap
+                    showMessage(`Başarılı! Şifre sıfırlama bağlantısı ${email} adresine gönderildi. Lütfen gelen kutunuzu kontrol edin.`, "success");
+                    
+                } catch (error) {
+                    console.error("Şifre sıfırlama hatası:", error);
+                    let errorMessage = "Şifre sıfırlama işlemi sırasında bir hata oluştu.";
+
+                    switch (error.code) {
+                        case 'auth/invalid-email':
+                            errorMessage = "Geçersiz e-posta adresi formatı.";
+                            break;
+                        case 'auth/user-not-found':
+                            // Güvenlik için kullanıcıya e-postanın gönderildiği mesajını göstermek daha iyidir
+                            // Ancak bu örnekte Firebase'in döndürdüğü gerçek hatayı yakalıyoruz.
+                            errorMessage = "Böyle bir kullanıcı bulunamadı.";
+                            break;
+                        default:
+                            errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.";
+                    }
+                    
+                    showMessage("Hata: " + errorMessage, "error");
+
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Şifre Sıfırlama Bağlantısı Gönder';
+                }
+            });
+            
+        } else {
+            // auth nesnesi yoksa, formu ve butonu devre dışı bırak.
+             document.getElementById('resetButton').disabled = true;
+             document.getElementById('resetButton').textContent = 'Servis Kullanılamıyor (Firebase Hatası)';
+             console.error("Şifre sıfırlama işlemleri atlandı, çünkü Firebase Auth başlatılamadı.");
+        }
+
+    </script>
+</body>
+</html>
