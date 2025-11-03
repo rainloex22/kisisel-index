@@ -24,15 +24,16 @@
         }
         .neon-text-red {
             color: var(--red-neon);
-            text-shadow: 0 0 5px var(--red-neon), 0 0 10px rgba(255, 0, 0, 0.5);
+            /* PARLAKLIK DÜŞÜRÜLDÜ */
+            text-shadow: 0 0 3px var(--red-neon), 0 0 6px rgba(255, 0, 0, 0.3);
         }
         .neon-border-red {
             border: 2px solid var(--red-neon);
-            box-shadow: 0 0 8px var(--red-neon), inset 0 0 8px var(--red-neon);
+            box-shadow: 0 0 5px var(--red-neon), inset 0 0 5px var(--red-neon);
             transition: all 0.3s ease;
         }
         .neon-border-red:hover {
-            box-shadow: 0 0 15px #fff, 0 0 20px var(--red-neon);
+            box-shadow: 0 0 10px #fff, 0 0 15px var(--red-neon);
             border-color: #fff;
             transform: translateY(-2px);
         }
@@ -116,7 +117,7 @@
             </button>
             
             <p id="disclaimer" class="text-sm text-gray-400 mt-4 text-center">
-                * Bu özellik, yasalara uygun harici indirme servislerine yönlendirme/simülasyon yapmaktadır.
+                * Bu özellik, yasalara uygun harici indirme servislerine yönlendirme yapar.
             </p>
         </div>
 
@@ -162,52 +163,42 @@
         }
 
         /**
-         * İndirme butonuna tıklandığında çalışır. URL'yi kontrol eder ve simülasyon/yönlendirme yapar.
+         * İndirme butonuna tıklandığında çalışır. URL'yi kontrol eder ve harici servise yönlendirme yapar.
          */
         function startDownload() {
             const url = videoUrlInput.value.trim();
             messageBox.classList.remove('hidden');
-            messageBox.classList.remove('bg-red-900/50', 'bg-green-900/50', 'border-red-500', 'border-green-500', 'text-red-300', 'text-green-300');
+            messageBox.className = 'mt-4 p-4 rounded-lg bg-yellow-900/50 border border-yellow-500 text-yellow-300';
             
             if (!url) {
                 // URL boşsa hata mesajı göster
                 messageBox.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i> Lütfen geçerli bir video URL\'si girin.';
+                messageBox.classList.remove('bg-yellow-900/50', 'border-yellow-500', 'text-yellow-300');
                 messageBox.classList.add('bg-red-900/50', 'border-red-500', 'text-red-300');
                 return;
             }
-
-            // Basit URL formatı kontrolü
-            const urlRegex = new RegExp(`(https?:\/\/)?(www\.)?${selectedPlatform}\.com\/`, 'i');
-            if (!urlRegex.test(url) && selectedPlatform !== 'tiktok' && selectedPlatform !== 'instagram') {
-                 // Sadece YouTube için basit kontrol
-                 messageBox.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i> Girdiğiniz URL bir ${selectedPlatform.toUpperCase()} linki gibi görünmüyor. Yine de devam ediyoruz...`;
-                 messageBox.classList.add('bg-yellow-900/50', 'border-yellow-500', 'text-yellow-300');
-            }
             
-            // Simülasyon: İndirme işlemi başladı. Gerçek indirme için harici bir servise yönlendirme yapılmalı.
-            // Örnek: savefrom.net, y2mate.com gibi bir siteye yönlendirebiliriz.
-            
-            // Örnek Yönlendirme (Gerçek kullanımda bunu aktif edebilirsiniz):
-            // const externalDownloaderUrl = `https://savefrom.net/?url=${encodeURIComponent(url)}`;
-            // window.open(externalDownloaderUrl, '_blank');
-            
-            // Şimdilik Simülasyon ve Yönergeler:
+            // Yükleme mesajını göster
             messageBox.innerHTML = `
-                <i class="fas fa-spinner fa-spin mr-2"></i> Video analiz ediliyor... 
-                <br> <span class="text-sm mt-1 block">Yönlendirme Simülasyonu: Lütfen harici bir indirme sitesine giderek URL'nizi yapıştırın. (Örn: SaveFrom.net)</span>
+                <i class="fas fa-spinner fa-spin mr-2"></i> Video analiz ediliyor ve harici indirme sitesine yönlendiriliyorsunuz...
             `;
             messageBox.classList.add('bg-blue-900/50', 'border-blue-500', 'text-blue-300');
-
-
-            // 3 saniye sonra başarılı mesajı göster
+            
+            // Yönlendirme işlemi (Gerçekçi indirme deneyimi için)
+            const externalDownloaderUrl = `https://tr.savefrom.net/?url=${encodeURIComponent(url)}`;
+            
+            // 2 saniye sonra yönlendirmeyi başlat
             setTimeout(() => {
+                window.open(externalDownloaderUrl, '_blank');
+                
+                // Kullanıcıya bilgi ver ve yeni indirme seçeneği sun
                 messageBox.innerHTML = `
-                    <i class="fas fa-check-circle mr-2"></i> Analiz Tamamlandı! Lütfen çıkan harici siteden indirmeyi başlatın.
+                    <i class="fas fa-external-link-alt mr-2"></i> Yeni sekmede indirme sayfası açıldı. Lütfen indirmeyi oradan başlatın.
                     <button onclick="resetPage()" class="ml-4 underline hover:text-white transition">Yeni İndirme</button>
                 `;
                 messageBox.classList.remove('bg-blue-900/50', 'border-blue-500', 'text-blue-300');
                 messageBox.classList.add('bg-green-900/50', 'border-green-500', 'text-green-300');
-            }, 3000);
+            }, 2000); // 2 saniye yükleme simülasyonu
         }
         
         /**
