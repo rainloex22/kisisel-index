@@ -11,18 +11,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Varsayılan Temalar */
             --purple: #6c5ce7;
             --dark-bg: #1a0e21;
             --card-bg: #1f112c;
             --sidebar-bg: #140b1b;
             --accent-purple: #9c84ff;
+
+            /* Aktif Tema Renkleri (JS ile güncellenecek) */
+            --active-theme-color: var(--purple);
+            --active-bg-color: var(--dark-bg);
+            --active-card-color: var(--card-bg);
         }
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--dark-bg);
+            background-color: var(--active-bg-color); /* Tema Renkleri Kullanımı */
             color: #ffffff;
             display: flex;
             min-height: 100vh;
+            transition: background-color 0.3s;
         }
         .sidebar {
             background-color: var(--sidebar-bg);
@@ -38,23 +45,24 @@
             cursor: pointer;
         }
         .nav-item:hover, .nav-item.active {
-            background-color: var(--purple);
+            background-color: var(--active-theme-color); /* Tema Renkleri Kullanımı */
             color: white;
             box-shadow: 0 4px 10px rgba(108, 92, 231, 0.4);
         }
         .stat-card {
-            background-color: var(--card-bg);
+            background-color: var(--active-card-color); /* Tema Renkleri Kullanımı */
             border: 1px solid rgba(108, 92, 231, 0.3);
+            transition: background-color 0.3s;
         }
         .stat-icon {
             color: var(--accent-purple);
         }
         .cta-button {
-            background-color: var(--purple);
+            background-color: var(--active-theme-color); /* Tema Renkleri Kullanımı */
             transition: background-color 0.3s ease;
         }
         .cta-button:hover {
-            background-color: #5c4cd9;
+            opacity: 0.8;
         }
         .chart-mock {
             background-color: #2a1b3a;
@@ -71,7 +79,7 @@
             border-left: 4px solid transparent;
         }
         .link-item.active-link {
-            border-left-color: var(--purple);
+            border-left-color: var(--active-theme-color); /* Tema Renkleri Kullanımı */
         }
         .link-item:hover {
             background-color: rgba(255, 255, 255, 0.05);
@@ -82,6 +90,24 @@
             backdrop-filter: blur(3px);
             z-index: 50;
         }
+
+        /* Tema Seçimi Stilleri */
+        .theme-option {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .theme-option:hover {
+            transform: scale(1.1);
+        }
+        .theme-option.selected {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
     </style>
 </head>
 <body class="min-h-screen flex">
@@ -101,10 +127,10 @@
                 <i class="fas fa-link w-6"></i>
                 <span class="ml-3">Biyolinkler</span>
             </div>
-            <a href="#" class="nav-item">
+            <div id="navSettings" class="nav-item" data-content="settings">
                 <i class="fas fa-cog w-6"></i>
                 <span class="ml-3">Ayarlar</span>
-            </a>
+            </div>
             <a href="index.html" class="nav-item">
                 <i class="fas fa-home w-6"></i>
                 <span class="ml-3">Ana Sayfa</span>
@@ -124,7 +150,7 @@
     <!-- Ana İçerik -->
     <div class="flex-grow p-4 md:p-10 overflow-y-auto">
 
-        <!-- Kontrol Paneli İçeriği (Varsayılan olarak aktif) -->
+        <!-- 1. Kontrol Paneli İçeriği -->
         <section id="dashboardContent" class="content-tab">
             <header class="mb-8 flex justify-between items-center">
                 <h2 class="text-3xl font-bold">Kontrol Paneli</h2>
@@ -174,7 +200,7 @@
             </section>
         </section>
 
-        <!-- Biyolink Yönetimi İçeriği (Başlangıçta gizli) -->
+        <!-- 2. Biyolink Yönetimi İçeriği -->
         <section id="linksContent" class="content-tab hidden">
             <header class="mb-8 flex justify-between items-center">
                 <h2 class="text-3xl font-bold">Biyolink Yönetimi</h2>
@@ -191,9 +217,84 @@
             </div>
         </section>
         
+        <!-- 3. Ayarlar İçeriği -->
+        <section id="settingsContent" class="content-tab hidden">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold">Ayarlar</h2>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Hesap Bilgileri Kartı -->
+                <div class="stat-card p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-user-circle mr-2 text-accent-purple"></i> Hesap Bilgileri
+                    </h3>
+                    <form id="profileForm">
+                        <div class="mb-4">
+                            <label for="profileName" class="block text-sm font-medium text-gray-300 mb-1">Adınız / Kullanıcı Adınız</label>
+                            <input type="text" id="profileName" required class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-purple focus:border-purple" placeholder="Örn: Baki S2">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="profileLinkSlug" class="block text-sm font-medium text-gray-300 mb-1 flex items-center justify-between">
+                                Biyolink Sayfa Adresi (URL Uzantısı)
+                                <span class="bg-yellow-500 text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">PREMIUM</span>
+                            </label>
+                            
+                            <div class="flex relative">
+                                <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-600 bg-gray-600 text-gray-300 text-sm">baki-s2.com/</span>
+                                <input type="text" id="profileLinkSlug" disabled class="flex-grow px-4 py-2 rounded-r-lg bg-gray-700 border border-gray-600 text-gray-500 cursor-not-allowed" placeholder="kullaniciadi">
+                            </div>
+                            <p class="text-sm text-red-400 mt-2 flex items-center">
+                                <i class="fas fa-lock mr-1"></i> Özel URL uzantısını değiştirmek Premium abonelik gerektirir.
+                            </p>
+                        </div>
+                        
+                        <button type="submit" id="saveProfileBtn" class="cta-button px-6 py-2 rounded-lg font-semibold text-white">
+                            <i class="fas fa-save mr-2"></i> Bilgileri Kaydet
+                        </button>
+                        <span id="profileStatus" class="ml-4 text-sm text-gray-400"></span>
+                    </form>
+                </div>
+
+                <!-- Görünüm Ayarları Kartı -->
+                <div class="stat-card p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-paint-brush mr-2 text-accent-purple"></i> Görünüm Ayarları
+                    </h3>
+                    <p class="text-gray-400 mb-4 text-sm">Panelinizin ve biyolink sayfanızın temasını özelleştirin.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Tema Rengi Seçimi</label>
+                            <div id="themeOptions" class="flex flex-wrap gap-4">
+                                <!-- Tema seçenekleri buraya JS ile yüklenecek -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="saveThemeBtn" class="cta-button px-6 py-2 rounded-lg font-semibold text-white mt-6">
+                        <i class="fas fa-check mr-2"></i> Görünümü Kaydet
+                    </button>
+                    <span id="themeStatus" class="ml-4 text-sm text-gray-400"></span>
+                </div>
+            </div>
+            
+            <div class="mt-8 stat-card p-6 rounded-xl shadow-lg border-red-500/30 border">
+                 <h3 class="text-xl font-semibold mb-4 flex items-center text-red-400">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Hesap Yönetimi
+                </h3>
+                 <p class="text-gray-400 mb-4 text-sm">Hesabınızı kalıcı olarak silebilirsiniz. Lütfen dikkatli olun.</p>
+                 <button id="deleteAccountBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition">
+                    Hesabı Kalıcı Sil
+                </button>
+            </div>
+        </section>
+        
     </div>
 
-    <!-- Yeni Link Oluşturma/Düzenleme Modalı -->
+    <!-- Modallar (Önceki Adımlardan) -->
     <div id="linkModal" class="modal fixed inset-0 flex items-center justify-center hidden">
         <div class="bg-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-md">
             <h3 id="modalTitle" class="text-2xl font-bold mb-6">Yeni Link Oluştur</h3>
@@ -212,7 +313,7 @@
 
                 <div class="mb-6 flex items-center justify-between">
                     <label for="linkActive" class="text-sm font-medium text-gray-300">Aktif Durum</label>
-                    <input type="checkbox" id="linkActive" checked class="form-checkbox h-5 w-5 text-purple bg-gray-700 border-gray-600 rounded">
+                    <input type="checkbox" id="linkActive" class="form-checkbox h-5 w-5 text-purple bg-gray-700 border-gray-600 rounded">
                 </div>
                 
                 <div class="flex justify-end space-x-3">
@@ -227,7 +328,6 @@
         </div>
     </div>
     
-    <!-- Mesaj Kutusu Modalı (Alert/Confirm yerine) -->
     <div id="messageModal" class="modal fixed inset-0 flex items-center justify-center hidden">
         <div class="bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-sm">
             <p id="messageText" class="text-lg text-center font-medium mb-4"></p>
@@ -242,10 +342,9 @@
         // Firebase Modülleri
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, getDoc, collection, query, addDoc, updateDoc, deleteDoc, getDocs, limit, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, getDoc, collection, query, addDoc, updateDoc, deleteDoc, getDocs, limit, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Firestore loglarını etkinleştir (Geliştirme için)
         setLogLevel('Debug');
 
         // Global Değişkenler (Canvas tarafından sağlanır)
@@ -255,16 +354,36 @@
 
         let db, auth, userId = null;
         let isAuthReady = false;
-        let unsubscribeLinks = null; // Link dinleyicisini saklamak için
+        let unsubscribeLinks = null;
+        let unsubscribeProfile = null;
+        let selectedTheme = null; // Aktif seçilen temayı tutar
+
+        // Tema Tanımları (CSS Değişken İsimleri ve Tailwind Renkleri)
+        const THEMES = [
+            { name: "Mor (Varsayılan)", key: "purple", color: "#6c5ce7", darkBg: "#1a0e21", cardBg: "#1f112c" },
+            { name: "Kırmızı Gece", key: "red", color: "#ef4444", darkBg: "#1a0e21", cardBg: "#1f112c" },
+            { name: "Mavi Gökyüzü", key: "blue", color: "#3b82f6", darkBg: "#f3f4f6", cardBg: "#ffffff" },
+            { name: "Neon Yeşil", key: "green", color: "#10b981", darkBg: "#051610", cardBg: "#1f112c" },
+        ];
+
 
         // UI Elementleri
         const totalClicksEl = document.getElementById('totalClicks');
         const uniqueVisitorsEl = document.getElementById('uniqueVisitors');
         const userIdDisplayEl = document.getElementById('userIdDisplay');
-        const chartMockEl = document.querySelector('.chart-mock');
         const linkListContainerEl = document.getElementById('linkListContainer');
+        const chartMockEl = document.querySelector('.chart-mock');
         
-        // Modal Elementleri
+        // Ayarlar Elementleri
+        const profileForm = document.getElementById('profileForm');
+        const profileNameField = document.getElementById('profileName');
+        const profileLinkSlugField = document.getElementById('profileLinkSlug');
+        const profileStatusEl = document.getElementById('profileStatus');
+        const themeOptionsEl = document.getElementById('themeOptions');
+        const saveThemeBtn = document.getElementById('saveThemeBtn');
+        const themeStatusEl = document.getElementById('themeStatus');
+        
+        // Link Modal Elementleri
         const linkModal = document.getElementById('linkModal');
         const linkForm = document.getElementById('linkForm');
         const linkIdField = document.getElementById('linkIdField');
@@ -279,7 +398,6 @@
         const messageModal = document.getElementById('messageModal');
         const messageTextEl = document.getElementById('messageText');
         const messageActionsEl = document.getElementById('messageActions');
-        const closeMessageModalBtn = document.getElementById('closeMessageModalBtn');
 
         // Navigasyon Elementleri
         const navItems = document.querySelectorAll('.nav-item[data-content]');
@@ -290,22 +408,37 @@
 
         // --- Firestore Yolları ve Yardımcı Fonksiyonlar ---
         
-        // Firestore Yolunu oluşturur (Özel Kullanıcı Verisi)
         const getDashboardDocRef = (uid) => doc(db, `/artifacts/${appId}/users/${uid}/dashboard_stats/main`);
         const getLinksCollectionRef = (uid) => collection(db, `/artifacts/${appId}/users/${uid}/links`);
+        const getProfileDocRef = (uid) => doc(db, `/artifacts/${appId}/users/${uid}/settings/profile`);
         
-        // Basit bir sayıyı okunabilir formatta döndürür
         const formatNumber = (num) => {
             if (num === null || isNaN(num)) return 'N/A';
             return num.toLocaleString('tr-TR');
         };
 
-        // Mesaj Modalını gösterir
-        const showMessage = (text) => {
+        const showMessage = (text, isConfirm = false, onConfirm = () => {}) => {
             messageTextEl.textContent = text;
-            messageActionsEl.innerHTML = `<button id="closeMessageModalBtn" class="cta-button px-4 py-2 rounded-lg font-semibold text-white w-full">Tamam</button>`;
+            if (isConfirm) {
+                messageActionsEl.innerHTML = `
+                    <button id="confirmBtn" class="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition">Evet</button>
+                    <button id="cancelBtn" class="px-4 py-2 rounded-lg text-gray-300 bg-gray-600 hover:bg-gray-700 transition">İptal</button>
+                `;
+                document.getElementById('confirmBtn').onclick = () => { messageModal.classList.add('hidden'); onConfirm(); };
+                document.getElementById('cancelBtn').onclick = () => messageModal.classList.add('hidden');
+            } else {
+                 messageActionsEl.innerHTML = `<button id="closeMessageModalBtn" class="cta-button px-4 py-2 rounded-lg font-semibold text-white w-full">Tamam</button>`;
+                 document.getElementById('closeMessageModalBtn').onclick = () => messageModal.classList.add('hidden');
+            }
             messageModal.classList.remove('hidden');
-            document.getElementById('closeMessageModalBtn').onclick = () => messageModal.classList.add('hidden');
+        };
+
+        // Tema Kök Değişkenlerini Günceller
+        const applyTheme = (themeKey) => {
+            const theme = THEMES.find(t => t.key === themeKey) || THEMES[0]; // Varsayılan: Mor
+            document.documentElement.style.setProperty('--active-theme-color', theme.color);
+            document.documentElement.style.setProperty('--active-bg-color', theme.darkBg);
+            document.documentElement.style.setProperty('--active-card-color', theme.cardBg);
         };
 
         // --- Firebase Başlatma ve Kimlik Doğrulama ---
@@ -316,7 +449,6 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
-                // Kimlik doğrulama işlemi
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
@@ -328,19 +460,19 @@
                         userId = user.uid;
                         isAuthReady = true;
                         userIdDisplayEl.textContent = userId;
-                        console.log("Kullanıcı doğrulandı. UID:", userId);
                         
                         setupDashboardListener(userId);
-                        // Biyolink dinleyicisini auth'dan sonra başlat
                         setupLinksListener(userId);
+                        setupProfileListener(userId);
                         
                         checkAndCreateDefaultStats(userId);
+                        checkAndCreateDefaultProfile(userId);
+                        renderThemeOptions();
                     } else {
-                        // Eğer oturum açma başarısız olursa
-                        console.log("Oturum açma başarısız, anonim devam ediliyor.");
                         userId = auth.currentUser ? auth.currentUser.uid : crypto.randomUUID();
                         userIdDisplayEl.textContent = userId + " (Anonim)";
                         isAuthReady = true;
+                        renderThemeOptions();
                     }
                 });
 
@@ -349,23 +481,16 @@
             }
         }
 
-        // --- Dashboard İşlevleri (Önceki Adımdan) ---
-
+        // --- Dashboard & Links İşlevleri (Kısaltıldı) ---
+        
         async function checkAndCreateDefaultStats(uid) {
             const docRef = getDashboardDocRef(uid);
             try {
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) {
-                    console.log("Varsayılan istatistik belgesi oluşturuluyor...");
-                    await setDoc(docRef, {
-                        totalClicks: 0,
-                        uniqueVisitors: 0,
-                        createdAt: new Date(),
-                    });
+                    await setDoc(docRef, { totalClicks: 0, uniqueVisitors: 0, createdAt: new Date() });
                 }
-            } catch (error) {
-                console.error("Varsayılan istatistik oluşturulurken hata:", error);
-            }
+            } catch (error) { console.error("Varsayılan istatistik oluşturulurken hata:", error); }
         }
 
         function setupDashboardListener(uid) {
@@ -381,53 +506,28 @@
                     uniqueVisitorsEl.innerHTML = formatNumber(0);
                     chartMockEl.textContent = "Veri Yok (Yeni Hesap)";
                 }
-            }, (error) => {
-                console.error("Dashboard verisi dinlenirken hata:", error);
-            });
+            }, (error) => { console.error("Dashboard verisi dinlenirken hata:", error); });
         }
         
-        // --- Biyolink Yönetimi İşlevleri ---
-        
-        // Biyolink listesini gerçek zamanlı dinle
         function setupLinksListener(uid) {
-            if (unsubscribeLinks) {
-                unsubscribeLinks(); // Önceki dinleyiciyi kapat
-            }
-            
-            // Tüm linkleri (limit yok) isim alanına göre A'dan Z'ye sıralayarak getir.
-            // Firestore'da `orderBy` kullanmak indeks gerektirebilir, bu yüzden şimdilik sadece `collection` kullanıp JS'te sıralıyoruz.
+            if (unsubscribeLinks) { unsubscribeLinks(); }
             const linksQuery = query(getLinksCollectionRef(uid));
-            
             unsubscribeLinks = onSnapshot(linksQuery, (snapshot) => {
                 let links = [];
-                snapshot.forEach((doc) => {
-                    links.push({ id: doc.id, ...doc.data() });
-                });
-                
-                // Linkleri JavaScript'te isme göre sırala (Daha güvenli, indeks gerektirmez)
+                snapshot.forEach((doc) => { links.push({ id: doc.id, ...doc.data() }); });
                 links.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-
                 renderLinkList(links);
-            }, (error) => {
-                console.error("Link verisi dinlenirken hata:", error);
-                linkListContainerEl.innerHTML = `<p class="text-red-400 p-4">Linkler yüklenirken hata oluştu: ${error.message}</p>`;
-            });
+            }, (error) => { console.error("Link verisi dinlenirken hata:", error); });
         }
         
-        // Link listesini render et
         function renderLinkList(links) {
-            linkListContainerEl.innerHTML = ''; // Listeyi temizle
-            
-            if (links.length === 0) {
-                 linkListContainerEl.innerHTML = `
-                    <div class="stat-card p-6 rounded-xl shadow-lg text-center text-gray-400">
-                        <i class="fas fa-info-circle mr-2"></i> Henüz oluşturulmuş bir biyolinkiniz yok. Hemen bir tane oluşturun!
-                    </div>
-                `;
+             linkListContainerEl.innerHTML = '';
+             if (links.length === 0) {
+                 linkListContainerEl.innerHTML = `<div class="stat-card p-6 rounded-xl shadow-lg text-center text-gray-400"><i class="fas fa-info-circle mr-2"></i> Henüz oluşturulmuş bir biyolinkiniz yok. Hemen bir tane oluşturun!</div>`;
                 return;
-            }
-
-            links.forEach(link => {
+             }
+             
+             links.forEach(link => {
                 const isActive = link.active === true;
                 const statusColor = isActive ? 'text-green-400' : 'text-red-400';
                 const statusText = isActive ? 'Aktif' : 'Pasif';
@@ -439,7 +539,7 @@
                 linkItem.innerHTML = `
                     <div class="flex-grow">
                         <p class="text-lg font-semibold">${link.name || 'İsimsiz Link'}</p>
-                        <p class="text-sm text-gray-400 truncate">${link.url || 'URL Yok'}</p>
+                        <p class="text-sm text-gray-400 truncate">baki-s2.com/${link.id ? link.id.substring(0, 8) : 'hata'}</p>
                     </div>
                     <div class="flex items-center space-x-6 text-right">
                         <div class="hidden sm:block">
@@ -455,19 +555,16 @@
                     </div>
                 `;
                 
-                // Düzenle butonuna tıklama olayını ekle
                 linkItem.querySelector('.edit-link-btn').addEventListener('click', () => openLinkModalForEdit(link.id, link));
 
                 linkListContainerEl.appendChild(linkItem);
             });
         }
         
-        // Link Ekleme/Düzenleme Modalını açar
+        // Link Modal ve Form İşlevleri (Kısaltıldı)
         function openLinkModal(linkData = null) {
-            linkForm.reset(); // Formu temizle
-            
+            linkForm.reset();
             if (linkData) {
-                // Düzenleme modu
                 modalTitleEl.textContent = `Link Düzenle: ${linkData.name}`;
                 linkIdField.value = linkData.id;
                 linkNameField.value = linkData.name || '';
@@ -475,66 +572,38 @@
                 linkActiveField.checked = linkData.active !== false;
                 deleteLinkBtn.classList.remove('hidden');
             } else {
-                // Yeni oluşturma modu
                 modalTitleEl.textContent = 'Yeni Link Oluştur';
                 linkIdField.value = '';
-                linkActiveField.checked = true; // Varsayılan olarak aktif
+                linkActiveField.checked = true;
                 deleteLinkBtn.classList.add('hidden');
             }
-
             linkModal.classList.remove('hidden');
         }
         
-        // Link Düzenle butonuna tıklandığında modalı aç
         const openLinkModalForEdit = (linkId, linkData) => {
-            if (!isAuthReady) {
-                 showMessage("Veriler yüklenmeden düzenleme yapılamaz.");
-                 return;
-            }
+            if (!isAuthReady) { showMessage("Veriler yüklenmeden düzenleme yapılamaz."); return; }
             openLinkModal(linkData);
         }
         
-        // Link Modalını kapat
-        closeModalBtn.addEventListener('click', () => {
-            linkModal.classList.add('hidden');
-        });
+        closeModalBtn.addEventListener('click', () => { linkModal.classList.add('hidden'); });
         
-        // Link Formu Gönderme İşlemi
         linkForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const linkId = linkIdField.value;
             const name = linkNameField.value.trim();
             const url = linkUrlField.value.trim();
             const active = linkActiveField.checked;
 
-            if (!name || !url) {
-                showMessage("Lütfen link adı ve hedef URL alanlarını doldurun.");
-                return;
-            }
+            if (!name || !url) { showMessage("Lütfen link adı ve hedef URL alanlarını doldurun."); return; }
 
-            linkModal.classList.add('hidden'); // Modal'ı hemen kapat
-
+            linkModal.classList.add('hidden');
             try {
-                const linkData = {
-                    name,
-                    url,
-                    active,
-                    // Eğer yeni linkse, tıklama sayısını 0 olarak ayarla
-                    clicks: linkId ? undefined : 0, 
-                    createdAt: linkId ? undefined : new Date(),
-                    updatedAt: new Date()
-                };
-
+                const linkData = { name, url, active, updatedAt: new Date() };
                 if (linkId) {
-                    // Düzenleme
-                    const docRef = doc(db, `/artifacts/${appId}/users/${userId}/links`, linkId);
-                    await updateDoc(docRef, linkData);
+                    await updateDoc(doc(db, `/artifacts/${appId}/users/${userId}/links`, linkId), linkData);
                     showMessage(`'${name}' linki başarıyla güncellendi.`);
                 } else {
-                    // Yeni Oluşturma
-                    const colRef = getLinksCollectionRef(userId);
-                    await addDoc(colRef, linkData);
+                    await addDoc(getLinksCollectionRef(userId), { ...linkData, clicks: 0, createdAt: new Date() });
                     showMessage(`'${name}' linki başarıyla oluşturuldu.`);
                 }
             } catch (error) {
@@ -543,51 +612,144 @@
             }
         });
         
-        // Link Silme İşlemi
         deleteLinkBtn.addEventListener('click', async () => {
             const linkId = linkIdField.value;
             const linkName = linkNameField.value.trim();
-
             if (!linkId) return;
 
-            // Silme onayı için özel mesaj modunda aç
-            messageTextEl.textContent = `'${linkName}' linkini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`;
-            messageActionsEl.innerHTML = `
-                <button id="confirmDeleteBtn" class="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition">Evet, Sil</button>
-                <button id="cancelDeleteBtn" class="px-4 py-2 rounded-lg text-gray-300 bg-gray-600 hover:bg-gray-700 transition">İptal</button>
-            `;
-            messageModal.classList.remove('hidden');
-            linkModal.classList.add('hidden'); // Düzenleme modalını kapat
-
-            document.getElementById('cancelDeleteBtn').onclick = () => {
-                 messageModal.classList.add('hidden');
-                 linkModal.classList.remove('hidden'); // İptal edilirse düzenleme modalını geri aç
-            };
-            
-            document.getElementById('confirmDeleteBtn').onclick = async () => {
-                messageModal.classList.add('hidden'); // Mesaj modalını kapat
-
+            showMessage(`'${linkName}' linkini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`, true, async () => {
                 try {
-                    const docRef = doc(db, `/artifacts/${appId}/users/${userId}/links`, linkId);
-                    await deleteDoc(docRef);
+                    await deleteDoc(doc(db, `/artifacts/${appId}/users/${userId}/links`, linkId));
                     showMessage(`'${linkName}' linki başarıyla silindi.`);
                 } catch (error) {
                     console.error("Link silinirken hata:", error);
                     showMessage(`Silme işlemi başarısız: ${error.message}`);
                 }
-            };
+            });
+            linkModal.classList.add('hidden');
         });
+        
+        // --- Ayarlar İşlevleri ---
+        
+        async function checkAndCreateDefaultProfile(uid) {
+            const docRef = getProfileDocRef(uid);
+            try {
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    await setDoc(docRef, { 
+                        name: "Yeni Kullanıcı", 
+                        slug: "kullanici-" + uid.substring(0, 6),
+                        theme: THEMES[0].key, // Varsayılan tema
+                        createdAt: new Date() 
+                    });
+                }
+            } catch (error) { console.error("Varsayılan profil oluşturulurken hata:", error); }
+        }
+        
+        // Profil verilerini gerçek zamanlı dinle ve formu/temayı güncelle
+        function setupProfileListener(uid) {
+            if (unsubscribeProfile) { unsubscribeProfile(); }
+            
+            const docRef = getProfileDocRef(uid);
+            
+            unsubscribeProfile = onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    profileNameField.value = data.name || '';
+                    profileLinkSlugField.value = data.slug || ''; // Okunabilir ama değiştirilemez
+                    selectedTheme = data.theme || THEMES[0].key;
+                    applyTheme(selectedTheme);
+                    highlightSelectedTheme(selectedTheme);
+                }
+            }, (error) => { console.error("Profil verisi dinlenirken hata:", error); });
+        }
+
+        // Tema Seçeneklerini Render Etme
+        function renderThemeOptions() {
+            themeOptionsEl.innerHTML = '';
+            THEMES.forEach(theme => {
+                const div = document.createElement('div');
+                div.className = 'theme-option';
+                div.style.backgroundColor = theme.color;
+                div.setAttribute('data-theme-key', theme.key);
+                div.title = theme.name;
+                div.onclick = () => handleThemeSelection(theme.key);
+                themeOptionsEl.appendChild(div);
+            });
+            // Dinleyiciden gelen aktif temayı hemen vurgula
+            highlightSelectedTheme(selectedTheme);
+        }
+
+        // Seçilen temayı vurgulama
+        function highlightSelectedTheme(key) {
+            document.querySelectorAll('.theme-option').forEach(el => {
+                el.classList.remove('selected');
+                if (el.getAttribute('data-theme-key') === key) {
+                    el.classList.add('selected');
+                }
+            });
+        }
+
+        // Tema Seçimini İşleme
+        function handleThemeSelection(key) {
+            selectedTheme = key;
+            applyTheme(key);
+            highlightSelectedTheme(key);
+        }
+
+        // Tema Kaydetme İşlemi
+        saveThemeBtn.addEventListener('click', async () => {
+            if (!userId || !selectedTheme) {
+                showMessage("Lütfen bir tema seçin ve oturumun açıldığından emin olun.");
+                return;
+            }
+            themeStatusEl.textContent = 'Kaydediliyor...';
+            try {
+                const docRef = getProfileDocRef(userId);
+                await updateDoc(docRef, { theme: selectedTheme, updatedAt: new Date() });
+                themeStatusEl.textContent = 'Tema başarıyla kaydedildi!';
+                setTimeout(() => themeStatusEl.textContent = '', 3000);
+            } catch (error) {
+                console.error("Tema kaydedilirken hata:", error);
+                themeStatusEl.textContent = `Hata: ${error.message}`;
+            }
+        });
+        
+        // Profil Formu Gönderme İşlemi (Sadece Name günceller)
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!userId) { showMessage("Oturum kimliği bulunamadı."); return; }
+            
+            const name = profileNameField.value.trim();
+            // Slug premium olduğu için burada güncellenmeyecek
+            
+            profileStatusEl.textContent = 'Kaydediliyor...';
+            
+            try {
+                const docRef = getProfileDocRef(userId);
+                
+                await updateDoc(docRef, {
+                    name: name,
+                    updatedAt: new Date()
+                });
+                
+                profileStatusEl.textContent = 'Başarıyla kaydedildi!';
+                setTimeout(() => profileStatusEl.textContent = '', 3000);
+
+            } catch (error) {
+                console.error("Profil kaydedilirken hata:", error);
+                profileStatusEl.textContent = `Hata: ${error.message}`;
+            }
+        });
+
 
         // --- Navigasyon ve Olay Dinleyicileri ---
         
-        // Sekmeli navigasyon işlevi
         const switchTab = (targetContentId) => {
-            // Tüm içerikleri gizle
             contentTabs.forEach(tab => tab.classList.add('hidden'));
-            // Hedef içeriği göster
             document.getElementById(`${targetContentId}Content`).classList.remove('hidden');
             
-            // Sidebar öğelerini güncelle
             navItems.forEach(item => {
                 if (item.getAttribute('data-content') === targetContentId) {
                     item.classList.add('active');
@@ -597,14 +759,13 @@
             });
         };
         
-        // Sidebar ve hızlı buton dinleyicileri
         navItems.forEach(item => {
             item.addEventListener('click', () => switchTab(item.getAttribute('data-content')));
         });
 
         quickCreateLinkBtn.addEventListener('click', () => {
              openLinkModal(null);
-             switchTab('links'); // Hızlı oluşturmada otomatik link sayfasına geç
+             switchTab('links');
         });
         
         openNewLinkModalBtn.addEventListener('click', () => openLinkModal(null));
