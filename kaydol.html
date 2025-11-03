@@ -104,12 +104,17 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // --- DOM Elementlerini Başlat (FIXED) ---
-        const messageBox = document.getElementById('messageBox');
+        // --- DOM Elementlerini Başlat (let ile tanımlandı) ---
+        let messageBox = document.getElementById('messageBox');
         
         // --- Mesaj Gösterme Fonksiyonu ---
         function showMessage(message, type = 'success') {
-            if (!messageBox) return; 
+            // Savunma mekanizması: Eğer bir hata nedeniyle başlangıçta bulunamadıysa tekrar dene.
+            if (!messageBox) {
+                messageBox = document.getElementById('messageBox');
+                if (!messageBox) return; // Hala bulunamazsa sessizce geri dön
+            }
+
             messageBox.textContent = message;
             messageBox.className = type === 'success' ? 'message-success' : 'message-error';
             messageBox.classList.add('message-show');
