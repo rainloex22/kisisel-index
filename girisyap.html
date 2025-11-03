@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        /* CSS variables based on the user's theme */
         :root { --purple: #6c5ce7; }
         body { font-family: 'Poppins', sans-serif; background-color: #1a0e21; color: #ffffff; }
         .header-bg { background-color: rgba(26, 14, 33, 0.9); backdrop-filter: blur(5px); }
@@ -22,7 +23,7 @@
             background-color: #5c4cd9;
             transform: translateY(-1px);
         }
-        /* Özel Mesaj Kutusu Stili */
+        /* Custom Message Box Style (Same as kaydol.html) */
         #messageBox {
             visibility: hidden;
             position: fixed;
@@ -35,6 +36,9 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             opacity: 0;
             transition: opacity 0.3s, visibility 0.3s;
+            display: flex; /* İçeriğin ortalanması için */
+            align-items: center;
+            justify-content: center;
         }
         .message-success { background-color: #10b981; }
         .message-error { background-color: #ef4444; }
@@ -75,9 +79,9 @@
                     <input type="password" id="login_password" required class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple focus:ring focus:ring-purple focus:ring-opacity-50 text-white" placeholder="Şifreniz">
                 </div>
                 
-                <!-- Şifremi Unuttum Bağlantısı -->
+                <!-- Şifremi Unuttum Bağlantısı (sifremiunuttum.html dosyası oluşturulmadığı için şimdilik boş) -->
                 <div class="text-right">
-                    <a href="sifremiunuttum.html" class="text-sm text-purple hover:underline font-medium">Şifremi Unuttum?</a>
+                    <a href="#" class="text-sm text-purple hover:underline font-medium">Şifremi Unuttum?</a>
                 </div>
 
                 <button type="submit" id="loginButton" class="w-full btn-login py-3 rounded-lg font-bold text-white text-lg mt-4">
@@ -106,17 +110,18 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
         
-        // Yeni Firebase yapılandırması
+        // Yeni Firebase yapılandırması (kaydol.html ile aynı, projeden alınan güncel bilgiler)
         const firebaseConfig = {
-            apiKey: "AIzaSyDNlqHUC3n8OD0qKIwUibHlG_zb5-mwb-U",
-            authDomain: "bakikaraxyz.firebaseapp.com",
-            projectId: "bakikaraxyz",
-            storageBucket: "bakikaraxyz.firebasestorage.app",
-            messagingSenderId: "943266630443",
-            appId: "1:943266630443:web:f183bee1e4765460d5136e",
-            measurementId: "G-VYGDTHD960"
+            apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
+            authDomain: "baki-s2-yonetim.firebaseapp.com",
+            projectId: "baki-s2-yonetim",
+            storageBucket: "baki-s2-yonetim.firebasestorage.app",
+            messagingSenderId: "692508919425",
+            appId: "1:692508919425:web:fac963c81c11b7be70af80",
+            measurementId: "G-Q52XG8GLB2"
         };
 
+        // Canvas'tan gelen özel yetkilendirme tokenı
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // --- DOM Elementlerini Başlat ---
@@ -128,7 +133,7 @@
                 messageBox = document.getElementById('messageBox');
                 if (!messageBox) return; 
             }
-            messageBox.textContent = message;
+            messageBox.innerHTML = message; // innerHTML kullanıldı (hata mesajlarında kod vs. gösterilmek istenirse)
             messageBox.className = type === 'success' ? 'message-success' : 'message-error';
             messageBox.classList.add('message-show');
             setTimeout(() => {
@@ -139,13 +144,15 @@
         // Firebase Uygulamasını Başlat
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        // Oturum kalıcılığını yerel depolama olarak ayarla
         setPersistence(auth, browserLocalPersistence); 
 
-        // Oturum Açma Kontrolü (Canvas Gereksinimi)
+        // Oturum Açma Kontrolü (Anonim Giriş veya Custom Token)
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 console.log("Kullanıcı durumu kontrol edildi. UID:", user.uid);
             } else if (!initialAuthToken) {
+                // Anonim girişi etkinleştir
                 signInAnonymously(auth).catch(e => console.error("Anonim giriş hatası:", e));
             }
         });
@@ -154,7 +161,7 @@
         if (initialAuthToken) {
             signInWithCustomToken(auth, initialAuthToken).catch(e => {
                 console.error("Custom token ile giriş hatası:", e);
-                showMessage("Hata: Oturum tokeni ile giriş yapılamadı.", "error");
+                // Burada kullanıcıya mesaj göstermeye gerek yok, bu arka plan işlemidir.
             });
         }
 
@@ -191,13 +198,13 @@
                         break;
                     case 'auth/user-not-found':
                     case 'auth/wrong-password':
-                        errorMessage = "Hatalı e-posta veya şifre.";
+                        errorMessage = "Hatalı e-posta veya şifre. Lütfen tekrar deneyin.";
                         break;
                     case 'auth/operation-not-allowed':
-                         errorMessage = "Bu kimlik doğrulama yöntemi Firebase'de etkin değil. Lütfen konsolda 'Authentication' -> 'Sign-in method' kısmından E-posta/Şifre'yi etkinleştirin.";
+                         errorMessage = "Bu kimlik doğrulama yöntemi Firebase'de etkin değil. (E-posta/Şifre)";
                          break;
                     default:
-                        errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin. Kod: " + error.code;
+                        errorMessage = "Bilinmeyen bir hata oluştu. Kod: " + error.code;
                 }
                 
                 showMessage("Giriş hatası: " + errorMessage, "error");
