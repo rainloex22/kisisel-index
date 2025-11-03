@@ -4,16 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hizmet Tanıtım | BAKİ S2</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --purple: #6c5ce7; /* Mor vurgu rengi */
-            --dark-bg: #111827; /* Çok koyu arka plan */
-            --card-bg: rgba(31, 41, 55, 0.9);
         }
         body {
             font-family: 'Poppins', sans-serif;
@@ -71,102 +67,32 @@
             transition: transform 0.5s ease;
             transform-origin: center;
         }
-        .mockup-content {
-            padding: 20px;
-            color: #ccc;
-        }
-        /* DİNAMİK NAV STİLLERİ */
-        .profile-avatar-nav {
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            font-size: 16px;
-            font-weight: 600;
-            background-color: var(--purple);
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            flex-shrink: 0;
-            cursor: pointer;
-        }
-        .card-dropdown { 
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(5px); 
-            border-radius: 0.5rem; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
-            border: 1px solid rgba(108, 92, 231, 0.1);
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Navbar -->
     <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
         <div class="w-full max-w-6xl flex justify-between items-center">
             
-            <!-- Logo -->
             <a href="index.html" class="text-3xl font-extrabold text-white flex items-center">
                 <i class="fas fa-terminal mr-2 text-purple"></i> BAKİ S2
             </a>
             
-            <!-- Navigasyon Linkleri -->
-            <nav class="hidden md:flex space-x-6 text-lg">
-                <!-- PANEL LINKI GUNCELlendi -->
-                <a href="panel.html" class="text-gray-300 hover:text-purple transition duration-200">Kullanıcı Paneli</a>
+            <nav class="flex space-x-6 text-lg items-center">
                 <a href="yardim.html" class="text-gray-300 hover:text-purple transition duration-200">Yardım Merkezi</a>
                 <a href="discord.html" class="text-gray-300 hover:text-purple transition duration-200">Discord</a>
                 <a href="fiyatlandirma.html" class="text-gray-300 hover:text-purple transition duration-200">Fiyatlandırma</a>
             </nav>
             
-            <!-- DİNAMİK CTA / KULLANICI BİLGİSİ ALANI -->
-            <div class="flex space-x-3 items-center">
-                <!-- 1. Oturum Kapalı Durumu (Varsayılan olarak gösterilir, JS ile gizlenir) -->
-                <div id="loggedOutNav" class="flex space-x-3 items-center">
-                    <span class="text-red-400 font-medium hidden sm:inline-block">Giriş Yapılmamış</span>
-                    <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-gray-300 hover:text-white transition duration-200 rounded-lg">Giriş Yap</a>
-                    <a href="kaydol.html" class="main-cta-button px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
-                </div>
-
-                <!-- 2. Oturum Açık Durumu (Varsayılan olarak gizlenir, JS ile gösterilir) -->
-                <div id="loggedInNav" class="relative hidden">
-                    <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
-                        <!-- Profil Baş Harfleri -->
-                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span>
-                        
-                        <div class="hidden sm:flex flex-col items-start">
-                            <!-- Kullanıcı Adı -->
-                            <span class="text-sm font-semibold" id="nav_profile_display_name">...</span>
-                            <!-- Kullanıcı Durumu (Premium/Standart) -->
-                            <span class="text-xs font-medium" id="nav_profile_status"></span>
-                        </div>
-                        <i class="fas fa-chevron-down text-xs text-gray-400"></i>
-                    </button>
-                    
-                    <!-- Dropdown Menü -->
-                    <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-48 card-dropdown bg-gray-800 rounded-lg shadow-xl py-1 z-30 hidden">
-                        <!-- Önizleme Alanı -->
-                        <div class="px-4 py-2 text-sm text-gray-400 border-b border-gray-700">
-                            <p class="font-bold text-white truncate" id="dropdown_email_preview">email@yok.com</p>
-                            <p class="text-xs font-medium" id="dropdown_status_preview">Standart</p>
-                        </div>
-                        <a href="panel.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition duration-150">
-                            <i class="fas fa-chart-line mr-2 w-4"></i> Kontrol Paneli
-                        </a>
-                        <div class="border-t border-gray-700 my-1"></div>
-                        <button id="logoutBtnNav" class="w-full text-left block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition duration-150">
-                            <i class="fas fa-sign-out-alt mr-2 w-4"></i> Çıkış Yap
-                        </button>
-                    </div>
-                </div>
+            <div>
+                 <a href="kaydol.html" class="main-cta-button px-5 py-2 rounded-lg font-semibold text-white">Başla</a>
             </div>
-            
+
         </div>
     </header>
 
-    <!-- Hero Section -->
     <main class="flex-grow flex flex-col items-center pt-20 pb-40 relative z-10 text-center">
         
-        <!-- Ana Slogan -->
         <div class="w-full max-w-4xl px-4">
             <h1 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
                 İstediğin Her Şey, <span class="text-purple">Tam Burada.</span>
@@ -175,7 +101,6 @@
                 BAKİ S2, modern, zengin özellikli ve hızlı biyolinkleriniz ve güvenli dosya barındırma hizmetiniz için vazgeçilmezinizdir. İhtiyacınız olan her şey — işte burada.
             </p>
             
-            <!-- CTA Butonları -->
             <div class="flex justify-center space-x-4">
                 <a href="kaydol.html" class="main-cta-button px-8 py-3 rounded-xl font-bold text-lg text-white">
                     Hemen Kaydol
@@ -186,20 +111,16 @@
             </div>
         </div>
 
-        <!-- Üst Üste Binen Görsel Vurgu Alanı (Mockup Simülasyonu) -->
         <div class="relative mt-20 h-[500px] w-full max-w-6xl flex justify-center items-end">
             
-            <!-- Sol Cihaz -->
             <div class="device-mockup left-1/2 -ml-[300px] bg-cover bg-center" style="transform: rotate(-15deg) scale(0.9); z-index: 1;">
                  <img src="https://via.placeholder.com/250x450/451a54/ffffff?text=BIOLINK+PANELI" alt="Biyolink Paneli" class="w-full h-full object-cover rounded-[2.8rem] p-1.5" style="border: 4px solid #6c5ce7;">
             </div>
 
-            <!-- Orta Cihaz (Ön Plan) -->
             <div class="device-mockup relative mx-4 bg-cover bg-center" style="transform: rotate(0deg) scale(1.1); z-index: 3; box-shadow: 0 15px 50px rgba(108, 92, 231, 0.7);">
                  <img src="https://via.placeholder.com/250x450/563e75/ffffff?text=HESAP+ISTATISTIKLERI" alt="Hesap İstatistikleri" class="w-full h-full object-cover rounded-[2.8rem] p-1.5" style="border: 4px solid #8f82f2;">
             </div>
 
-            <!-- Sağ Cihaz -->
             <div class="device-mockup right-1/2 mr-[300px] bg-cover bg-center" style="transform: rotate(15deg) scale(0.9); z-index: 2;">
                  <img src="https://via.placeholder.com/250x450/331a47/ffffff?text=DISCORD+PROFIL" alt="Discord Profil Görüntüsü" class="w-full h-full object-cover rounded-[2.8rem] p-1.5" style="border: 4px solid #6c5ce7;">
             </div>
@@ -207,145 +128,9 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-gray-900 text-gray-500 text-center p-4">
         © 2025 BAKİ S2 Yönetim Hizmetleri. Tüm hakları saklıdır.
     </footer>
 
-    <!-- Firebase Kodu ve Dinamik Navigasyon Kontrolü -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        
-        // --- Ortamdan Gelen Değişkenler ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // --- DOM Elementleri ---
-        const loggedOutNav = document.getElementById('loggedOutNav');
-        const loggedInNav = document.getElementById('loggedInNav');
-        const profileMenuButton = document.getElementById('profileMenuButton');
-        const profileDropdownMenu = document.getElementById('profileDropdownMenu');
-
-        // --- Firebase Başlatma ---
-        let auth;
-        try {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            // Başlangıçta custom token varsa oturum açmayı dene
-            if (initialAuthToken) {
-                signInWithCustomToken(auth, initialAuthToken).catch(e => {
-                    console.error("Custom Token ile giriş hatası:", e);
-                    // Hata durumunda anonim olarak devam et
-                    signInAnonymously(auth);
-                });
-            } else {
-                 // Custom token yoksa anonim olarak giriş yap (geliştirme ortamı için)
-                signInAnonymously(auth);
-            }
-
-        } catch (e) {
-            console.error("Firebase başlatma hatası:", e);
-        }
-
-        // --- Kullanıcı Profil Bilgilerini Türetme ve Gösterme ---
-        function renderUserProfile(user) {
-            const email = user.email;
-            let displayName = 'Kullanıcı';
-            let initials = 'K';
-            let userStatus = 'Standart Üye'; 
-            let statusColor = 'text-yellow-400';
-
-            if (email) {
-                const emailLocalPart = email.split('@')[0];
-                const nameParts = emailLocalPart.split(/[\._-]/); 
-                
-                if (nameParts.length > 1 && nameParts[0] && nameParts[1]) {
-                    initials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
-                    displayName = nameParts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-                } else {
-                    initials = emailLocalPart.charAt(0).toUpperCase();
-                    displayName = emailLocalPart.charAt(0).toUpperCase() + emailLocalPart.slice(1);
-                }
-
-                // Fictional Status Logic: E-posta "premium" içeriyorsa Premium yap
-                if (email.toLowerCase().includes('premium')) {
-                    userStatus = 'Premium Üye';
-                    statusColor = 'text-green-400';
-                }
-            } else if (user.isAnonymous) {
-                 displayName = 'Anonim';
-                 initials = 'A';
-                 userStatus = 'Misafir Oturumu';
-                 statusColor = 'text-gray-500';
-            }
-            
-            // --- Navbar Güncelleme ---
-            document.getElementById('nav_profile_initials').textContent = initials;
-            document.getElementById('nav_profile_display_name').textContent = displayName.split(' ')[0]; // Navbar'da sadece ilk kelimeyi göster
-            
-            const navStatusElement = document.getElementById('nav_profile_status');
-            navStatusElement.textContent = userStatus;
-            navStatusElement.className = `text-xs font-medium ${statusColor}`; 
-            
-            // --- Dropdown Güncelleme ---
-            document.getElementById('dropdown_email_preview').textContent = email || 'Misafir Oturumu';
-            const dropdownStatusElement = document.getElementById('dropdown_status_preview');
-            dropdownStatusElement.textContent = userStatus;
-            dropdownStatusElement.className = `text-xs font-medium ${statusColor}`; 
-        }
-
-        // --- Oturum Durumu Kontrolü ---
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // Kullanıcı giriş yapmışsa (anonim veya değil)
-                    renderUserProfile(user);
-                    loggedOutNav.classList.add('hidden');
-                    loggedInNav.classList.remove('hidden');
-                } else {
-                    // Kesinlikle oturum açılmamışsa
-                    loggedOutNav.classList.remove('hidden');
-                    loggedInNav.classList.add('hidden');
-                }
-            });
-        }
-
-
-        // --- Çıkış Yapma İşlemi ---
-        const handleLogout = async () => {
-            if (auth) {
-                try {
-                    profileDropdownMenu.classList.add('hidden');
-                    await signOut(auth);
-                } catch (error) {
-                    console.error("Çıkış yapma hatası:", error);
-                }
-            }
-        };
-
-        // --- Dropdown Toggle İşlemi ---
-        if (profileMenuButton) {
-            profileMenuButton.addEventListener('click', (e) => {
-                e.stopPropagation(); 
-                profileDropdownMenu.classList.toggle('hidden');
-            });
-        }
-
-
-        // Dropdown menü dışına tıklanınca gizle
-        document.addEventListener('click', (e) => {
-            if (profileDropdownMenu && profileMenuButton && !profileMenuButton.contains(e.target) && !profileDropdownMenu.contains(e.target)) {
-                profileDropdownMenu.classList.add('hidden');
-            }
-        });
-
-        // Çıkış düğmesine event listener ekle
-        if (document.getElementById('logoutBtnNav')) {
-            document.getElementById('logoutBtnNav').addEventListener('click', handleLogout);
-        }
-
-    </script>
-</body>
+    </body>
 </html>
