@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yardım Merkezi | BAKİ S2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --purple: #6c5ce7; }
+        body { font-family: 'Poppins', sans-serif; background-color: #1a0e21; color: #ffffff; }
+        .header-bg { background-color: rgba(26, 14, 33, 0.9); backdrop-filter: blur(5px); }
+        .content-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); border-radius: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
+        <div class="w-full max-w-6xl flex justify-between items-center">
+            <a href="index.html" class="text-3xl font-extrabold text-white flex items-center">
+                <i class="fas fa-terminal mr-2 text-purple"></i> BAKİ S2
+            </a>
+            <nav class="hidden md:flex space-x-6 text-lg">
+                <a href="yardim.html" class="text-purple transition duration-200">Yardım Merkezi</a>
+                <a href="discord.html" class="text-gray-300 hover:text-purple transition duration-200">Discord</a>
+                <a href="fiyatlandirma.html" class="text-gray-300 hover:text-purple transition duration-200">Fiyatlandırma</a>
+            </nav>
+            <div class="flex space-x-3">
+                <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-gray-300 hover:text-white transition duration-200 rounded-lg">Giriş Yap</a>
+                <a href="kaydol.html" class="bg-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
+            </div>
+        </div>
+    </header>
 
+    <!-- İçerik Alanı -->
+    <main class="flex-grow flex flex-col items-center py-20 px-4">
+        <div class="content-card p-8 md:p-12 w-full max-w-3xl text-center">
+            <h1 class="text-4xl font-extrabold mb-6 text-purple">Yardım Merkezi</h1>
+            <p class="text-lg text-gray-300 mb-8">
+                Aradığınız tüm soruların cevapları burada. En çok sorulan soruları aşağıda bulabilirsiniz.
+            </p>
+            
+            <div class="text-left space-y-4">
+                <details class="rounded-lg p-4 bg-gray-800 cursor-pointer transition duration-300 hover:bg-gray-700">
+                    <summary class="font-semibold text-xl text-white flex justify-between items-center">
+                        Nasıl Kayıt Olabilirim?
+                    </summary>
+                    <p class="mt-2 text-gray-400 border-t border-gray-700 pt-2">
+                        Sağ üst köşedeki "Kaydol" butonuna tıklayın ve formu eksiksiz doldurun.
+                    </p>
+                </details>
+                <details class="rounded-lg p-4 bg-gray-800 cursor-pointer transition duration-300 hover:bg-gray-700">
+                    <summary class="font-semibold text-xl text-white flex justify-between items-center">
+                        Fiyatlandırma Planlarınız Nelerdir?
+                    </summary>
+                    <p class="mt-2 text-gray-400 border-t border-gray-700 pt-2">
+                        Detaylı fiyatlandırma bilgilerini "Fiyatlandırma" sayfamızda bulabilirsiniz.
+                    </p>
+                </details>
+            </div>
+            
+            <a href="panel.html" class="mt-12 inline-block text-purple hover:text-white transition duration-200 font-semibold">
+                <i class="fas fa-arrow-left mr-2"></i> Ana Sayfaya Dön
+            </a>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-500 text-center p-4">
+        © 2025 BAKİ S2 Yönetim Hizmetleri.
+    </footer>
+</body>
+</html>
