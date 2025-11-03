@@ -10,6 +10,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
     
     <link rel="stylesheet" href="style.css"> 
+    
+    <style>
+        /* YÖNETİCİ BUTONU STİLİ */
+        .admin-self-promote-button {
+            background-color: #f7b731; /* Neon Sarı */
+            color: #1a1a2e; /* Koyu Mavi */
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 0 15px #f7b731, 0 0 5px #f7b731;
+        }
+        .admin-self-promote-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #f7b731, 0 0 10px #f7b731;
+        }
+    </style>
 </head>
 <body>
     
@@ -44,6 +65,11 @@
         
         <h1 class="title">BAKİ S2</h1>
         
+        <!-- YÖNETİCİ YAP BUTONU BURAYA EKLENDİ -->
+        <button id="admin-self-promote" class="admin-self-promote-button">
+            <i class="fas fa-crown"></i> Beni Yönetici Yap (Tek Tık)
+        </button>
+        
         <div id="discord-card" class="discord-info">
              <!-- Discord Kart içeriği script.js tarafından doldurulur -->
         </div>
@@ -75,7 +101,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setLogLevel, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; // setDoc eklendi
 
         // Global Canvas değişkenlerini kullanma
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -127,6 +153,41 @@
         }
         
         /**
+         * Mevcut kullanıcı ID'sini Firestore'daki yönetici listesine ekler.
+         */
+        async function addCurrentUserToAdmins() {
+            if (!isAuthReady || !db || !userId) {
+                showAccessMessage("Kimlik doğrulama hazır değil. Lütfen bekleyin.", false);
+                return;
+            }
+
+            const adminDocRef = doc(db, `artifacts/${appId}/public/data/admins`, userId);
+
+            try {
+                showAccessMessage("Kullanıcı yönetici olarak ekleniyor...", true);
+                
+                // Belgeyi oluştur/güncelle (User ID'nizi Document ID olarak ekler)
+                await setDoc(adminDocRef, { 
+                    role: 'admin',
+                    addedBy: 'self-promotion-button', 
+                    createdAt: new Date().toISOString() 
+                });
+
+                showAccessMessage("Başarılı! Yönetici yetkisi verildi. Şimdi 'Panel'e tıklayabilirsiniz.", true);
+                
+                // Başarılı olduktan sonra butonu bir süre sonra gizleyebiliriz.
+                setTimeout(() => {
+                    const button = document.getElementById('admin-self-promote');
+                    if (button) button.style.display = 'none';
+                }, 1500);
+
+            } catch (error) {
+                console.error("Yönetici ekleme hatası:", error);
+                showAccessMessage("Yönetici eklenirken bir hata oluştu: " + error.message, false);
+            }
+        }
+        
+        /**
          * Panel butonuna tıklandığında Firestore üzerinden yönetici erişimini kontrol eder.
          * Yönetici belgesi varsa erişim izni verir.
          */
@@ -162,11 +223,16 @@
             }
         }
 
-        // Panel Butonunu JavaScript ile bağlama (Erişim hatasını çözer)
+        // Butonları JavaScript ile bağlama
         document.addEventListener('DOMContentLoaded', () => {
             const panelButton = document.getElementById('panel-button');
             if (panelButton) {
                 panelButton.addEventListener('click', checkPanelAccess);
+            }
+            
+            const adminSelfPromoteButton = document.getElementById('admin-self-promote');
+            if (adminSelfPromoteButton) {
+                adminSelfPromoteButton.addEventListener('click', addCurrentUserToAdmins);
             }
         });
 
@@ -180,12 +246,12 @@
             if (!toast) {
                 toast = document.createElement('div');
                 toast.id = 'panel-access-toast';
-                // Konum: SAĞ ALT KÖŞE olarak güncellendi.
+                // Konum: SAĞ ALT KÖŞE
                 toast.style.cssText = `
                     position: fixed; 
                     bottom: 20px; 
                     right: 20px; 
-                    transform: none; /* Orta pozisyon dönüşümünü kaldır */
+                    transform: none; 
                     background-color: ${isSuccess ? 'rgba(67, 181, 129, 0.9)' : 'rgba(255, 0, 0, 0.9)'}; 
                     color: white; 
                     padding: 15px 25px; 
@@ -211,7 +277,7 @@
             
             setTimeout(() => {
                 toast.style.opacity = 0;
-            }, 4000); // Mesajı daha uzun süre göster (4 saniye)
+            }, 4000); 
         }
     </script>
 
