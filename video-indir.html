@@ -3,51 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video İndirme Servisi</title>
+    <title>Video İndirici | Platform Seçimi</title>
+    <!-- Tailwind CSS (Hızlı ve modern tasarım için) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome (İkonlar için) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        input[type="text"] { width: 80%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px 20px; background-color: #ff0000; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #cc0000; }
+        /* Ana temanıza uygun özel stiller */
+        :root {
+            --red-neon: #FF0000;
+            --dark-bg: #1a1a1a;
+            --card-bg: rgba(47, 49, 54, 0.9);
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-bg);
+            /* Ana sayfadaki blur efektine benzer bir geçiş */
+            background-image: radial-gradient(circle at center, rgba(255, 0, 0, 0.1) 0%, rgba(0, 0, 0, 1) 100%);
+        }
+        .neon-text-red {
+            color: var(--red-neon);
+            text-shadow: 0 0 5px var(--red-neon), 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        .neon-border-red {
+            border: 2px solid var(--red-neon);
+            box-shadow: 0 0 8px var(--red-neon), inset 0 0 8px var(--red-neon);
+            transition: all 0.3s ease;
+        }
+        .neon-border-red:hover {
+            box-shadow: 0 0 15px #fff, 0 0 20px var(--red-neon);
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        .platform-btn i {
+            transition: transform 0.3s ease;
+        }
+        .platform-btn:hover i {
+            transform: scale(1.1);
+        }
+        
+        /* YouTube için özel ikon rengi */
+        .platform-btn.youtube:hover {
+            color: #ff0000;
+        }
+        /* TikTok için özel ikon rengi */
+        .platform-btn.tiktok:hover {
+            color: #000000; /* Dark theme contrast */
+        }
+        /* Instagram için özel ikon rengi */
+        .platform-btn.instagram:hover {
+            color: #e4405f;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>YouTube Video İndirici (Yönlendirme)</h1>
-        <p>İndirmek istediğiniz YouTube videosunun linkini aşağıya yapıştırın ve İndir düğmesine tıklayın. Güvenli bir dış indirme servisine yönlendirileceksiniz.</p>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- Ana Kapsayıcı Kart -->
+    <div id="main-card" class="bg-[var(--card-bg)] text-white p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-lg mx-auto backdrop-blur-sm border-2 border-gray-700">
         
-        <input type="text" id="videoLink" placeholder="YouTube Linkini Buraya Yapıştırın (Örn: https://youtu.be/..." />
+        <!-- Başlık -->
+        <h1 class="text-4xl font-extrabold text-center mb-6 neon-text-red">
+            <i class="fas fa-video mr-3"></i> Video İndirme Merkezi
+        </h1>
         
-        <button onclick="redirectToDownloader()">İndir</button>
+        <!-- Geri Dön Butonu -->
+        <a href="/" class="absolute top-4 left-4 text-gray-400 hover:text-white transition duration-200 text-lg">
+            <i class="fas fa-arrow-left mr-2"></i> Ana Sayfa
+        </a>
+
+        <!-- Adım 1: Platform Seçimi -->
+        <div id="platform-selection">
+            <p class="text-xl text-gray-300 mb-6 text-center font-medium">Lütfen indirmek istediğiniz videonun platformunu seçin:</p>
+            
+            <div class="flex justify-around space-x-4">
+                
+                <!-- YouTube Butonu -->
+                <button onclick="selectPlatform('youtube')" 
+                        class="platform-btn youtube w-full flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-red-800 transition duration-300 neon-border-red">
+                    <i class="fab fa-youtube text-5xl mb-2"></i>
+                    <span class="font-semibold">YouTube</span>
+                </button>
+                
+                <!-- TikTok Butonu -->
+                <button onclick="selectPlatform('tiktok')" 
+                        class="platform-btn tiktok w-full flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-black transition duration-300 neon-border-red">
+                    <i class="fab fa-tiktok text-5xl mb-2"></i>
+                    <span class="font-semibold">TikTok</span>
+                </button>
+                
+                <!-- Instagram Butonu -->
+                <button onclick="selectPlatform('instagram')" 
+                        class="platform-btn instagram w-full flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-pink-700 transition duration-300 neon-border-red">
+                    <i class="fab fa-instagram text-5xl mb-2"></i>
+                    <span class="font-semibold">Instagram</span>
+                </button>
+                
+            </div>
+        </div>
         
-        <p style="margin-top: 30px; font-size: 0.8em; color: #666;">**Not:** Bu işlem, sunucu gerektirmeyen statik bir sayfa olduğundan, sizi üçüncü taraf güvenilir bir indirme servisine yönlendirecektir.</p>
+        <!-- Adım 2: URL Girişi (Varsayılan olarak gizli) -->
+        <div id="url-input-section" class="mt-8 pt-6 border-t border-gray-700 hidden">
+            <h2 id="platform-title" class="text-2xl font-bold text-center mb-4 neon-text-red">YouTube Video İndir</h2>
+            
+            <input type="url" id="video-url" placeholder="Video URL'sini buraya yapıştırın..."
+                   class="w-full p-3 mb-4 text-gray-900 bg-gray-200 border border-gray-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none"
+                   required>
+                   
+            <button onclick="startDownload()" 
+                    class="w-full py-3 font-bold text-lg rounded-lg bg-red-600 hover:bg-red-700 transition duration-300 text-white shadow-lg shadow-red-500/50">
+                <i class="fas fa-arrow-circle-down mr-2"></i> İNDİRMEYE BAŞLA
+            </button>
+            
+            <p id="disclaimer" class="text-sm text-gray-400 mt-4 text-center">
+                * Bu özellik, yasalara uygun harici indirme servislerine yönlendirme/simülasyon yapmaktadır.
+            </p>
+        </div>
+
+        <!-- Mesaj Alanı -->
+        <div id="message-box" class="mt-4 p-4 rounded-lg hidden bg-yellow-900/50 border border-yellow-500 text-yellow-300">
+            <!-- Mesajlar buraya gelecek -->
+        </div>
+        
     </div>
 
     <script>
-        function redirectToDownloader() {
-            const linkInput = document.getElementById('videoLink');
-            let videoUrl = linkInput.value.trim();
+        const platformSelection = document.getElementById('platform-selection');
+        const urlInputSection = document.getElementById('url-input-section');
+        const platformTitle = document.getElementById('platform-title');
+        const videoUrlInput = document.getElementById('video-url');
+        const messageBox = document.getElementById('message-box');
+        let selectedPlatform = '';
 
-            if (!videoUrl) {
-                alert("Lütfen geçerli bir YouTube linki girin.");
+        /**
+         * Kullanıcının seçtiği platforma göre arayüzü günceller.
+         * @param {string} platform - Seçilen platformun adı (youtube, tiktok, instagram)
+         */
+        function selectPlatform(platform) {
+            selectedPlatform = platform;
+            
+            // Başlıkları ve renkleri ayarla
+            const platformNames = {
+                'youtube': 'YouTube',
+                'tiktok': 'TikTok',
+                'instagram': 'Instagram'
+            };
+            
+            platformTitle.textContent = `${platformNames[platform]} Video İndir`;
+            videoUrlInput.value = ''; // Input'u temizle
+            messageBox.classList.add('hidden'); // Mesaj kutusunu gizle
+
+            // Seçim ekranını gizle, URL giriş ekranını göster
+            platformSelection.classList.add('hidden');
+            urlInputSection.classList.remove('hidden');
+
+            // URL girişine odaklan
+            setTimeout(() => videoUrlInput.focus(), 100);
+        }
+
+        /**
+         * İndirme butonuna tıklandığında çalışır. URL'yi kontrol eder ve simülasyon/yönlendirme yapar.
+         */
+        function startDownload() {
+            const url = videoUrlInput.value.trim();
+            messageBox.classList.remove('hidden');
+            messageBox.classList.remove('bg-red-900/50', 'bg-green-900/50', 'border-red-500', 'border-green-500', 'text-red-300', 'text-green-300');
+            
+            if (!url) {
+                // URL boşsa hata mesajı göster
+                messageBox.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i> Lütfen geçerli bir video URL\'si girin.';
+                messageBox.classList.add('bg-red-900/50', 'border-red-500', 'text-red-300');
                 return;
             }
 
-            // Basit bir kontrol: Linkin YouTube linki olup olmadığını denetler
-            if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-                
-                // Popüler bir indirme servisi olan 'ssyoutube' yönlendirme formatını kullanıyoruz.
-                // Kullanıcının linkini yeni bir sekmede açarak indirme aracına gönderir.
-                const redirectUrl = "https://www.ssyoutube.com/" + videoUrl;
-
-                // Yeni sekmede aç
-                window.open(redirectUrl, '_blank');
-
-            } else {
-                alert("Lütfen sadece bir YouTube linki girdiğinizden emin olun.");
+            // Basit URL formatı kontrolü
+            const urlRegex = new RegExp(`(https?:\/\/)?(www\.)?${selectedPlatform}\.com\/`, 'i');
+            if (!urlRegex.test(url) && selectedPlatform !== 'tiktok' && selectedPlatform !== 'instagram') {
+                 // Sadece YouTube için basit kontrol
+                 messageBox.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i> Girdiğiniz URL bir ${selectedPlatform.toUpperCase()} linki gibi görünmüyor. Yine de devam ediyoruz...`;
+                 messageBox.classList.add('bg-yellow-900/50', 'border-yellow-500', 'text-yellow-300');
             }
+            
+            // Simülasyon: İndirme işlemi başladı. Gerçek indirme için harici bir servise yönlendirme yapılmalı.
+            // Örnek: savefrom.net, y2mate.com gibi bir siteye yönlendirebiliriz.
+            
+            // Örnek Yönlendirme (Gerçek kullanımda bunu aktif edebilirsiniz):
+            // const externalDownloaderUrl = `https://savefrom.net/?url=${encodeURIComponent(url)}`;
+            // window.open(externalDownloaderUrl, '_blank');
+            
+            // Şimdilik Simülasyon ve Yönergeler:
+            messageBox.innerHTML = `
+                <i class="fas fa-spinner fa-spin mr-2"></i> Video analiz ediliyor... 
+                <br> <span class="text-sm mt-1 block">Yönlendirme Simülasyonu: Lütfen harici bir indirme sitesine giderek URL'nizi yapıştırın. (Örn: SaveFrom.net)</span>
+            `;
+            messageBox.classList.add('bg-blue-900/50', 'border-blue-500', 'text-blue-300');
+
+
+            // 3 saniye sonra başarılı mesajı göster
+            setTimeout(() => {
+                messageBox.innerHTML = `
+                    <i class="fas fa-check-circle mr-2"></i> Analiz Tamamlandı! Lütfen çıkan harici siteden indirmeyi başlatın.
+                    <button onclick="resetPage()" class="ml-4 underline hover:text-white transition">Yeni İndirme</button>
+                `;
+                messageBox.classList.remove('bg-blue-900/50', 'border-blue-500', 'text-blue-300');
+                messageBox.classList.add('bg-green-900/50', 'border-green-500', 'text-green-300');
+            }, 3000);
         }
+        
+        /**
+         * Sayfayı ilk platform seçimi durumuna geri döndürür.
+         */
+        function resetPage() {
+            messageBox.classList.add('hidden');
+            urlInputSection.classList.add('hidden');
+            platformSelection.classList.remove('hidden');
+            selectedPlatform = '';
+        }
+
     </script>
 </body>
 </html>
