@@ -223,13 +223,28 @@
 
         // --- Firebase Başlatma ---
         let auth;
-        try {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            // Oturumun yalnızca tarayıcı sekmesi açıkken kalmasını ayarla
-            setPersistence(auth, browserSessionPersistence); 
-        } catch (e) {
-            console.error("Firebase başlatma hatası:", e);
+        let app; // 'app' değişkenini modül kapsamında tanımla
+        
+        if (Object.keys(firebaseConfig).length === 0) {
+            console.error("HATA: Firebase yapılandırması (__firebase_config) eksik veya boş.");
+        } else {
+            try {
+                // Uygulamayı başlat
+                app = initializeApp(firebaseConfig);
+                
+                // Auth servisini al
+                auth = getAuth(app);
+                
+                // Auth servisi başarılıysa devam et
+                if (auth) {
+                    // Oturumun yalnızca tarayıcı sekmesi açıkken kalmasını ayarla
+                    setPersistence(auth, browserSessionPersistence); 
+                }
+
+            } catch (e) {
+                // Başlatma sırasında oluşan hataları yakala
+                console.error("Firebase başlatma/servis alma hatası:", e);
+            }
         }
 
 
@@ -351,6 +366,12 @@
 
             if (!email || !password) {
                 displayMessage("Lütfen tüm alanları doldurun.", 'error');
+                return;
+            }
+            
+            // Eğer Auth servisi başlatılmamışsa, giriş denemesini engelle
+            if (!auth) {
+                displayMessage("Sistem hatası: Kimlik doğrulama servisi kullanılamıyor. Lütfen yapılandırmayı kontrol edin.", 'error');
                 return;
             }
 
