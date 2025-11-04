@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giriş Yap | BAKİ S2</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -84,16 +82,13 @@
 </head>
 <body class="flex flex-col">
 
-    <!-- Navbar -->
     <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
         <div class="w-full max-w-6xl flex justify-between items-center">
             
-            <!-- Logo -->
             <a href="index.html" class="text-3xl font-extrabold text-white flex items-center">
                 <i class="fas fa-terminal mr-2 text-purple"></i> BAKİ S2
             </a>
             
-            <!-- Navigasyon Linkleri (Orta) -->
             <nav class="hidden md:flex space-x-6 text-lg">
                 <a href="panel.html" class="text-gray-300 hover:text-purple transition duration-200">Kullanıcı Paneli</a>
                 <a href="yardim.html" class="text-gray-300 hover:text-purple transition duration-200">Yardım Merkezi</a>
@@ -101,33 +96,25 @@
                 <a href="fiyatlandirma.html" class="text-gray-300 hover:text-purple transition duration-200">Fiyatlandırma</a>
             </nav>
             
-            <!-- DİNAMİK CTA / KULLANICI BİLGİSİ ALANI -->
             <div class="flex space-x-3 items-center">
-                <!-- 1. Oturum Kapalı Durumu (Varsayılan olarak gösterilir, JS ile gizlenir) -->
                 <div id="loggedOutNav" class="flex space-x-3 items-center">
                     <span class="text-red-400 font-medium hidden sm:inline-block">Giriş Yapılmamış</span>
-                    <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-gray-300 hover:text-white transition duration-200 rounded-lg">Giriş Yap</a>
+                    <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-white transition duration-200 rounded-lg font-bold border border-purple">Giriş Yap</a>
                     <a href="kaydol.html" class="main-cta-button px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
                 </div>
 
-                <!-- 2. Oturum Açık Durumu (Varsayılan olarak gizlenir, JS ile gösterilir) -->
                 <div id="loggedInNav" class="relative hidden">
                     <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
-                        <!-- Profil Baş Harfleri -->
                         <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span>
                         
                         <div class="hidden sm:flex flex-col items-start">
-                            <!-- Kullanıcı Adı -->
                             <span class="text-sm font-semibold" id="nav_profile_display_name">...</span>
-                            <!-- Kullanıcı Durumu (Premium/Standart) -->
                             <span class="text-xs font-medium" id="nav_profile_status"></span>
                         </div>
                         <i class="fas fa-chevron-down text-xs text-gray-400"></i>
                     </button>
                     
-                    <!-- Dropdown Menü -->
                     <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-48 card-dropdown bg-gray-800 rounded-lg shadow-xl py-1 z-30 hidden">
-                        <!-- Önizleme Alanı -->
                         <div class="px-4 py-2 text-sm text-gray-400 border-b border-gray-700">
                             <p class="font-bold text-white truncate" id="dropdown_email_preview">email@yok.com</p>
                             <p class="text-xs font-medium" id="dropdown_status_preview">Standart</p>
@@ -149,7 +136,6 @@
     <main class="flex-grow flex justify-center items-center py-12">
         <div class="w-full max-w-md px-4">
             
-            <!-- Logo -->
             <div class="text-center mb-10">
                 <a href="index.html" class="text-4xl font-extrabold text-white flex items-center justify-center">
                     <i class="fas fa-terminal mr-3 text-purple"></i> BAKİ S2
@@ -159,32 +145,32 @@
 
             <div class="form-card p-8 rounded-xl">
 
-                <!-- Giriş Formu -->
                 <form id="loginForm" class="space-y-6">
                     
-                    <!-- E-posta Alanı -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-300 mb-1">E-posta Adresi</label>
                         <input type="email" id="email" class="input-field w-full p-3 rounded-lg" placeholder="e-posta@adresiniz.com" required>
                     </div>
 
-                    <!-- Şifre Alanı -->
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Şifre</label>
                         <input type="password" id="password" class="input-field w-full p-3 rounded-lg" placeholder="••••••••" required>
                     </div>
 
-                    <!-- Dinamik Mesaj Alanı -->
+                    <div class="flex justify-end">
+                        <a href="sifre-sifirla.html" class="text-sm font-medium text-purple hover:text-white transition duration-200">
+                            Şifremi Unuttum
+                        </a>
+                    </div>
+                    
                     <div id="messageBox" class="alert p-3 rounded-lg text-sm hidden"></div>
 
-                    <!-- Giriş Butonu -->
                     <button type="submit" id="loginButton" class="main-cta-button w-full p-3 rounded-lg font-bold text-white text-lg">
                         Giriş Yap <i class="fas fa-sign-in-alt ml-2"></i>
                     </button>
 
                 </form>
 
-                <!-- Ek Bağlantılar -->
                 <div class="mt-6 text-center text-sm">
                     <p class="text-gray-400">
                         Hesabınız yok mu? 
@@ -197,28 +183,36 @@
     </main>
 
 
-    <!-- Firebase Kodu ve Giriş Mantığı -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, setPersistence, browserSessionPersistence, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
         // --- Ortamdan Gelen Değişkenler ---
+        // BURAYA KENDİ FIREBASE YAPILANDIRMANIZI EKLEYİN!
+        // Şu anki kod, __firebase_config adında global bir değişken arıyor. 
+        // Eğer bu değişken yoksa veya geçersizse, auth işlemi başlamayacaktır.
+        // EN BASİT YÖNTEM: Aşağıdaki değişkeni doldurmak
+        
+        const myFirebaseConfig = {
+            apiKey: "YOUR_API_KEY", // Kendi anahtarınızı ekleyin
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
         let auth;
-        let app;
-        let firebaseConfig = {};
-        let isConfigAvailable = false; 
+        let isConfigAvailable = false;
+        let firebaseConfig = myFirebaseConfig;
 
-        try {
-            // __firebase_config'in varlığını ve tipini kontrol et
-            if (typeof __firebase_config !== 'undefined' && typeof __firebase_config === 'string' && __firebase_config.trim().length > 0) {
-                 firebaseConfig = JSON.parse(__firebase_config);
-                 isConfigAvailable = true;
-            }
-        } catch (e) {
-            console.error("HATA: Firebase yapılandırması JSON ayrıştırma hatası:", e);
-            // Ayrıştırma hatası varsa, config kullanılamaz
-            isConfigAvailable = false; 
+        // Yapılandırmanın boş olup olmadığını kontrol edin
+        if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+             isConfigAvailable = true;
+        } else {
+             console.error("KRİTİK HATA: Firebase yapılandırma bilgileri eksik veya geçersiz. Lütfen 'myFirebaseConfig' değişkenini kendi anahtarlarınızla doldurun.");
         }
+
 
         // --- DOM Elementleri (Giriş Formu) ---
         const loginForm = document.getElementById('loginForm');
@@ -239,26 +233,23 @@
         if (isConfigAvailable) {
             try {
                 // Uygulamayı başlat
-                app = initializeApp(firebaseConfig);
+                const app = initializeApp(firebaseConfig);
                 
                 // Auth servisini al
                 auth = getAuth(app);
                 
-                // Auth servisi başarılıysa devam et
+                // Oturumun yalnızca tarayıcı sekmesi açıkken kalmasını ayarla
                 if (auth) {
-                    // Oturumun yalnızca tarayıcı sekmesi açıkken kalmasını ayarla
                     setPersistence(auth, browserSessionPersistence); 
                 }
 
             } catch (e) {
-                // Başlatma sırasında oluşan hataları yakala
                 console.error("Firebase başlatma/servis alma hatası:", e);
                 auth = null; 
-                isConfigAvailable = false; // Başlatma başarısız oldu
+                isConfigAvailable = false; 
                 displayMessage("Kritik Hata: Firebase servisleri başlatılamadı. Konsolu kontrol edin.", 'error');
             }
         } else {
-             // Yapılandırma eksikse/geçersizse hata mesajını göster
              displayMessage("Kritik Hata: Firebase yapılandırması eksik. Kimlik doğrulama işlemi çalışmayacaktır.", 'error');
         }
 
@@ -273,14 +264,16 @@
 
             if (email) {
                 const emailLocalPart = email.split('@')[0];
-                const nameParts = emailLocalPart.split(/[\._-]/); 
+                const nameParts = emailLocalPart.split(/[\._-]/).filter(Boolean); // boş dizeleri filtrele
                 
                 if (nameParts.length > 1 && nameParts[0] && nameParts[1]) {
                     initials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
                     displayName = nameParts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+                } else if (nameParts.length > 0) {
+                    initials = nameParts[0].charAt(0).toUpperCase();
+                    displayName = nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
                 } else {
-                    initials = emailLocalPart.charAt(0).toUpperCase();
-                    displayName = emailLocalPart.charAt(0).toUpperCase() + emailLocalPart.slice(1);
+                    initials = email.charAt(0).toUpperCase();
                 }
 
                 // Fictional Status Logic: E-posta "premium" içeriyorsa Premium yap
@@ -296,7 +289,7 @@
             }
             
             // --- Navbar Güncelleme ---
-            document.getElementById('nav_profile_initials').textContent = initials;
+            document.getElementById('nav_profile_initials').textContent = initials.substring(0,2);
             document.getElementById('nav_profile_display_name').textContent = displayName.split(' ')[0]; 
             
             const navStatusElement = document.getElementById('nav_profile_status');
@@ -346,6 +339,8 @@
                     try {
                         profileDropdownMenu.classList.add('hidden');
                         await signOut(auth);
+                        // Oturum kapandığında giriş sayfasına yönlendir
+                        window.location.href = "girisyap.html"; 
                     } catch (error) {
                         console.error("Çıkış yapma hatası:", error);
                     }
@@ -387,7 +382,6 @@
                 return;
             }
             
-            // Firebase Auth başlatılmadıysa işlemi engelle
             if (!auth || !isConfigAvailable) {
                 displayMessage("Sistem hatası: Kimlik doğrulama servisi yapılandırılamadı. Giriş engellendi.", 'error');
                 return;
@@ -396,8 +390,7 @@
             // Butonu devre dışı bırak ve yükleniyor durumunu göster
             loginButton.disabled = true;
             loginButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Giriş Yapılıyor...';
-            displayMessage("Giriş yapılıyor, lütfen bekleyin...", 'success');
-
+            messageBox.classList.add('hidden'); // Yeni girişte önceki mesajı gizle
 
             try {
                 // Firebase ile e-posta ve şifre ile giriş yap
@@ -420,7 +413,7 @@
                 switch (error.code) {
                     case 'auth/user-not-found':
                     case 'auth/wrong-password':
-                        errorMessage = "E-posta veya şifre hatalı.";
+                        errorMessage = "E-posta veya şifre hatalı. Lütfen kontrol edin.";
                         break;
                     case 'auth/invalid-email':
                         errorMessage = "Geçersiz e-posta formatı.";
@@ -429,7 +422,7 @@
                         errorMessage = "Hesabınız askıya alınmıştır.";
                         break;
                     default:
-                        errorMessage = `Giriş Hatası: ${error.message}`;
+                        errorMessage = `Giriş Hatası: ${error.message.includes('password') ? 'E-posta veya şifre hatalı.' : 'Sunucuya bağlanılamadı.'}`;
                         break;
                 }
 
