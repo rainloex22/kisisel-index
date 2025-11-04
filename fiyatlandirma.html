@@ -247,15 +247,118 @@
 
     <script type="module" src="./firebase-auth-service.js"></script>
 
-    <script type="module">
-        // --- Modal Fonksiyonları ---
-        const modal = document.getElementById('purchaseModal');
-        const modalPlanName = document.getElementById('modalPlanName');
-        const modalPlanPrice = document.getElementById('modalPlanPrice');
-        const modalLoginBtn = document.getElementById('modalLoginBtn');
-        const modalRegisterBtn = document.getElementById('modalRegisterBtn');
+    // TÜM HTML DOSYALARINDAKİ (girisyap.html, kaydol.html, yardim.html, discord.html, fiyatlandirma.html, panel.html, sifremiunuttum.html) <script type="module"> bloğunu bu kodla değiştirin.
 
-        window.openPurchaseModal = function(planName, planPrice) {
+<script type="module">
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { app } from "./firebase-auth-service.js"; // firebase-auth-service.js dosyanızdaki app objesini içe aktarın
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const authButtons = document.getElementById('authButtons');
+    const loggedInNav = document.getElementById('loggedInNav');
+
+    function getInitials(name) {
+        if (!name) return '??';
+        const parts = name.split(' ');
+        if (parts.length > 1) {
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+        return name[0].toUpperCase();
+    }
+
+    /**
+     * Header UI'yı kullanıcı oturum durumuna göre günceller.
+     * @param {Object|null} user - Firebase User objesi veya null
+     */
+    async function updateHeaderUI(user) {
+        if (authButtons && loggedInNav) {
+            if (user && !user.isAnonymous) {
+                // 1. KULLANICI GİRİŞ YAPMIŞ DURUMDA
+                authButtons.classList.add('hidden');
+                loggedInNav.classList.remove('hidden');
+
+                const navDisplayName = document.getElementById('navDisplayName');
+                const navAccountType = document.getElementById('navAccountType');
+                const navProfilePicture = document.getElementById('navProfilePicture');
+                
+                let displayName = user.displayName || user.email.split('@')[0];
+                let accountType = "STANDART"; // Varsayılan değer
+                let photoURL = user.photoURL || '';
+                
+                // Firestore'dan Hesap Türünü çek
+                try {
+                    const docSnap = await getDoc(doc(db, "users", user.uid));
+                    if (docSnap.exists()) {
+                        accountType = docSnap.data().accountType || "STANDART";
+                    }
+                } catch (e) {
+                    console.error("Firestore veri çekme hatası:", e);
+                }
+
+                // Bilgileri yerleştir
+                navDisplayName.textContent = displayName;
+                navAccountType.textContent = accountType;
+
+                // Profil Fotoğrafı/Baş Harfler
+                if (navProfilePicture) {
+                    if (photoURL) {
+                        navProfilePicture.innerHTML = `<img src="${photoURL}" alt="Profil Fotoğrafı" class="h-full w-full object-cover">`;
+                    } else {
+                        navProfilePicture.innerHTML = `<span class="text-white text-base font-bold">${getInitials(displayName)}</span>`;
+                    }
+                }
+                
+                // Çıkış butonuna olayı bağla
+                document.getElementById('logoutButton')?.addEventListener('click', handleLogout);
+
+            } else {
+                // 2. KULLANICI GİRİŞ YAPMAMIŞ DURUMDA
+                authButtons.classList.remove('hidden');
+                loggedInNav.classList.add('hidden');
+            }
+        }
+    }
+
+    // Çıkış Yapma Fonksiyonu
+    async function handleLogout() {
+        try {
+            await signOut(auth);
+            // Çıkış yapıldıktan sonra giriş sayfasına yönlendir
+            window.location.href = 'girisyap.html';
+        } catch (error) {
+            console.error("Çıkış hatası:", error);
+            alert("Çıkış yaparken bir hata oluştu: " + error.message);
+        }
+    }
+
+    // --- Oturum Durumu Değişikliği Dinleyicisi ---
+    onAuthStateChanged(auth, (user) => {
+        updateHeaderUI(user);
+    });
+    
+    // YENİ: Dropdown açma/kapama JS'i
+    document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('hidden');
+    });
+    document.addEventListener('click', (event) => {
+        const menu = document.getElementById('loggedInNav');
+        const isClickInside = menu?.contains(event.target);
+        if (!isClickInside) {
+            document.getElementById('profileDropdown')?.classList.add('hidden');
+        }
+    });
+
+    // Sayfa yüklendiğinde body opacity'sini 1'e ayarla (fade-in) - (Eğer ilgili CSS varsa)
+    document.addEventListener('DOMContentLoaded', () => {
+        if(document.body.style.opacity === '0') {
+             document.body.style.opacity = '1';
+        }
+    });
+</script>
             
             // Modal içeriğini güncelle
             modalPlanName.textContent = planName;
