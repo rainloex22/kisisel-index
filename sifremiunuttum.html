@@ -11,18 +11,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { --purple: #6c5ce7; }
-        body { font-family: 'Poppins', sans-serif; background-color: #1a0e21; color: #ffffff; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #1a0e21; 
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex; 
+            flex-direction: column;
+        }
         .header-bg { background-color: rgba(26, 14, 33, 0.9); backdrop-filter: blur(5px); }
-        .form-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); border-radius: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .form-card { 
+            background-color: #2a1b3a; /* Kaydol sayfasıyla uyumlu hale getirildi */
+            border: 1px solid rgba(108, 92, 231, 0.3); /* Kaydol sayfasıyla uyumlu hale getirildi */
+            border-radius: 1rem; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); 
+        }
+        .input-field {
+            background-color: #3b2f4f; /* Kaydol sayfasıyla uyumlu hale getirildi */
+            border: 1px solid transparent;
+            color: white;
+            transition: border-color 0.3s;
+        }
+        .input-field:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 1px var(--purple);
+            outline: none;
+        }
         .btn-reset {
             background-color: var(--purple);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
         .btn-reset:hover {
             background-color: #5c4cd9;
             transform: translateY(-1px);
         }
-        /* Özel Mesaj Kutusu Stili */
+        /* Mesaj Kutusu Stili */
         #messageBox {
             visibility: hidden;
             position: fixed;
@@ -36,12 +60,14 @@
             opacity: 0;
             transition: opacity 0.3s, visibility 0.3s;
             display: flex; 
-            flex-direction: column; /* İçeriğin alt alta gelmesi için */
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center; /* Mesajın ortalanması için eklendi */
+            text-align: center;
             max-width: 90%;
             min-width: 280px;
+            color: white; /* Mesaj rengi beyaz yapıldı */
+            font-weight: 600;
         }
         .message-success { background-color: #10b981; }
         .message-error { background-color: #ef4444; }
@@ -49,20 +75,23 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Navbar (girisyap.html ve kaydol.html ile aynı) -->
+    <!-- Navbar (Kullanıcı durumu ile dinamik hale getirildi) -->
     <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
         <div class="w-full max-w-6xl flex justify-between items-center">
             <a href="panel.html" class="text-3xl font-extrabold text-white flex items-center">
                 <i class="fas fa-terminal mr-2 text-purple"></i> BAKİ S2
             </a>
             <nav class="hidden md:flex space-x-6 text-lg">
+                <!-- Kullanıcı Panelini buraya ekledik -->
+                <a href="panel.html" class="text-gray-300 hover:text-purple transition duration-200">Kullanıcı Paneli</a>
                 <a href="yardim.html" class="text-gray-300 hover:text-purple transition duration-200">Yardım Merkezi</a>
                 <a href="discord.html" class="text-gray-300 hover:text-purple transition duration-200">Discord</a>
                 <a href="fiyatlandirma.html" class="text-gray-300 hover:text-purple transition duration-200">Fiyatlandirma</a>
             </nav>
-            <div class="flex space-x-3">
-                <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-purple transition duration-200 rounded-lg">Giriş Yap</a>
-                <a href="kaydol.html" class="bg-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
+            <!-- Kimlik doğrulama butonları buraya JS ile yüklenecek -->
+            <div id="authButtonsContainer" class="flex space-x-3">
+                <!-- Yer tutucu: Yükleniyor... -->
+                <div class="px-5 py-2 rounded-lg font-semibold text-gray-500">Yükleniyor...</div>
             </div>
         </div>
     </header>
@@ -70,22 +99,22 @@
     <!-- İçerik Alanı -->
     <main class="flex-grow flex flex-col items-center justify-center py-12 px-4">
         <div class="form-card p-8 md:p-10 w-full max-w-md">
-            <h1 class="text-3xl font-extrabold mb-4 text-white text-center">Şifremi Sıfırla</h1>
+            <h1 class="text-3xl font-extrabold mb-4 text-white text-center">🔒 Şifremi Sıfırla</h1>
             <p class="text-center text-gray-400 mb-6">Hesabınızla ilişkili e-posta adresinizi girin. Size bir şifre sıfırlama bağlantısı göndereceğiz.</p>
             
             <form id="passwordResetForm" class="space-y-4">
                 <div>
                     <label for="reset_email" class="block text-sm font-medium text-gray-400 text-left mb-1">E-posta</label>
-                    <input type="email" id="reset_email" required class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple focus:ring focus:ring-purple focus:ring-opacity-50 text-white" placeholder="ornek@mail.com">
+                    <input type="email" id="reset_email" required class="input-field w-full p-3 rounded-lg" placeholder="ornek@mail.com">
                 </div>
 
                 <button type="submit" id="resetButton" class="w-full btn-reset py-3 rounded-lg font-bold text-white text-lg mt-4">
-                    Sıfırlama Bağlantısı Gönder
+                    <i class="fas fa-envelope mr-2"></i> Sıfırlama Bağlantısı Gönder
                 </button>
             </form>
             
             <p class="text-center text-sm text-gray-400 mt-4">
-                <a href="girisyap.html" class="text-purple hover:underline font-semibold">Giriş sayfasına geri dön</a>
+                <a href="girisyap.html" class="text-purple hover:underline font-semibold transition duration-200">Giriş sayfasına geri dön</a>
             </p>
         </div>
     </main>
@@ -94,18 +123,23 @@
     <div id="messageBox"></div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-500 text-center p-4">
+    <footer class="bg-gray-900 text-gray-500 text-center p-4 mt-auto">
         © 2025 BAKİ S2 Yönetim Hizmetleri.
     </footer>
 
     <!-- Firebase Kodu -->
     <script type="module">
-        // Gerekli Firebase fonksiyonlarını içe aktar
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, setPersistence, browserLocalPersistence, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+        // Gerekli Firebase fonksiyonlarını içe aktar (v11.6.1 kullanıldı)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        // GÜNCEL Firebase yapılandırması (Önceki sayfalardan alınan)
-        const firebaseConfig = {
+        // --- Zorunlu Global Değişkenlerin Alınması ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const globalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Kullanıcının hardcoded ayarları (yedek olarak)
+        const hardcodedConfig = {
             apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
             authDomain: "baki-s2-yonetim.firebaseapp.com",
             projectId: "baki-s2-yonetim",
@@ -114,71 +148,123 @@
             appId: "1:692508919425:web:fac963c81c11b7be70af80",
             measurementId: "G-Q52XG8GLB2"
         };
-
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        const firebaseConfig = globalFirebaseConfig || hardcodedConfig;
+        let auth;
+        let isConfigAvailable = !!firebaseConfig.apiKey;
 
         // --- DOM Elementlerini Başlat ---
-        let messageBox = document.getElementById('messageBox');
-        
-        // --- Mesaj Gösterme Fonksiyonu (Düzeltildi) ---
+        const passwordResetForm = document.getElementById('passwordResetForm');
+        const resetButton = document.getElementById('resetButton');
+        const emailInput = document.getElementById('reset_email');
+        const messageBox = document.getElementById('messageBox');
+        const authButtonsContainer = document.getElementById('authButtonsContainer');
+        const originalButtonText = '<i class="fas fa-envelope mr-2"></i> Sıfırlama Bağlantısı Gönder';
+
+
+        // --- Mesaj Gösterme Fonksiyonu ---
         function showMessage(message, type = 'success') {
-            // Element kontrolü
-            if (!messageBox) {
-                messageBox = document.getElementById('messageBox');
-                if (!messageBox) {
-                     console.error("Message box element not found!");
-                     return;
-                }
-            }
+            if (!messageBox) return;
 
-            // Önceki renk sınıflarını temizle
             messageBox.classList.remove('message-success', 'message-error');
-
-            // İçeriği ve yeni renk sınıfını ayarla
             messageBox.innerHTML = message;
             const colorClass = type === 'success' ? 'message-success' : 'message-error';
             messageBox.classList.add(colorClass);
 
-            // Mesaj kutusunu görünür yap
             messageBox.classList.add('message-show');
             
-            // 5 saniye sonra gizle
             setTimeout(() => {
                 messageBox.classList.remove('message-show');
-            }, 5000); 
+            }, 5000);
         }
 
-        // Firebase Uygulamasını Başlat
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        setPersistence(auth, browserLocalPersistence); 
+        // --- Header UI Güncelleme Fonksiyonu ---
+        function updateHeaderUI(user) {
+            authButtonsContainer.innerHTML = ''; // Mevcut içeriği temizle
 
-        // Oturum Kontrolü (Canvas Gereksinimi)
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("Kullanıcı durumu kontrol edildi. UID:", user.uid);
-            } else if (!initialAuthToken) {
-                signInAnonymously(auth).catch(e => console.error("Anonim giriş hatası:", e));
+            if (user && user.isAnonymous === false) {
+                // Oturum Açık: Panel ve Çıkış Yap butonlarını göster
+                const panelText = user.email ? user.email.split('@')[0] : 'Panel';
+                
+                authButtonsContainer.innerHTML = `
+                    <a href="panel.html" class="hidden sm:inline-block px-4 py-2 text-white transition duration-200 rounded-lg font-bold border border-purple hover:bg-purple/10">${panelText}</a>
+                    <button id="logoutButton" class="bg-red-600 px-5 py-2 rounded-lg font-semibold text-white hover:bg-red-700 transition duration-200">Çıkış Yap</button>
+                `;
+
+                // Çıkış yapma işlevini butona bağla
+                document.getElementById('logoutButton').addEventListener('click', handleLogout);
+
+            } else {
+                // Oturum Kapalı: Giriş Yap ve Kaydol butonlarını göster
+                authButtonsContainer.innerHTML = `
+                    <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-white transition duration-200 rounded-lg font-bold border border-purple hover:bg-purple/10">Giriş Yap</a>
+                    <a href="kaydol.html" class="bg-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
+                `;
             }
-        });
+        }
+        
+        // --- Çıkış Yapma İşlemi ---
+        async function handleLogout() {
+            if (!auth) return;
+            try {
+                await signOut(auth);
+                showMessage("Başarıyla çıkış yaptınız.", "success");
+                // Çıkış sonrası giriş sayfasına yönlendir
+                setTimeout(() => window.location.href = 'girisyap.html', 1500); 
+            } catch (error) {
+                console.error("Çıkış yapma hatası:", error);
+                showMessage("Çıkış yapma işlemi sırasında bir hata oluştu.", "error");
+            }
+        }
 
-        if (initialAuthToken) {
-            signInWithCustomToken(auth, initialAuthToken).catch(e => {
-                console.error("Custom token ile giriş hatası:", e);
-            });
+        // --- Firebase Başlatma ve Oturum Kontrolü ---
+        if (isConfigAvailable) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                
+                onAuthStateChanged(auth, (user) => {
+                    if (user && user.isAnonymous === false) {
+                        updateHeaderUI(user);
+                    } else {
+                        updateHeaderUI(null);
+                        // Anonim giriş veya custom token ile otomatik giriş
+                        if (initialAuthToken) {
+                            signInWithCustomToken(auth, initialAuthToken).catch(e => {
+                                console.error("Özel token ile giriş başarısız, anonim olarak deneniyor:", e);
+                                signInAnonymously(auth).catch(e => console.error("Anonim giriş başarısız:", e));
+                            });
+                        } else if (!user) {
+                            signInAnonymously(auth).catch(e => console.error("Anonim giriş başarısız:", e));
+                        }
+                    }
+                });
+
+            } catch (e) {
+                console.error("Firebase başlatma hatası:", e);
+                isConfigAvailable = false;
+                updateHeaderUI(null);
+            }
+        } else {
+            console.error("Firebase yapılandırması mevcut değil.");
+            updateHeaderUI(null);
         }
 
         // --- Şifre Sıfırlama İşlemi ---
-        document.getElementById('passwordResetForm').addEventListener('submit', async (e) => {
+        passwordResetForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('reset_email').value;
+            
+            if (!isConfigAvailable || !auth) {
+                 showMessage("Hata: Firebase bağlantısı kurulamadı.", "error");
+                 return;
+            }
 
-            const button = document.getElementById('resetButton');
-            button.disabled = true;
-            button.textContent = 'Gönderiliyor...';
+            const email = emailInput.value;
+
+            resetButton.disabled = true;
+            resetButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Gönderiliyor...';
 
             try {
-                // Firebase Auth ile sıfırlama e-postası gönder
                 await sendPasswordResetEmail(auth, email);
                 
                 const successMessage = `
@@ -187,29 +273,29 @@
                 `;
 
                 showMessage(successMessage, "success");
-                document.getElementById('passwordResetForm').reset(); // Formu temizle
+                passwordResetForm.reset(); 
 
             } catch (error) {
                 console.error("Şifre sıfırlama hatası:", error);
                 let errorMessage = "İşlem sırasında bir hata oluştu.";
 
-                // Hata kodlarına göre mesajları özelleştirme
                 switch (error.code) {
                     case 'auth/user-not-found':
+                    case 'auth/missing-email':
                         errorMessage = "Bu e-posta adresine sahip bir kullanıcı bulunamadı.";
                         break;
                     case 'auth/invalid-email':
                         errorMessage = "Geçersiz e-posta adresi formatı.";
                         break;
                     default:
-                        errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin. Kod: " + error.code;
+                        errorMessage = `Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin. (Kod: ${error.code})`;
                 }
                 
                 showMessage("Hata: " + errorMessage, "error");
 
             } finally {
-                button.disabled = false;
-                button.textContent = 'Sıfırlama Bağlantısı Gönder';
+                resetButton.disabled = false;
+                resetButton.innerHTML = originalButtonText;
             }
         });
     </script>
