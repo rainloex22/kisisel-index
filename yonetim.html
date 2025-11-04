@@ -11,13 +11,13 @@
         :root { --purple: #6c5ce7; }
         body { 
             font-family: 'Poppins', sans-serif; 
-            background-color: #110915; /* Daha koyu arka plan */
+            background-color: #110915; 
             color: #ffffff;
             min-height: 100vh;
             display: flex; 
         }
         .sidebar {
-            background-color: #1a0e21; /* Navbar arka planı */
+            background-color: #1a0e21; 
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
             flex-shrink: 0;
             width: 250px;
@@ -51,10 +51,11 @@
             background-color: rgba(108, 92, 231, 0.1);
             border-radius: 0.5rem;
         }
-        /* Gizli durum mesajı */
+        /* Yükleme Ekranı Stilleri */
         #loadingOverlay {
             background-color: #110915; 
-            z-index: 100;
+            z-index: 1000; /* Her şeyin üstünde olmalı */
+            display: flex; /* Varsayılan olarak görünür */
         }
     </style>
 </head>
@@ -152,119 +153,138 @@
     <script type="module" src="./firebase-auth-service.js"></script>
     
     <script type="module">
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { app } from "./firebase-auth-service.js"; 
-
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const adminPanelWrapper = document.getElementById('adminPanelWrapper');
-    const loadingMessage = document.getElementById('loadingMessage');
-    const adminLogoutButton = document.getElementById('adminLogoutButton');
-    const navItems = document.querySelectorAll('.nav-item');
-    const contentTabs = document.querySelectorAll('.content-tab');
-    const pageTitle = document.getElementById('pageTitle');
-    
-    // --- Kullanıcı Arayüzü Güncellemesi (Firebase durumuna göre) ---
-    function updateAdminUI(user) {
-        if (user) {
-            // Kullanıcı girişliyse, çıkış butonunu göster
-            adminLogoutButton.style.display = 'flex'; 
-            loadingMessage.textContent = `Oturum açık: ${user.email}. Veriler yükleniyor...`;
-        } else {
-            // Kullanıcı girişli değilse, çıkış butonunu gizle
-            adminLogoutButton.style.display = 'none';
-            loadingMessage.textContent = 'Giriş yapılmadan erişildi. Sadece admin bilir.';
-        }
-    }
-
-    // --- Veri Çekme Fonksiyonu (Yönetim Panosu) ---
-    async function loadDashboardData() {
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // DİKKAT: firebase-auth-service.js dosyası hatalıysa bu satır HATA verir ve aşağıdaki kod çalışmaz.
+        // Bu yüzden, hata versin ya da vermesin paneli gösterme kodunu import'tan ayırdık.
+        let app;
         try {
-            // Firestore verilerini çekme denemesi
-            
-            // Toplam Kullanıcı Sayısı
-            const usersSnapshot = await getDocs(collection(db, "users"));
-            document.getElementById('totalUsers').textContent = usersSnapshot.size.toLocaleString('tr-TR');
-
-            // Toplam Link Sayısı (Varsayımsal 'links' koleksiyonu)
-            const linksSnapshot = await getDocs(collection(db, "links"));
-            document.getElementById('totalLinks').textContent = linksSnapshot.size.toLocaleString('tr-TR');
-
-            // Aktif Premium Kullanıcı Sayısı
-            const premiumQuery = query(collection(db, "users"), where("accountType", "==", "PREMIUM"));
-            const premiumSnapshot = await getDocs(premiumQuery);
-            document.getElementById('premiumUsers').textContent = premiumSnapshot.size.toLocaleString('tr-TR');
-
+             // firebase-auth-service.js dosyasından 'app' objesini çekmeye çalış
+             const authService = await import("./firebase-auth-service.js");
+             app = authService.app;
         } catch (e) {
-            console.error("Yönetim verileri yüklenirken hata:", e);
-            // Firebase Security Rules izin vermediğinde HATA gösterilir
-            document.getElementById('totalUsers').textContent = 'HATA';
-            document.getElementById('totalLinks').textContent = 'HATA';
-            document.getElementById('premiumUsers').textContent = 'HATA';
+            console.warn("UYARI: './firebase-auth-service.js' dosyası yüklenemedi. Firebase işlevleri çalışmayacak.");
+            // Hata olsa bile 'app' undefined kalır, Firebase işlevleri hata verir ama arayüz görünür.
         }
-    }
 
-    // --- Sayfa Geçişleri (Tab Switching) ---
-    const switchTab = (targetContentId) => {
-        contentTabs.forEach(tab => tab.classList.add('hidden'));
-        document.getElementById(`${targetContentId}Content`).classList.remove('hidden');
+        const auth = app ? getAuth(app) : null;
+        const db = app ? getFirestore(app) : null;
         
-        navItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('data-content') === targetContentId) {
-                item.classList.add('active');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const adminPanelWrapper = document.getElementById('adminPanelWrapper');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const adminLogoutButton = document.getElementById('adminLogoutButton');
+        const navItems = document.querySelectorAll('.nav-item');
+        const contentTabs = document.querySelectorAll('.content-tab');
+        const pageTitle = document.getElementById('pageTitle');
+        
+        // --- Kullanıcı Arayüzü Güncellemesi (Firebase durumuna göre) ---
+        function updateAdminUI(user) {
+            if (user) {
+                // Kullanıcı girişliyse, çıkış butonunu göster
+                adminLogoutButton.style.display = 'flex'; 
+                loadingMessage.textContent = `Oturum açık: ${user.email}. Veriler yükleniyor...`;
+            } else {
+                // Kullanıcı girişli değilse, çıkış butonunu gizle
+                adminLogoutButton.style.display = 'none';
+                loadingMessage.textContent = 'Giriş yapılmadan erişildi. Sadece admin bilir.';
             }
-        });
-        
-        const titleMap = {
-            'dashboard': 'Yönetim Panosu',
-            'users': 'Kullanıcı Yönetimi',
-            'links': 'Link Yönetimi',
-            'settings': 'Sistem Ayarları'
-        };
-        pageTitle.textContent = titleMap[targetContentId] || 'Yönetim Paneli';
-    };
-
-    // --- Olay Dinleyicileri ---
-    adminLogoutButton.addEventListener('click', async () => {
-        try {
-            await signOut(auth);
-            // Çıkış yapınca sayfayı yenile
-            window.location.reload(); 
-        } catch (error) {
-            console.error("Çıkış hatası:", error);
-            alert("Çıkış yapılırken bir hata oluştu.");
         }
-    });
 
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchTab(item.getAttribute('data-content'));
+        // --- Veri Çekme Fonksiyonu (Yönetim Panosu) ---
+        async function loadDashboardData() {
+            if (!db) {
+                // Firebase bağlantısı yoksa HATA göster
+                document.getElementById('totalUsers').textContent = 'BAĞLANTI YOK';
+                document.getElementById('totalLinks').textContent = 'BAĞLANTI YOK';
+                document.getElementById('premiumUsers').textContent = 'BAĞLANTI YOK';
+                return;
+            }
+
+            try {
+                const usersSnapshot = await getDocs(collection(db, "users"));
+                document.getElementById('totalUsers').textContent = usersSnapshot.size.toLocaleString('tr-TR');
+
+                const linksSnapshot = await getDocs(collection(db, "links"));
+                document.getElementById('totalLinks').textContent = linksSnapshot.size.toLocaleString('tr-TR');
+
+                const premiumQuery = query(collection(db, "users"), where("accountType", "==", "PREMIUM"));
+                const premiumSnapshot = await getDocs(premiumQuery);
+                document.getElementById('premiumUsers').textContent = premiumSnapshot.size.toLocaleString('tr-TR');
+
+            } catch (e) {
+                console.error("Yönetim verileri yüklenirken hata:", e);
+                document.getElementById('totalUsers').textContent = 'HATA';
+                document.getElementById('totalLinks').textContent = 'HATA';
+                document.getElementById('premiumUsers').textContent = 'HATA';
+            }
+        }
+
+        // --- Sayfa Geçişleri (Tab Switching) ---
+        const switchTab = (targetContentId) => {
+            contentTabs.forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(`${targetContentId}Content`).classList.remove('hidden');
+            
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-content') === targetContentId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            const titleMap = {
+                'dashboard': 'Yönetim Panosu',
+                'users': 'Kullanıcı Yönetimi',
+                'links': 'Link Yönetimi',
+                'settings': 'Sistem Ayarları'
+            };
+            pageTitle.textContent = titleMap[targetContentId] || 'Yönetim Paneli';
+        };
+
+        // --- Olay Dinleyicileri ---
+        adminLogoutButton.addEventListener('click', async () => {
+            if (auth) {
+                 try {
+                    await signOut(auth);
+                    window.location.reload(); 
+                } catch (error) {
+                    console.error("Çıkış hatası:", error);
+                    alert("Çıkış yapılırken bir hata oluştu.");
+                }
+            }
+           
         });
-    });
 
-    // --- Başlatma (Hata Giderme: Asenkron bekleme yapmadan hemen göster) ---
-    document.addEventListener('DOMContentLoaded', () => {
-        // 1. Yükleme ekranını ANINDA gizle ve paneli göster
-        loadingOverlay.classList.add('hidden');
-        adminPanelWrapper.classList.remove('hidden');
-        
-        // 2. İlk sekmeyi ayarla
-        switchTab('dashboard'); 
-
-        // 3. Firebase durumunu dinle (Çıkış butonunu güncellemek için)
-        onAuthStateChanged(auth, (user) => {
-            updateAdminUI(user);
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab(item.getAttribute('data-content'));
+            });
         });
 
-        // 4. Veri çekme işlemini başlat (Firebase durumu bağımsız)
-        loadDashboardData(); 
-    });
+        // --- Başlatma (Hata Giderme: Asenkron bekleme yapmadan hemen göster) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Yükleme ekranını ANINDA gizle ve paneli göster (CSS'e güvenmek yerine stil kullan)
+            loadingOverlay.style.display = 'none';
+            adminPanelWrapper.classList.remove('hidden');
+            
+            // 2. İlk sekmeyi ayarla
+            switchTab('dashboard'); 
 
-</script>
+            // 3. Firebase durumunu dinle (Çıkış butonunu güncellemek için)
+            if (auth) {
+                 onAuthStateChanged(auth, (user) => {
+                    updateAdminUI(user);
+                });
+            } else {
+                 updateAdminUI(null);
+            }
+           
+            // 4. Veri çekme işlemini başlat (Firebase durumu bağımsız)
+            loadDashboardData(); 
+        });
+
+    </script>
 </body>
 </html>
