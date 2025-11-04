@@ -63,17 +63,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Loading ekranını anında gizle
             const loadingOverlay = document.getElementById('loadingOverlay');
             if (loadingOverlay) {
                 loadingOverlay.style.display = 'none';
             }
-            // Ana paneli anında göster
             const adminPanelWrapper = document.getElementById('adminPanelWrapper');
             if (adminPanelWrapper) {
                 adminPanelWrapper.classList.remove('hidden');
             }
-            // Bu basit script, firebase-auth-service.js dosyası hatalı olsa bile paneli gösterir.
         });
     </script>
     
@@ -166,24 +163,28 @@
     <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
-    <script type="module" src="./firebase-auth-service.js"></script>
     
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // KRİTİK DÜZELTME: import hatası olsa bile çalışması için try...catch
-        let app;
-        try {
-             const authService = await import("./firebase-auth-service.js");
-             app = authService.app;
-        } catch (e) {
-            console.warn("UYARI: './firebase-auth-service.js' dosyası yüklenemedi. Firebase işlevleri çalışmayacak. (Hata devam ediyorsa bu dosyayı kontrol edin.)");
-        }
+        // KRİTİK DÜZELTME: Firebase Config ve Başlatma doğrudan buraya eklendi
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
+            authDomain: "baki-s2-yonetim.firebaseapp.com",
+            projectId: "baki-s2-yonetim",
+            storageBucket: "baki-s2-yonetim.firebasestorage.app",
+            messagingSenderId: "692508919425",
+            appId: "1:692508919425:web:fac963c81c11b7be70af80",
+            measurementId: "G-Q52XG8GLB2"
+        };
 
-        const auth = app ? getAuth(app) : null;
-        const db = app ? getFirestore(app) : null;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
         
+        // HTML Elementleri
         const loadingMessage = document.getElementById('loadingMessage');
         const adminLogoutButton = document.getElementById('adminLogoutButton');
         const navItems = document.querySelectorAll('.nav-item');
@@ -203,13 +204,6 @@
 
         // --- Veri Çekme Fonksiyonu (Yönetim Panosu) ---
         async function loadDashboardData() {
-            if (!db) {
-                document.getElementById('totalUsers').textContent = 'BAĞLANTI YOK';
-                document.getElementById('totalLinks').textContent = 'BAĞLANTI YOK';
-                document.getElementById('premiumUsers').textContent = 'BAĞLANTI YOK';
-                return;
-            }
-
             try {
                 // Firestore verilerini çekme
                 const usersSnapshot = await getDocs(collection(db, "users"));
@@ -224,6 +218,7 @@
 
             } catch (e) {
                 console.error("Yönetim verileri yüklenirken hata:", e);
+                // Genellikle Güvenlik Kuralı İhlali (Security Rules) nedeniyle HATA döner
                 document.getElementById('totalUsers').textContent = 'HATA';
                 document.getElementById('totalLinks').textContent = 'HATA';
                 document.getElementById('premiumUsers').textContent = 'HATA';
@@ -253,14 +248,12 @@
 
         // --- Olay Dinleyicileri ---
         adminLogoutButton.addEventListener('click', async () => {
-            if (auth) {
-                 try {
-                    await signOut(auth);
-                    window.location.reload(); 
-                } catch (error) {
-                    console.error("Çıkış hatası:", error);
-                    alert("Çıkış yapılırken bir hata oluştu.");
-                }
+            try {
+                await signOut(auth);
+                window.location.reload(); 
+            } catch (error) {
+                console.error("Çıkış hatası:", error);
+                alert("Çıkış yapılırken bir hata oluştu.");
             }
            
         });
@@ -277,14 +270,12 @@
             // Paneli gösterme görevi yukarıdaki basit script'e devredildi.
             switchTab('dashboard'); 
 
-            if (auth) {
-                 onAuthStateChanged(auth, (user) => {
-                    updateAdminUI(user);
-                });
-            } else {
-                 updateAdminUI(null);
-            }
+            // Firebase durumunu dinle (Bu asenkron çalışır, UI hemen açılmıştır)
+            onAuthStateChanged(auth, (user) => {
+                updateAdminUI(user);
+            });
            
+            // Veri çekme işlemini başlat
             loadDashboardData(); 
         });
 
