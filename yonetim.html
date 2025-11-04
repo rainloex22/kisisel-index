@@ -32,6 +32,15 @@
             border-radius: 0.75rem; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
         }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            text-decoration: none;
+            color: #e5e7eb;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
         .nav-item.active {
             background-color: var(--purple);
             color: white;
@@ -40,6 +49,7 @@
         }
         .nav-item:hover:not(.active) {
             background-color: rgba(108, 92, 231, 0.1);
+            border-radius: 0.5rem;
         }
         /* Gizli durum mesajı */
         #loadingOverlay {
@@ -50,9 +60,9 @@
 </head>
 <body class="flex">
 
-    <div id="loadingOverlay" class="fixed inset-0 flex flex-col items-center justify-center">
+    <div id="loadingOverlay" class="fixed inset-0 flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500 mb-4"></div>
-        <p id="loadingMessage" class="text-lg text-white">Yetkilendirme kontrol ediliyor...</p>
+        <p id="loadingMessage" class="text-lg text-white text-center">Yönetici Paneli yükleniyor...</p>
     </div>
 
     <div id="adminPanelWrapper" class="hidden w-full flex">
@@ -78,7 +88,7 @@
             </nav>
 
             <div class="mt-auto pt-4 border-t border-gray-700">
-                <button id="adminLogoutButton" class="w-full flex items-center justify-center p-3 text-red-400 bg-gray-700 rounded-lg font-semibold hover:bg-red-800 hover:text-white transition duration-200">
+                <button id="adminLogoutButton" style="display: none;" class="w-full flex items-center justify-center p-3 text-red-400 bg-gray-700 rounded-lg font-semibold hover:bg-red-800 hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt mr-3"></i> Çıkış Yap
                 </button>
             </div>
@@ -116,18 +126,21 @@
             </div>
             
             <div id="usersContent" class="content-tab hidden">
-                <p class="text-gray-300">Bu bölümde Firebase/Firestore kullanarak kullanıcı listesini çekebilir, rol ve abonelik durumlarını güncelleyebilirsiniz.</p>
+                <h3 class="text-2xl font-bold text-white mb-4">Kullanıcı Yönetimi</h3>
+                <p class="text-gray-300">Bu bölüm sadece arayüzdür. Gerçek kullanıcı listesini göstermek için Firebase Yönetim API'leri veya Cloud Functions kullanmanız gerekir.</p>
                 <div class="mt-4 p-4 admin-card">
-                    <p class="text-yellow-400"><i class="fas fa-exclamation-triangle mr-2"></i> **ÖNEMLİ:** Kullanıcı verilerini direkt Firebase'den çekmek güvenlik riski taşıyabilir. Yönetim işlemlerini bir Cloud Function üzerinden yapmanız önerilir.</p>
+                    <p class="text-yellow-400"><i class="fas fa-exclamation-triangle mr-2"></i> **UYARI:** Bu ekrandan kullanıcı verisi çekilemez. İşlemlerinizi Firebase Console üzerinden yapın.</p>
                 </div>
             </div>
 
             <div id="linksContent" class="content-tab hidden">
-                <p class="text-gray-300">Bu bölümde tüm kısaltılmış linkleri görebilir, yasa dışı veya kurallara aykırı linkleri pasif hale getirebilirsiniz.</p>
+                <h3 class="text-2xl font-bold text-white mb-4">Link Yönetimi</h3>
+                <p class="text-gray-300">Bu bölümde, tüm kısaltılmış linkleri görebilir ve linkleri devre dışı bırakma gibi yönetimsel görevleri yürütebilirsiniz (Firebase verilerine erişim gerektirir).</p>
             </div>
 
             <div id="settingsContent" class="content-tab hidden">
-                <p class="text-gray-300">Bu bölümde sitenin ana ayarları (örneğin kayıtları kapatma, duyuru metinlerini değiştirme vb.) yönetilebilir.</p>
+                <h3 class="text-2xl font-bold text-white mb-4">Sistem Ayarları</h3>
+                <p class="text-gray-300">Siteyi bakım moduna alma, duyuru metinlerini güncelleme veya genel ayarları değiştirme işlemleri bu kısımda yapılabilir.</p>
             </div>
         </div>
 
@@ -140,7 +153,7 @@
     
     <script type="module">
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { app } from "./firebase-auth-service.js"; 
 
         const auth = getAuth(app);
@@ -154,39 +167,30 @@
         const contentTabs = document.querySelectorAll('.content-tab');
         const pageTitle = document.getElementById('pageTitle');
         
-        // --- Yetkilendirme Kontrolü ---
-        async function checkAdminStatus(user) {
-            if (!user) {
-                loadingMessage.textContent = 'Giriş yapılmamış. Yönlendiriliyor...';
-                setTimeout(() => window.location.href = 'girisyap.html', 1500);
-                return;
+        // --- Basit Panel Başlatma ---
+        function initializeAdminPanel(user) {
+            // Yükleme ekranını gizle ve paneli göster
+            loadingOverlay.classList.add('hidden');
+            adminPanelWrapper.classList.remove('hidden');
+
+            if (user) {
+                // Kullanıcı girişliyse, çıkış butonunu göster
+                adminLogoutButton.style.display = 'flex'; 
+                loadingMessage.textContent = `Oturum açık: ${user.email}`;
+            } else {
+                // Kullanıcı girişli değilse, çıkış butonunu gizle
+                adminLogoutButton.style.display = 'none';
+                loadingMessage.textContent = 'Giriş yapılmadan erişildi. Sadece admin bilir.';
             }
 
-            try {
-                const docRef = doc(db, "users", user.uid);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists() && docSnap.data().isAdmin === true) {
-                    // Yönetici Yetkisi Var
-                    loadingOverlay.classList.add('hidden');
-                    adminPanelWrapper.classList.remove('hidden');
-                    loadDashboardData(); // Yönetim verilerini yükle
-                } else {
-                    // Yönetici Yetkisi Yok
-                    loadingMessage.textContent = 'Yetkiniz bulunmamaktadır. Kullanıcı paneline yönlendiriliyor...';
-                    setTimeout(() => window.location.href = 'kullanicipaneli.html', 2000);
-                }
-            } catch (e) {
-                console.error("Yetkilendirme kontrol hatası:", e);
-                loadingMessage.textContent = 'Hata: Yetkilendirme sırasında sunucu hatası.';
-                setTimeout(() => window.location.href = 'panel.html', 3000);
-            }
+            // Veri çekme işlemini başlat (Veri çekmek için yetkili olmanız gerekebilir)
+            loadDashboardData(); 
         }
 
         // --- Veri Çekme Fonksiyonu (Yönetim Panosu) ---
         async function loadDashboardData() {
             try {
-                // Toplam Kullanıcı Sayısı (Basitçe users koleksiyonunu sayar)
+                // Toplam Kullanıcı Sayısı (Firestore'dan çekilir)
                 const usersSnapshot = await getDocs(collection(db, "users"));
                 document.getElementById('totalUsers').textContent = usersSnapshot.size;
 
@@ -194,20 +198,21 @@
                 const linksSnapshot = await getDocs(collection(db, "links"));
                 document.getElementById('totalLinks').textContent = linksSnapshot.size;
 
-                // Aktif Premium Kullanıcı Sayısı
+                // Aktif Premium Kullanıcı Sayısı (Firestore'dan çekilir)
                 const premiumQuery = query(collection(db, "users"), where("accountType", "==", "PREMIUM"));
                 const premiumSnapshot = await getDocs(premiumQuery);
                 document.getElementById('premiumUsers').textContent = premiumSnapshot.size;
 
             } catch (e) {
                 console.error("Yönetim verileri yüklenirken hata:", e);
-                document.getElementById('totalUsers').textContent = 'Hata';
-                document.getElementById('totalLinks').textContent = 'Hata';
-                document.getElementById('premiumUsers').textContent = 'Hata';
+                // Firebase Security Rules izin vermediğinde veya koleksiyon yoksa HATA gösterilir
+                document.getElementById('totalUsers').textContent = 'HATA';
+                document.getElementById('totalLinks').textContent = 'HATA';
+                document.getElementById('premiumUsers').textContent = 'HATA';
             }
         }
 
-        // --- Sayfa Geçişleri ---
+        // --- Sayfa Geçişleri (Tab Switching) ---
         const switchTab = (targetContentId) => {
             contentTabs.forEach(tab => tab.classList.add('hidden'));
             document.getElementById(`${targetContentId}Content`).classList.remove('hidden');
@@ -234,7 +239,8 @@
         adminLogoutButton.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                window.location.href = 'girisyap.html'; 
+                // Çıkış yapınca sayfayı yenile
+                window.location.reload(); 
             } catch (error) {
                 console.error("Çıkış hatası:", error);
                 alert("Çıkış yapılırken bir hata oluştu.");
@@ -250,16 +256,11 @@
 
         // --- Başlatma ---
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                checkAdminStatus(user);
-            } else {
-                 loadingMessage.textContent = 'Oturum açılmadı. Giriş sayfasına yönlendiriliyor...';
-                 setTimeout(() => window.location.href = 'girisyap.html', 1500);
-            }
+            // Kullanıcı giriş yapmış olsun veya olmasın, paneli başlat.
+            initializeAdminPanel(user);
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            // İlk sekme olarak Yönetim Panosu'nu ayarla
             switchTab('dashboard'); 
         });
 
