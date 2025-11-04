@@ -44,7 +44,7 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
-        /* YENİ: Navbar Stilleri */
+        /* Navbar Stilleri */
         .profile-avatar-nav {
             width: 40px;
             height: 40px;
@@ -100,7 +100,7 @@
 
                 <div id="loggedInNav" class="relative hidden"> 
                     <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
-                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
+                        <div id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</div> 
                         
                         <div class="hidden sm:flex flex-col items-end">
                             <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
@@ -111,7 +111,7 @@
                     </button>
                     
                     <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
-                        <a href="kullanicipaneli%20(1).html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
+                        <a href="kullanicipaneli.html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
                             <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
                         </a>
                         
@@ -170,173 +170,154 @@
         © 2025 BAKİ S2 Yönetim Hizmetleri.
     </footer>
     
-    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js"></script>
-
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
     <script type="module" src="./firebase-auth-service.js"></script>
 
-    // TÜM HTML DOSYALARINDAKİ (girisyap.html, kaydol.html, yardim.html, discord.html, fiyatlandirma.html, panel.html, sifremiunuttum.html) bloğunu bu kodla değiştirin.
+    <script type="module">
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { app } from "./firebase-auth-service.js"; 
 
-<script type="module">
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { app } from "./firebase-auth-service.js"; // firebase-auth-service.js dosyanızdaki app objesini içe aktarın
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const loggedOutNav = document.getElementById('loggedOutNav');
+        const loggedInNav = document.getElementById('loggedInNav');
+        const memberCountElement = document.getElementById('member-count');
+        const onlineCountElement = document.getElementById('online-count');
+        
+        // Discord Widget API URL'sini kendi sunucunuzun ID'siyle güncelleyin!
+        const apiUrl = 'https://discord.com/api/guilds/YuHbprEFDE/widget.json'; // Örnek olarak URL'nin son kısmı kullanıldı
 
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const authButtons = document.getElementById('authButtons');
-    const loggedInNav = document.getElementById('loggedInNav');
-
-    function getInitials(name) {
-        if (!name) return '??';
-        const parts = name.split(' ');
-        if (parts.length > 1) {
-            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        function getInitials(name) {
+            if (!name) return '??';
+            const parts = name.split(' ');
+            if (parts.length > 1) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+            return name[0].toUpperCase();
         }
-        return name[0].toUpperCase();
-    }
 
-    /**
-     * Header UI'yı kullanıcı oturum durumuna göre günceller.
-     * @param {Object|null} user - Firebase User objesi veya null
-     */
-    async function updateHeaderUI(user) {
-        if (authButtons && loggedInNav) {
-            if (user && !user.isAnonymous) {
-                // 1. KULLANICI GİRİŞ YAPMIŞ DURUMDA
-                authButtons.classList.add('hidden');
-                loggedInNav.classList.remove('hidden');
+        async function updateHeaderUI(user) {
+            if (loggedInNav && loggedOutNav) {
+                if (user && !user.isAnonymous) {
+                    // 1. KULLANICI GİRİŞ YAPMIŞ DURUMDA
+                    loggedOutNav.classList.add('hidden');
+                    loggedInNav.classList.remove('hidden');
 
-                const navDisplayName = document.getElementById('navDisplayName');
-                const navAccountType = document.getElementById('navAccountType');
-                const navProfilePicture = document.getElementById('navProfilePicture');
-                
-                let displayName = user.displayName || user.email.split('@')[0];
-                let accountType = "STANDART"; // Varsayılan değer
-                let photoURL = user.photoURL || '';
-                
-                // Firestore'dan Hesap Türünü çek
-                try {
-                    const docSnap = await getDoc(doc(db, "users", user.uid));
-                    if (docSnap.exists()) {
-                        accountType = docSnap.data().accountType || "STANDART";
+                    const navDisplayName = document.getElementById('nav_display_name');
+                    const navAccountType = document.getElementById('nav_user_role');
+                    const navProfilePicture = document.getElementById('nav_profile_initials');
+                    
+                    let displayName = user.displayName || user.email.split('@')[0];
+                    let accountType = "STANDART"; 
+                    let photoURL = user.photoURL || '';
+                    
+                    // Firestore'dan Hesap Türünü çek
+                    try {
+                        const docSnap = await getDoc(doc(db, "users", user.uid));
+                        if (docSnap.exists()) {
+                            accountType = docSnap.data().accountType || "STANDART";
+                        }
+                    } catch (e) {
+                        console.error("Firestore veri çekme hatası:", e);
                     }
-                } catch (e) {
-                    console.error("Firestore veri çekme hatası:", e);
-                }
 
-                // Bilgileri yerleştir
-                navDisplayName.textContent = displayName;
-                navAccountType.textContent = accountType;
+                    // Bilgileri yerleştir
+                    navDisplayName.textContent = displayName;
+                    navAccountType.textContent = accountType;
 
-                // Profil Fotoğrafı/Baş Harfler
-                if (navProfilePicture) {
-                    if (photoURL) {
-                        navProfilePicture.innerHTML = `<img src="${photoURL}" alt="Profil Fotoğrafı" class="h-full w-full object-cover">`;
-                    } else {
-                        navProfilePicture.innerHTML = `<span class="text-white text-base font-bold">${getInitials(displayName)}</span>`;
+                    // Profil Fotoğrafı/Baş Harfler
+                    if (navProfilePicture) {
+                        if (photoURL) {
+                            // HTML yapısını div'e img olarak değiştir
+                            navProfilePicture.style.backgroundImage = `url('${photoURL}')`;
+                            navProfilePicture.innerHTML = '';
+                            navProfilePicture.style.backgroundSize = 'cover';
+                            navProfilePicture.style.backgroundPosition = 'center';
+
+                        } else {
+                            navProfilePicture.style.backgroundImage = 'none';
+                            navProfilePicture.innerHTML = `<span>${getInitials(displayName)}</span>`;
+                        }
                     }
-                }
-                
-                // Çıkış butonuna olayı bağla
-                document.getElementById('logoutButton')?.addEventListener('click', handleLogout);
+                    
+                    // Çıkış butonuna olayı bağla
+                    document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
 
-            } else {
-                // 2. KULLANICI GİRİŞ YAPMAMIŞ DURUMDA
-                authButtons.classList.remove('hidden');
-                loggedInNav.classList.add('hidden');
+                } else {
+                    // 2. KULLANICI GİRİŞ YAPMAMIŞ DURUMDA
+                    loggedOutNav.classList.remove('hidden');
+                    loggedInNav.classList.add('hidden');
+                }
             }
         }
-    }
 
-    // Çıkış Yapma Fonksiyonu
-    async function handleLogout() {
-        try {
-            await signOut(auth);
-            // Çıkış yapıldıktan sonra giriş sayfasına yönlendir
-            window.location.href = 'girisyap.html';
-        } catch (error) {
-            console.error("Çıkış hatası:", error);
-            alert("Çıkış yaparken bir hata oluştu: " + error.message);
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'girisyap.html';
+            } catch (error) {
+                console.error("Çıkış hatası:", error);
+                alert("Çıkış yaparken bir hata oluştu: " + error.message);
+            }
         }
-    }
 
-    // --- Oturum Durumu Değişikliği Dinleyicisi ---
-    onAuthStateChanged(auth, (user) => {
-        updateHeaderUI(user);
-    });
-    
-    // YENİ: Dropdown açma/kapama JS'i
-    document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const dropdown = document.getElementById('profileDropdown');
-        dropdown.classList.toggle('hidden');
-    });
-    document.addEventListener('click', (event) => {
-        const menu = document.getElementById('loggedInNav');
-        const isClickInside = menu?.contains(event.target);
-        if (!isClickInside) {
-            document.getElementById('profileDropdown')?.classList.add('hidden');
-        }
-    });
+        // --- Discord İstatistikleri ---
+        async function fetchDiscordStats() {
+            try {
+                // Not: CORS veya API izni sorunları olabilir.
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`API Hatası: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                const totalMembers = data.approximate_member_count || 'N/A';
+                const onlineMembers = data.approximate_presence_count || 'N/A';
+                
+                // İstatistikleri arayüze yaz
+                memberCountElement.textContent = formatNumber(totalMembers);
+                onlineCountElement.textContent = formatNumber(onlineMembers);
 
-    // Sayfa yüklendiğinde body opacity'sini 1'e ayarla (fade-in) - (Eğer ilgili CSS varsa)
-    document.addEventListener('DOMContentLoaded', () => {
-        if(document.body.style.opacity === '0') {
-             document.body.style.opacity = '1';
+            } catch (error) {
+                console.error("Discord istatistikleri çekilirken hata oluştu:", error);
+                memberCountElement.innerHTML = 'N/A';
+                onlineCountElement.innerHTML = 'Kapalı';
+            }
         }
-    });
+
+        function formatNumber(num) {
+            if (typeof num === 'number') {
+                return num.toLocaleString('tr-TR');
+            }
+            return num;
+        }
+
+        // --- Oturum Durumu Değişikliği ve Sayfa Başlatma ---
+        onAuthStateChanged(auth, (user) => {
+            updateHeaderUI(user);
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // İLK ÖNCELİK: Sayfa Görünürlüğünü Aç
+            // Mor sayfayı görme problemini çözer
+            if(document.body.style.opacity === '0' || document.body.style.opacity === '') {
+                 document.body.style.opacity = '1';
+            }
             
-            /**
-             * Discord API'sinden sunucu istatistiklerini çeker.
-             */
-            async function fetchDiscordStats() {
-                try {
-                    const response = await fetch(apiUrl, { method: 'GET' });
-                    
-                    if (!response.ok) {
-                        throw new Error(`API Hatası: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    const totalMembers = data.approximate_member_count || 'N/A';
-                    const onlineMembers = data.approximate_presence_count || 'N/A';
-                    
-                    // İstatistikleri arayüze yaz
-                    memberCountElement.textContent = formatNumber(totalMembers);
-                    onlineCountElement.textContent = formatNumber(onlineMembers);
-
-                } catch (error) {
-                    console.error("Discord istatistikleri çekilirken hata oluştu:", error);
-                    // Hata durumunda varsayılan bir değer göster
-                    memberCountElement.innerHTML = 'Hata!';
-                    onlineCountElement.innerHTML = 'Kapalı';
-                }
-            }
-
-            /**
-             * Büyük sayıları okunabilir formatta döndürür (örneğin 3500 -> 3.5K).
-             * @param {number|string} num
-             * @returns {string}
-             */
-            function formatNumber(num) {
-                if (typeof num === 'number') {
-                    return num.toLocaleString('tr-TR');
-                }
-                return num;
-            }
-
+            // Discord istatistiklerini çek
             fetchDiscordStats();
 
-            // YENİ: Dropdown açma/kapama JS'i
+            // Dropdown açma/kapama
             document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
-                e.stopPropagation(); // Butona tıklanınca document click olayını tetiklemesin
-                const dropdown = document.getElementById('profileDropdown');
-                dropdown.classList.toggle('hidden');
+                e.stopPropagation(); 
+                document.getElementById('profileDropdown')?.classList.toggle('hidden');
             });
-            // Dışarı tıklamada kapatma
+
             document.addEventListener('click', (event) => {
                 const menu = document.getElementById('loggedInNav');
                 const isClickInside = menu?.contains(event.target);
@@ -345,9 +326,6 @@
                 }
             });
         });
-        
-        // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
-        window.onload = window.startClient;
     </script>
 </body>
 </html>
