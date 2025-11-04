@@ -53,7 +53,7 @@
             position: fixed;
             bottom: 20px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(20px); /* Başlangıçta biraz aşağıda */
             z-index: 1000;
             padding: 15px 30px;
             border-radius: 8px;
@@ -63,6 +63,8 @@
             pointer-events: none; 
             color: white;
             font-weight: 600;
+            display: flex;
+            align-items: center;
         }
         .message-success { background-color: #10b981; } 
         .message-error { background-color: #ef4444; } 
@@ -101,16 +103,16 @@
 
                 <div id="loggedInNav" class="relative hidden"> 
                     <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
-                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
+                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">..</span> 
                         <div class="hidden sm:flex flex-col items-end">
-                            <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
-                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5">Yükleniyor...</span>
+                            <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor..</span>
+                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5">Yükleniyor..</span>
                         </div>
                         <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
                     </button>
                     
                     <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
-                        <a href="kullanicipaneli%20(1).html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
+                        <a href="kullanicipaneli.html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
                             <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
                         </a>
                         <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
@@ -119,7 +121,7 @@
                     </div>
                 </div>
             </div>
-        </nav>
+            </nav>
     </header>
     <main class="flex-grow flex flex-col items-center justify-center py-12 px-4">
         <div class="form-card p-8 md:p-10 w-full max-w-md">
@@ -159,11 +161,13 @@
 
     <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
     <script type="module" src="./firebase-auth-service.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, setPersistence, browserSessionPersistence, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- KULLANICININ SAĞLADIĞI YAPILANDIRMA ---
         const firebaseConfig = {
@@ -176,14 +180,40 @@
             measurementId: "G-Q52XG8GLB2"
         };
         
-        let auth;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app); // Firestore başlatıldı
+
+        // Oturumu kalıcı yap
+        setPersistence(auth, browserSessionPersistence).catch(e => console.error("Persistence hatası:", e));
         
+        // --- Yardımcı Fonksiyonlar ---
+        function getInitials(name) {
+            if (!name) return '..';
+            const parts = name.split(' ');
+            if (parts.length > 1) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return name[0].toUpperCase();
+        }
+
+        function getRoleBadge(role) {
+            let base = "text-xs font-medium rounded-full px-2 py-0.5 mt-0.5 ";
+            switch(role) {
+                case 'Yönetici': return base + 'bg-red-500/20 text-red-300';
+                case 'Premium': return base + 'bg-yellow-500/20 text-yellow-300';
+                default: return base + 'bg-green-500/20 text-green-300'; // Üye
+            }
+        }
+
         // --- Mesaj Gösterme Fonksiyonu (Animasyonlu) ---
         function showMessage(message, type = 'success') {
             const messageBox = document.getElementById('messageBox');
             if (!messageBox) return; 
             
-            messageBox.textContent = message;
+            // İstenen: İkon eklendi
+            const icon = type === 'success' ? '<i class="fas fa-check-circle mr-2"></i>' : '<i class="fas fa-exclamation-triangle mr-2"></i>';
+            messageBox.innerHTML = icon + message;
             messageBox.className = type === 'success' ? 'message-success' : 'message-error';
             messageBox.classList.add('message-show');
 
@@ -192,6 +222,49 @@
             }, 3000);
         }
 
+        // --- Navbar Güncelleme ---
+        function updateHeaderUI(user) {
+            const loggedInNav = document.getElementById('loggedInNav');
+            const loggedOutNav = document.getElementById('loggedOutNav');
+            
+            if (user && !user.isAnonymous) {
+                // Giriş Yapılmış Durum: Navbar'ı güncelle
+                loggedInNav.classList.remove('hidden');
+                loggedOutNav.classList.add('hidden');
+
+                const initialsEl = document.getElementById('nav_profile_initials');
+                const displayNameEl = document.getElementById('nav_display_name');
+                const roleEl = document.getElementById('nav_user_role');
+                
+                // Varsayılan isim ve rol
+                let displayName = user.email ? user.email.split('@')[0] : 'Kullanıcı';
+                let userRole = 'Üye'; 
+
+                if (initialsEl) initialsEl.textContent = getInitials(displayName);
+                if (displayNameEl) displayNameEl.textContent = displayName;
+                if (roleEl) {
+                    roleEl.textContent = userRole;
+                    roleEl.className = getRoleBadge(userRole);
+                }
+
+                // Kullanıcı panelindeyse oraya yönlendir
+                window.location.href = 'kullanicipaneli.html'; 
+                
+            } else {
+                // Giriş Yapılmamış Durum
+                loggedInNav.classList.add('hidden');
+                loggedOutNav.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            signOut(auth).then(() => {
+                window.location.href = 'girisyap.html'; 
+            }).catch((error) => {
+                console.error("Çıkış Yapma Hatası:", error);
+            });
+        }
+        
         // --- Butonu Sıfırlama Fonksiyonu ---
         const originalButtonContent = '<i class="fas fa-user-plus mr-2"></i> Hesap Oluştur';
         function resetRegisterButton() {
@@ -201,33 +274,26 @@
                 registerButton.innerHTML = originalButtonContent;
             }
         }
-        
-        // --- Firebase Başlatma ve Oturum Kontrolü ---
-        async function initFirebase() {
-            try {
-                // Firebase'i kullanıcıdan gelen config ile başlat
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                
-                // Anonim giriş yap (Navbar için)
-                signInAnonymously(auth).catch(e => console.error("Anonim giriş başarısız:", e));
 
-            } catch (e) {
-                console.error("KRİTİK HATA: Firebase başlatma hatası.", e);
+        // --- Oturum Kontrolü ve Dinleyiciler ---
+        onAuthStateChanged(auth, (user) => {
+            if (user && !user.isAnonymous) {
+                // Zaten giriş yapmışsa panoya yönlendir
+                updateHeaderUI(user); 
+            } else {
+                 // Anonim giriş yap (Public sayfa olduğu için)
+                 signInAnonymously(auth).catch(e => console.error("Anonim giriş başarısız:", e));
+                 updateHeaderUI(null);
             }
-            // Ortak Auth Servisini başlat
-            window.startClient();
-        }
-
-        // DOM yüklendiğinde Firebase'i başlat
-        document.addEventListener('DOMContentLoaded', initFirebase);
+        });
         
-        // YENİ: Dropdown açma/kapama JS'i
+        document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
+        // Dropdown Logic
         document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
             e.stopPropagation();
-            const dropdown = document.getElementById('profileDropdown');
-            dropdown.classList.toggle('hidden');
+            document.getElementById('profileDropdown')?.classList.toggle('hidden');
         });
+
         document.addEventListener('click', (event) => {
             const menu = document.getElementById('loggedInNav');
             const isClickInside = menu?.contains(event.target);
@@ -257,18 +323,34 @@
                     showMessage("Hata: Şifreleriniz birbiriyle eşleşmiyor!", "error");
                     return;
                 }
+                if (password.length < 6) {
+                    showMessage("Hata: Şifre en az 6 karakter olmalıdır.", "error");
+                    return;
+                }
 
                 const registerButton = document.getElementById('registerButton');
                 registerButton.disabled = true;
                 registerButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Hesap Oluşturuluyor...';
                 
                 try {
-                    await createUserWithEmailAndPassword(auth, email, password);
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    // Firestore'a temel kullanıcı verilerini kaydet
+                    await setDoc(doc(db, "users", user.uid), {
+                        uid: user.uid,
+                        email: user.email,
+                        createdAt: new Date(),
+                        role: 'Üye', // Varsayılan rol
+                        displayName: email.split('@')[0] // Varsayılan ad
+                    });
                     
-                    showMessage("✅ Kayıt başarılı! Giriş yapabilirsiniz. Yönlendiriliyorsunuz...", "success");
+                    // İSTENEN: Kayıt Başarılı Mesajı
+                    showMessage("Kayıt başarılı! Giriş yapılıyor ve panoya yönlendiriliyorsunuz.", "success");
                     
+                    // 2 saniye bekleyip panoya yönlendir (updateHeaderUI'dan önce yapılırsa sorun çıkmaz)
                     setTimeout(() => {
-                        window.location.href = 'girisyap.html'; 
+                        window.location.href = 'kullanicipaneli.html'; 
                     }, 2000);
 
                 } catch (error) {
@@ -286,11 +368,12 @@
                             errorMessage = "Şifre en az 6 karakter olmalıdır.";
                             break;
                         default:
-                            errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin. Kod: " + error.code;
+                            errorMessage = "Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin. (Kod: " + error.code + ")";
                             break;
                     }
                     
-                    showMessage("Hata: " + errorMessage, "error");
+                    // İSTENEN: Kayıt Başarısız Mesajı
+                    showMessage(errorMessage, "error");
                     
                     resetRegisterButton(); 
 
