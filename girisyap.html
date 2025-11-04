@@ -185,34 +185,51 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, setPersistence, browserSessionPersistence, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, setPersistence, browserSessionPersistence, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        // --- Ortamdan Gelen Değişkenler ---
-        // BURAYA KENDİ FIREBASE YAPILANDIRMANIZI EKLEYİN!
-        // Şu anki kod, __firebase_config adında global bir değişken arıyor. 
-        // Eğer bu değişken yoksa veya geçersizse, auth işlemi başlamayacaktır.
-        // EN BASİT YÖNTEM: Aşağıdaki değişkeni doldurmak
-        
-        const myFirebaseConfig = {
-            apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao", // Kendi anahtarınızı ekleyin
-            authDomain: "baki-s2-yonetim.firebaseapp.com",
-            projectId: "baki-s2-yonetim",
-            storageBucket: "baki-s2-yonetim.firebasestorage.app",
-            messagingSenderId: "692508919425",
-            appId: "1:692508919425:web:fac963c81c11b7be70af80"
-        };
-        
-        let auth;
+        let auth = null;
         let isConfigAvailable = false;
-        let firebaseConfig = myFirebaseConfig;
+        
+        // --- Ortamdan Gelen Değişkenleri Kullanarak Firebase Başlatma ---
+        
+        const setupFirebase = async () => {
+            try {
+                // Zorunlu global değişkenleri alın
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // Yapılandırmanın boş olup olmadığını kontrol edin
-        if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.apiKey !== "YOUR_API_KEY") {
-             isConfigAvailable = true;
-        } else {
-             console.error("KRİTİK HATA: Firebase yapılandırma bilgileri eksik veya geçersiz. Lütfen 'myFirebaseConfig' değişkenini kendi anahtarlarınızla doldurun.");
-        }
+                if (firebaseConfig.apiKey) {
+                    isConfigAvailable = true;
+                    
+                    // 1. Uygulamayı başlat
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    
+                    // 2. Oturumun yalnızca tarayıcı sekmesi açıkken kalmasını ayarla
+                    await setPersistence(auth, browserSessionPersistence);
+                    
+                    // 3. Ortam token'ı ile veya anonim olarak oturum aç
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("Firebase: Custom token ile oturum açıldı.");
+                    } else if (!auth.currentUser) {
+                        // Eğer mevcut bir oturum yoksa anonim olarak oturum aç (userId elde etmek için)
+                        await signInAnonymously(auth);
+                        console.log("Firebase: Anonim olarak oturum açıldı.");
+                    }
+                    
+                } else {
+                    console.error("KRİTİK HATA: Firebase yapılandırma bilgileri eksik veya geçersiz.");
+                }
 
+            } catch (e) {
+                console.error("Firebase Başlatma/Servis Hatası:", e);
+                displayMessage("Kritik Hata: Firebase servisleri başlatılamadı. Kimlik doğrulama çalışmayacaktır.", 'error');
+                auth = null;
+                isConfigAvailable = false;
+            }
+        };
 
         // --- DOM Elementleri (Giriş Formu) ---
         const loginForm = document.getElementById('loginForm');
@@ -227,31 +244,6 @@
         const profileMenuButton = document.getElementById('profileMenuButton');
         const profileDropdownMenu = document.getElementById('profileDropdownMenu');
         const logoutBtnNav = document.getElementById('logoutBtnNav');
-
-
-        // --- Firebase Başlatma ---
-        if (isConfigAvailable) {
-            try {
-                // Uygulamayı başlat
-                const app = initializeApp(firebaseConfig);
-                
-                // Auth servisini al
-                auth = getAuth(app);
-                
-                // Oturumun yalnızca tarayıcı sekmesi açıkken kalmasını ayarla
-                if (auth) {
-                    setPersistence(auth, browserSessionPersistence); 
-                }
-
-            } catch (e) {
-                console.error("Firebase başlatma/servis alma hatası:", e);
-                auth = null; 
-                isConfigAvailable = false; 
-                displayMessage("Kritik Hata: Firebase servisleri başlatılamadı. Konsolu kontrol edin.", 'error');
-            }
-        } else {
-             displayMessage("Kritik Hata: Firebase yapılandırması eksik. Kimlik doğrulama işlemi çalışmayacaktır.", 'error');
-        }
 
 
         // --- Kullanıcı Profil Bilgilerini Türetme ve Gösterme ---
@@ -318,40 +310,45 @@
                 messageBox.classList.add('bg-green-900/30', 'text-green-300');
             }
         }
-
-
-        // --- Oturum Durumu Kontrolü (Navbar için) ---
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                if (user && !user.isAnonymous) { // Sadece gerçek bir kullanıcı girişi varsa
-                    renderUserProfile(user);
-                    loggedOutNav.classList.add('hidden');
-                    loggedInNav.classList.remove('hidden');
-                } else {
-                    loggedOutNav.classList.remove('hidden');
-                    loggedInNav.classList.add('hidden');
-                }
-            });
-
-            // --- Çıkış Yapma İşlemi ---
-            const handleLogout = async () => {
-                if (auth) {
-                    try {
-                        profileDropdownMenu.classList.add('hidden');
-                        await signOut(auth);
-                        // Oturum kapandığında giriş sayfasına yönlendir
-                        window.location.href = "girisyap.html"; 
-                    } catch (error) {
-                        console.error("Çıkış yapma hatası:", error);
+        
+        // --- Firebase Başlatma ve Oturum Kontrolü ---
+        setupFirebase().then(() => {
+            if (auth) {
+                // Oturum Durumu Kontrolü (Navbar için)
+                onAuthStateChanged(auth, (user) => {
+                    // isAnonymous: true ise anonim giriş. E-posta/şifre ile giriş yapan kullanıcı anonim değildir.
+                    if (user && user.email) { 
+                        renderUserProfile(user);
+                        loggedOutNav.classList.add('hidden');
+                        loggedInNav.classList.remove('hidden');
+                    } else {
+                        loggedOutNav.classList.remove('hidden');
+                        loggedInNav.classList.add('hidden');
                     }
+                });
+
+                // --- Çıkış Yapma İşlemi ---
+                const handleLogout = async () => {
+                    if (auth) {
+                        try {
+                            profileDropdownMenu.classList.add('hidden');
+                            await signOut(auth);
+                            // Çıkış yaptıktan sonra giriş sayfasına yönlendir (yeniden anonim olarak oturum açılacak)
+                            window.location.href = "girisyap.html"; 
+                        } catch (error) {
+                            console.error("Çıkış yapma hatası:", error);
+                        }
+                    }
+                };
+                
+                // Çıkış düğmesine event listener ekle
+                if (logoutBtnNav) {
+                    logoutBtnNav.addEventListener('click', handleLogout);
                 }
-            };
-            
-            // Çıkış düğmesine event listener ekle
-            if (logoutBtnNav) {
-                logoutBtnNav.addEventListener('click', handleLogout);
+            } else {
+                console.error("Auth nesnesi başlatılamadı. Çıkış ve Giriş işlevleri çalışmayacak.");
             }
-        }
+        });
 
 
         // --- Dropdown Toggle İşlemi ---
