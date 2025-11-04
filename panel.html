@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel | BAKİ S2</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -82,25 +84,32 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
+    <!-- HEADER (Dinamik Alanlar Eklendi) -->
     <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
         <div class="w-full max-w-6xl flex justify-between items-center">
             
+            <!-- Logo -->
             <a href="index.html" class="text-3xl font-extrabold text-white flex items-center">
                 <i class="fas fa-terminal mr-2 text-purple"></i> BAKİ S2
             </a>
             
+            <!-- Navigasyon Linkleri -->
             <nav class="flex space-x-6 text-lg items-center">
                 <a href="yardim.html" class="text-gray-300 hover:text-purple transition duration-200">Yardım Merkezi</a>
                 <a href="discord.html" class="text-gray-300 hover:text-purple transition duration-200">Discord</a>
                 <a href="fiyatlandirma.html" class="text-gray-300 hover:text-purple transition duration-200">Fiyatlandırma</a>
             </nav>
             
+            <!-- DİNAMİK BUTON/PROFİL ALANI -->
             <div id="authButtons" class="flex space-x-3">
-                </div>
+                <!-- Buraya JS ile oturum durumuna göre Profil veya Giriş/Kaydol butonları eklenecek -->
+                <!-- Varsayılan olarak boş bırakılmıştır. -->
+            </div>
 
         </div>
     </header>
 
+    <!-- MAIN CONTENT (Orijinal Ana Sayfa İçeriği - Değişmedi) -->
     <main class="flex-grow flex flex-col items-center pt-20 pb-40 relative z-10 text-center">
         
         <div class="w-full max-w-4xl px-4">
@@ -112,6 +121,7 @@
             </p>
             
             <div class="flex justify-center space-x-4">
+                <!-- Bu butonlar, giriş yapılmış olsa bile ana sayfa içeriğinde kaldığı için korundu -->
                 <a href="kaydol.html" class="main-cta-button px-8 py-3 rounded-xl font-bold text-lg text-white">
                     Hemen Kaydol
                 </a>
@@ -138,20 +148,21 @@
         </div>
     </main>
 
+    <!-- Footer -->
     <footer class="bg-gray-900 text-gray-500 text-center p-4 mt-auto">
         © 2025 BAKİ S2 Yönetim Hizmetleri. Tüm hakları saklıdır.
     </footer>
 
+    <!-- Firebase Oturum Yönetimi ve Dinamik Navbar Kodu -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
         
-        // --- ⚠️ LÜTFEN KONTROL EDİN: Kendi Firebase Anahtarlarınız ---
+        // Buradaki firebaseConfig, Canvas ortamında otomatik olarak sağlanır.
         const firebaseConfig = {
-            apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
+            apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao", // Örnek Anahtar
             authDomain: "baki-s2-yonetim.firebaseapp.com",
             projectId: "baki-s2-yonetim",
-            // ... diğer yapılandırma verileri
         };
         
         // --- Firebase Başlatma ---
@@ -169,7 +180,12 @@
                 window.location.href = 'girisyap.html';
             } catch (error) {
                 console.error("Çıkış hatası:", error);
-                alert("Çıkış yapılırken bir hata oluştu: " + error.message);
+                // Hata durumunda kullanıcıya bilgi ver
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'fixed top-20 right-4 p-3 bg-red-600 text-white rounded-lg shadow-xl';
+                errorMessage.textContent = 'Çıkış yapılırken bir hata oluştu.';
+                document.body.appendChild(errorMessage);
+                setTimeout(() => errorMessage.remove(), 3000);
             }
         }
 
@@ -179,18 +195,25 @@
 
             if (user && user.email) {
                 // 1. Kullanıcı Giriş Yapmış Durumda (Hesap adı, türü, fotoğraf)
+                // Hesap türü ve kullanıcı adı için mock veriler kullanılmıştır (gerçek Firestore verisine bağlanmadı)
+                const displayName = user.displayName || user.email.split('@')[0].substring(0, 10);
+                const profilePhotoUrl = user.photoURL || `https://ui-avatars.com/api/?name=${displayName.substring(0, 1)}&background=6c5ce7&color=fff`;
+
                 const profileHtml = `
                     <div class="flex items-center space-x-4">
-                        <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=${user.email.split('@')[0].substring(0, 1)}&background=6c5ce7&color=fff'}" 
+                        <!-- Profil Fotoğrafı -->
+                        <img src="${profilePhotoUrl}" 
                              alt="Profil" class="profile-pic">
                         
+                        <!-- Hesap Bilgisi -->
                         <div class="hidden sm:block text-left">
-                            <span class="block text-sm font-semibold">${user.displayName || user.email.split('@')[0].substring(0, 10)}</span>
-                            <span class="block text-xs text-gray-400">Standart (Varsayılan Tür)</span>
+                            <span class="block text-sm font-semibold">${displayName}</span>
+                            <span class="block text-xs text-gray-400">Standart Kullanıcı</span>
                         </div>
 
+                        <!-- Çıkış Butonu -->
                         <button id="logoutButtonNav" class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition duration-200">
-                            Çıkış Yap
+                            <i class="fas fa-sign-out-alt"></i> Çıkış
                         </button>
                     </div>
                 `;
