@@ -167,49 +167,43 @@
     const contentTabs = document.querySelectorAll('.content-tab');
     const pageTitle = document.getElementById('pageTitle');
     
-    // --- Basit Panel Başlatma ---
-    function initializeAdminPanel(user) {
-        // Yükleme ekranını hemen gizle ve paneli göster
-        loadingOverlay.classList.add('hidden');
-        adminPanelWrapper.classList.remove('hidden');
-
+    // --- Kullanıcı Arayüzü Güncellemesi (Firebase durumuna göre) ---
+    function updateAdminUI(user) {
         if (user) {
             // Kullanıcı girişliyse, çıkış butonunu göster
             adminLogoutButton.style.display = 'flex'; 
-            loadingMessage.textContent = `Oturum açık: ${user.email}`;
+            loadingMessage.textContent = `Oturum açık: ${user.email}. Veriler yükleniyor...`;
         } else {
             // Kullanıcı girişli değilse, çıkış butonunu gizle
             adminLogoutButton.style.display = 'none';
             loadingMessage.textContent = 'Giriş yapılmadan erişildi. Sadece admin bilir.';
         }
-
-        // Veri çekme işlemini başlat
-        loadDashboardData(); 
     }
 
     // --- Veri Çekme Fonksiyonu (Yönetim Panosu) ---
     async function loadDashboardData() {
         try {
-            // Firestore verilerini çekme denemesi (Eğer Firebase Security Rules izin vermezse HATA döner)
+            // Firestore verilerini çekme denemesi
             
-            // Toplam Kullanıcı Sayısı (Firestore'dan çekilir)
+            // Toplam Kullanıcı Sayısı
             const usersSnapshot = await getDocs(collection(db, "users"));
-            document.getElementById('totalUsers').textContent = usersSnapshot.size;
+            document.getElementById('totalUsers').textContent = usersSnapshot.size.toLocaleString('tr-TR');
 
             // Toplam Link Sayısı (Varsayımsal 'links' koleksiyonu)
             const linksSnapshot = await getDocs(collection(db, "links"));
-            document.getElementById('totalLinks').textContent = linksSnapshot.size;
+            document.getElementById('totalLinks').textContent = linksSnapshot.size.toLocaleString('tr-TR');
 
-            // Aktif Premium Kullanıcı Sayısı (Firestore'dan çekilir)
+            // Aktif Premium Kullanıcı Sayısı
             const premiumQuery = query(collection(db, "users"), where("accountType", "==", "PREMIUM"));
             const premiumSnapshot = await getDocs(premiumQuery);
-            document.getElementById('premiumUsers').textContent = premiumSnapshot.size;
+            document.getElementById('premiumUsers').textContent = premiumSnapshot.size.toLocaleString('tr-TR');
 
         } catch (e) {
-            console.error("Yönetim verileri yüklenirken hata (Güvenlik Kuralı İhlali Olabilir):", e);
-            document.getElementById('totalUsers').textContent = 'HATA (İzin Yok)';
-            document.getElementById('totalLinks').textContent = 'HATA (İzin Yok)';
-            document.getElementById('premiumUsers').textContent = 'HATA (İzin Yok)';
+            console.error("Yönetim verileri yüklenirken hata:", e);
+            // Firebase Security Rules izin vermediğinde HATA gösterilir
+            document.getElementById('totalUsers').textContent = 'HATA';
+            document.getElementById('totalLinks').textContent = 'HATA';
+            document.getElementById('premiumUsers').textContent = 'HATA';
         }
     }
 
@@ -253,15 +247,22 @@
         });
     });
 
-    // --- Başlatma ---
-    // Sayfa DOM içeriği yüklendiğinde paneli hemen başlat
+    // --- Başlatma (Hata Giderme: Asenkron bekleme yapmadan hemen göster) ---
     document.addEventListener('DOMContentLoaded', () => {
-        // Firebase durumunu dinle (Çıkış butonunu güncellemek için)
-        onAuthStateChanged(auth, (user) => {
-            initializeAdminPanel(user);
-        });
+        // 1. Yükleme ekranını ANINDA gizle ve paneli göster
+        loadingOverlay.classList.add('hidden');
+        adminPanelWrapper.classList.remove('hidden');
         
+        // 2. İlk sekmeyi ayarla
         switchTab('dashboard'); 
+
+        // 3. Firebase durumunu dinle (Çıkış butonunu güncellemek için)
+        onAuthStateChanged(auth, (user) => {
+            updateAdminUI(user);
+        });
+
+        // 4. Veri çekme işlemini başlat (Firebase durumu bağımsız)
+        loadDashboardData(); 
     });
 
 </script>
