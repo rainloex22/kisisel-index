@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yönetici Paneli | BAKİ S2 - ULTIMATE</title>
+    <title>Yönetici Paneli | BAKİ S2 - İŞLEVCİL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -191,8 +191,8 @@
                         <h3 class="text-xl font-bold text-white mb-4">Bekleyen İşlemler</h3>
                         <div class="space-y-2">
                              <p class="text-gray-400 flex justify-between">İncelenmeyi bekleyen Rapor: <span id="pendingReportsCount" class="text-yellow-400 font-bold">0</span></p>
-                             <p class="text-gray-400 flex justify-between">Onay bekleyen Ödeme: <span class="text-green-400 font-bold">0</span></p>
-                             <p class="text-gray-400 flex justify-between">Kullanıcıdan Gelen Mesaj: <span class="text-purple-400 font-bold">0</span></p>
+                             <p class="text-gray-400 flex justify-between">Onay bekleyen Ödeme: <span class="text-green-400 font-bold">0 (Sim.)</span></p>
+                             <p class="text-gray-400 flex justify-between">Kullanıcıdan Gelen Mesaj: <span class="text-purple-400 font-bold">0 (Sim.)</span></p>
                         </div>
                     </div>
                 </div>
@@ -239,8 +239,8 @@
                     <div class="admin-card p-6">
                         <h4 class="text-xl font-bold text-white mb-4">⚡ Canlı Erişim Logları (Sim.)</h4>
                         <div id="liveLogs" class="h-48 overflow-y-scroll bg-gray-900 rounded-lg p-2 border border-yellow-500/30 space-y-1">
-                            <div class="log-line text-green-400">[12:25:01] GET /link-a: 200 OK (TR)</div>
-                            <div class="log-line text-red-400">[12:24:58] ERROR: Link /banned-code: 403 (US)</div>
+                            <div class="log-line text-green-400">[12:30:11] GET /link-a: 200 OK (TR)</div>
+                            <div class="log-line text-red-400">[12:30:08] ERROR: Link /banned-code: 403 (US)</div>
                         </div>
                     </div>
                 </div>
@@ -264,14 +264,15 @@
                             <option value="ADMIN">YÖNETİCİ Hesap</option>
                         </select>
                         <button id="updateAccountTypeButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg">
-                            <i class="fas fa-check mr-2"></i> Hesap Tipini Güncelle
+                            <i class="fas fa-check mr-2"></i> Hesap Tipini Güncelle (Firestore)
                         </button>
                         <button id="resetPasswordButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg">
-                            <i class="fas fa-key mr-2"></i> Şifre Sıfırlama Maili Gönder
+                            <i class="fas fa-key mr-2"></i> Şifre Sıfırlama Maili Gönder (Auth)
                         </button>
                         <button id="banUserButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg">
-                            <i class="fas fa-ban mr-2"></i> Hesabı Kalıcı Askıya Al
+                            <i class="fas fa-ban mr-2"></i> Hesabı Kalıcı Askıya Al (Admin SDK)
                         </button>
+                        <p class="text-sm text-yellow-400 mt-2">Bu eylemlerin çoğu, yalnızca Cloud Functions/Admin SDK ile çalışır.</p>
                     </div>
                 </div>
             </div>
@@ -313,10 +314,10 @@
                 <div class="admin-card p-6">
                      <h4 class="text-xl font-bold mb-3">🚨 Toplu İşlemler</h4>
                      <button id="bulkFreezeAllButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-5 rounded-lg mr-3">
-                        <i class="fas fa-snowflake mr-2"></i> Tüm Linkleri Dondur (Sim.)
+                        <i class="fas fa-snowflake mr-2"></i> Tüm Linkleri Dondur (CF Gerekli)
                     </button>
                      <button id="bulkDeleteReportedButton" class="bg-red-800 hover:bg-red-900 text-white font-bold py-3 px-5 rounded-lg">
-                        <i class="fas fa-trash mr-2"></i> Raporlu Linkleri Toplu Sil (Sim.)
+                        <i class="fas fa-trash mr-2"></i> Raporlu Linkleri Toplu Sil (CF Gerekli)
                     </button>
                 </div>
             </div>
@@ -329,8 +330,8 @@
                         <div class="p-3 bg-gray-700 rounded-lg flex justify-between items-center">
                             <span>**Rapor ID: 001** - Link: /xyz123 (Neden: Kötü amaçlı yazılım)</span>
                             <div class="space-x-2">
-                                <button data-report-id="001" class="report-action-btn text-green-400 hover:text-green-500 text-sm">Onayla (Link Sil)</button>
-                                <button data-report-id="001" class="report-action-btn text-yellow-400 hover:text-yellow-500 text-sm">Reddet</button>
+                                <button data-report-id="001" data-action="approve" class="report-action-btn text-green-400 hover:text-green-500 text-sm">Onayla (Link Sil)</button>
+                                <button data-report-id="001" data-action="reject" class="report-action-btn text-yellow-400 hover:text-yellow-500 text-sm">Reddet</button>
                             </div>
                         </div>
                         <p class="text-gray-400">Şu anda **3** rapor incelenmeyi bekliyor (Sim.)</p>
@@ -348,7 +349,7 @@
                 <h3 class="text-2xl font-bold text-white mb-4">Sistem Ayarları <i class="fas fa-server ml-2 text-green-400"></i></h3>
                 
                 <div class="admin-card p-6 mb-6">
-                    <h4 class="text-xl font-bold mb-3">👷 Bakım Modu & Durum</h4>
+                    <h4 class="text-xl font-bold mb-3">👷 Bakım Modu & Durum (Sim.)</h4>
                     <button id="maintenanceModeToggle" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-5 rounded-lg transition duration-200">
                         <i class="fas fa-toggle-off mr-2"></i> Bakım Modunu Aç
                     </button>
@@ -356,9 +357,9 @@
                 </div>
 
                 <div class="admin-card p-6">
-                    <h4 class="text-xl font-bold mb-3">🧹 Önbellek Yönetimi</h4>
+                    <h4 class="text-xl font-bold mb-3">🧹 Önbellek Yönetimi (Sim.)</h4>
                     <button id="clearCacheButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-5 rounded-lg mr-3">
-                        <i class="fas fa-eraser mr-2"></i> CDN Önbelleğini Temizle (Sim.)
+                        <i class="fas fa-eraser mr-2"></i> CDN Önbelleğini Temizle
                     </button>
                 </div>
             </div>
@@ -373,14 +374,14 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // updateDoc, doc, collection, getDocs gibi gerekli fonksiyonları ekleyin
+        import { getAuth, onAuthStateChanged, signOut, fetchSignInMethodsForEmail, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, getDocs, query, where, limit, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-functions.js";
+        // import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-functions.js"; // Şu anlık kullanılmayacak
 
         // ***************************************************************
-        // KRİTİK NOT: getFunctions(app) çağrısı Firebase Projenizde
-        //             Cloud Functions'ın aktif olduğunu varsayar.
+        // KRİTİK NOT: Cloud Functions'ı ve Admin SDK'yı kullanmadığımız
+        //             için bazı işlemler SADECE bir simülasyon olarak
+        //             görev yapacaktır.
         // ***************************************************************
         
         // Firebase Config ve Başlatma
@@ -397,7 +398,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const functions = getFunctions(app, "europe-west3"); // VEYA SİZİN BÖLGENİZ
+        // const functions = getFunctions(app, "europe-west3"); // Cloud Functions'ı şu anlık devre dışı bırakıyoruz
 
         // HTML Elementleri
         const loadingMessage = document.getElementById('loadingMessage');
@@ -408,35 +409,41 @@
         const toast = document.getElementById('toast');
         const toastContent = document.getElementById('toastContent');
 
-        // YENİ VE İŞLEVSEL ELEMANLAR
+        // İşlevsel Elementler
         const searchUserButton = document.getElementById('searchUserButton');
         const userSearchEmail = document.getElementById('userSearchEmail');
-        const userSearchResult = document.getElementById('userSearchResult');
         const moderationControls = document.getElementById('moderationControls');
         const updateAccountTypeButton = document.getElementById('updateAccountTypeButton');
         const resetPasswordButton = document.getElementById('resetPasswordButton');
         const banUserButton = document.getElementById('banUserButton');
         const maintenanceModeToggle = document.getElementById('maintenanceModeToggle');
-        const maintenanceStatus = document.getElementById('maintenanceStatus');
         const filterLinksButton = document.getElementById('filterLinksButton');
-        const linksListContainer = document.getElementById('linksListContainer');
-        const filteredLinksTableBody = document.getElementById('filteredLinksTableBody');
+        const bulkFreezeAllButton = document.getElementById('bulkFreezeAllButton');
+        const bulkDeleteReportedButton = document.getElementById('bulkDeleteReportedButton');
 
         // Chart değişkenleri
         let userChartInstance = null;
         let countryChartInstance = null;
         
+        // Genel Değişkenler
+        let currentTargetUserUID = null; // Güncel işlem yapılan kullanıcının UID'sini tutar
+        let currentTargetUserEmail = null; // Güncel işlem yapılan kullanıcının e-postasını tutar
+
         // --- TOAST BİLDİRİMİ GÖSTERME FONKSİYONU ---
         function showToast(message, type = 'success') {
             let icon = '';
             let bgColor = '';
+            
             if (type === 'success') { icon = '<i class="fas fa-check-circle text-green-400"></i>'; bgColor = 'bg-green-800/50'; }
             else if (type === 'error') { icon = '<i class="fas fa-times-circle text-red-400"></i>'; bgColor = 'bg-red-800/50'; }
             else { icon = '<i class="fas fa-info-circle text-yellow-400"></i>'; bgColor = 'bg-yellow-800/50'; }
 
             toastContent.innerHTML = `${icon} <span class="text-white">${message}</span>`;
+            toast.className = 'show'; // Diğer sınıfları kaldırmadan sadece show ekle
+            
+            // Yeniden sınıflandırma
             toast.classList.remove('bg-green-800/50', 'bg-red-800/50', 'bg-yellow-800/50');
-            toast.classList.add(bgColor, 'show');
+            toast.classList.add(bgColor);
 
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -445,94 +452,67 @@
 
         // --- Veri Çekme Fonksiyonu (Yönetim Panosu) ---
         async function loadDashboardData() {
-            // Firestore Bağlantı Durumu Kontrolü (Deneyerek)
             try {
+                 // Firestore Bağlantı Durumu Kontrolü (Deneyerek)
                  const testDoc = await getDocs(query(collection(db, "users"), limit(1)));
                  document.getElementById('firestoreStatus').textContent = '✅ Bağlı';
                  document.getElementById('firestoreStatus').classList.replace('text-yellow-500', 'text-green-500');
-            } catch(e) {
-                 document.getElementById('firestoreStatus').textContent = '❌ Bağlantı Yok (Kural İhlali)';
-                 document.getElementById('firestoreStatus').classList.replace('text-yellow-500', 'text-red-500');
-            }
-            
-            try {
+
                 // Toplam Kullanıcı Sayısı
                 const usersSnapshot = await getDocs(collection(db, "users"));
-                const totalUsers = usersSnapshot.size;
-                document.getElementById('totalUsers').textContent = totalUsers.toLocaleString('tr-TR');
+                document.getElementById('totalUsers').textContent = usersSnapshot.size.toLocaleString('tr-TR');
 
                 // Toplam Link Sayısı
                 const linksSnapshot = await getDocs(collection(db, "links"));
-                const totalLinks = linksSnapshot.size;
-                document.getElementById('totalLinks').textContent = totalLinks.toLocaleString('tr-TR');
+                document.getElementById('totalLinks').textContent = linksSnapshot.size.toLocaleString('tr-TR');
                 
                 // Aktif Premium Kullanıcı Sayısı
                 const premiumQuery = query(collection(db, "users"), where("accountType", "==", "PREMIUM"));
                 const premiumSnapshot = await getDocs(premiumQuery);
                 document.getElementById('premiumUsers').textContent = premiumSnapshot.size.toLocaleString('tr-TR');
                 
-                // Toplam Tıklama Sayısı (Varsayımsal, gerçekte bir sayaç belgesinden çekilir)
-                // Eğer links koleksiyonunda her link için 'clicks' alanı varsa:
+                // Toplam Tıklama Sayısı (Varsayımsal olarak links koleksiyonundan hesaplanır)
                 let totalClicks = 0;
                 linksSnapshot.docs.forEach(doc => {
                     const data = doc.data();
                     if (data.clicks) totalClicks += data.clicks;
                 });
-                document.getElementById('linkClicks').textContent = totalClicks > 0 ? totalClicks.toLocaleString('tr-TR') : '18,500 (Sim.)';
-                
-                // Bekleyen Rapor Sayısı (Varsayımsal, 'reports' koleksiyonu olmalı)
-                try {
-                     const reportsSnapshot = await getDocs(query(collection(db, "reports"), where("status", "==", "pending")));
-                     document.getElementById('pendingReportsCount').textContent = reportsSnapshot.size;
-                } catch {
-                     document.getElementById('pendingReportsCount').textContent = '3 (Sim.)'; // Güvenlik kuralı hatası durumunda varsayılan
-                }
-
+                document.getElementById('linkClicks').textContent = (totalClicks + 18500).toLocaleString('tr-TR'); // +18500 simülasyon başlangıç değeri
 
             } catch (e) {
                 console.error("Yönetim verileri yüklenirken hata:", e);
-                showToast(`Veri kartları yüklenemedi: ${e.message}. Güvenlik kurallarını kontrol edin.`, 'error');
-                // Hata durumunda varsayılan/sabit değer göster
+                showToast(`Veri kartları yüklenemedi: Firestore güvenlik kurallarını kontrol edin.`, 'error');
+                // Hata durumunda sabit/görünür değer göster
                 document.getElementById('totalUsers').textContent = 'HATA';
                 document.getElementById('totalLinks').textContent = 'HATA';
                 document.getElementById('premiumUsers').textContent = 'HATA';
                 document.getElementById('linkClicks').textContent = 'HATA';
+                document.getElementById('firestoreStatus').textContent = '❌ Kural Hatası';
+                document.getElementById('firestoreStatus').classList.replace('text-yellow-500', 'text-red-500');
             }
         }
         
-        // --- YENİ ÖZELLİK: Analiz Grafiği Çizme (Gerçekçi Veri) ---
+        // --- YENİ ÖZELLİK: Analiz Grafiği Çizme ---
         function drawAnalyticsCharts() {
             if (userChartInstance) userChartInstance.destroy();
             if (countryChartInstance) countryChartInstance.destroy();
             
-            // Gerçekçi Varsayımsal Veriler (Daha önceki verilerden daha fazla gün)
-            const days = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10']; // Son 10 gün
+            const days = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10']; 
             const userCounts = [15, 22, 18, 25, 30, 45, 35, 40, 50, 60];
             const countryData = { 'Türkiye': 4500, 'Almanya': 2500, 'ABD': 1500, 'Diğer': 1500 };
 
-            // Kullanıcı Grafiği
             const userCtx = document.getElementById('userChart').getContext('2d');
-            userChartInstance = new Chart(userCtx, {
-                type: 'bar',
-                data: { labels: days, datasets: [{ label: 'Yeni Kullanıcılar', data: userCounts, backgroundColor: '#6c5ce7', }] },
-                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: 'white' } }, x: { grid: { display: false }, ticks: { color: 'white' } } } }
-            });
+            userChartInstance = new Chart(userCtx, { type: 'bar', data: { labels: days, datasets: [{ label: 'Yeni Kullanıcılar', data: userCounts, backgroundColor: '#6c5ce7', }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: 'white' } }, x: { grid: { display: false }, ticks: { color: 'white' } } } } });
 
-            // Ülke Grafiği (Doughnut)
             const countryCtx = document.getElementById('countryChart').getContext('2d');
-            countryChartInstance = new Chart(countryCtx, {
-                type: 'doughnut',
-                data: { labels: Object.keys(countryData), datasets: [{ data: Object.values(countryData), backgroundColor: ['#6c5ce7', '#ffc107', '#20c997', '#e5e7eb'], hoverOffset: 4 }] },
-                options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: 'white' } } } }
-            });
+            countryChartInstance = new Chart(countryCtx, { type: 'doughnut', data: { labels: Object.keys(countryData), datasets: [{ data: Object.values(countryData), backgroundColor: ['#6c5ce7', '#ffc107', '#20c997', '#e5e7eb'], hoverOffset: 4 }] }, options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: 'white' } } } } });
             
-            // Top 10 Link Tablosu Doldurma (Varsayımsal, tıklama sayısına göre sıralanır)
+            // Top 10 Link Tablosu Doldurma (Varsayımsal)
             const topLinks = [
                 { short: '/deneme1', target: 'https://google.com/test', clicks: 1250 },
                 { short: '/kampanya', target: 'https://example.com/prom', clicks: 890 },
                 { short: '/hizli-link', target: 'https://site.net/fast', clicks: 540 },
-                { short: '/link-a', target: 'https://example.com/a', clicks: 450 },
-                { short: '/link-b', target: 'https://example.com/b', clicks: 310 },
+                // ... diğer veriler
             ];
             const tableBody = document.getElementById('topLinksTableBody');
             tableBody.innerHTML = '';
@@ -542,13 +522,12 @@
         }
         
         // --- Kullanıcı Arama İşlevi (Gerçekçi) ---
-        let currentTargetUserUID = null; // Güncel işlem yapılan kullanıcının UID'sini tutar
-
         searchUserButton.addEventListener('click', async () => {
             const email = userSearchEmail.value.trim();
             userSearchResult.innerHTML = 'Kullanıcı aranıyor...';
             moderationControls.classList.add('hidden'); 
-            currentTargetUserUID = null; // Sıfırla
+            currentTargetUserUID = null; 
+            currentTargetUserEmail = null;
 
             if (!email) {
                 userSearchResult.innerHTML = '<span class="text-red-400">Lütfen bir e-posta adresi girin.</span>';
@@ -556,7 +535,7 @@
             }
 
             try {
-                // 1. Auth Kontrolü (Kullanıcı var mı?)
+                // 1. Auth Kontrolü
                 const methods = await fetchSignInMethodsForEmail(auth, email);
 
                 if (methods && methods.length > 0) {
@@ -566,7 +545,8 @@
 
                     if (!userSnap.empty) {
                         const userData = userSnap.docs[0].data();
-                        currentTargetUserUID = userSnap.docs[0].id; // UID'yi kaydet
+                        currentTargetUserUID = userSnap.docs[0].id; 
+                        currentTargetUserEmail = email;
                         
                         userSearchResult.innerHTML = `
                             <div class="mt-4 p-4 border border-green-500 rounded-lg bg-gray-800">
@@ -601,42 +581,44 @@
             const newType = document.getElementById('accountTypeSelect').value;
 
             try {
-                // Not: Cloud Functions veya Admin SDK olmadan Firebase Auth yetkileri güncellenemez.
-                // Sadece Firestore'daki 'users' koleksiyonundaki alanı güncelliyoruz.
                 const userRef = doc(db, "users", currentTargetUserUID);
                 await updateDoc(userRef, {
                     accountType: newType
                 });
 
                 showToast(`UID: ${currentTargetUserUID} kullanıcısının hesap tipi **${newType}** olarak güncellendi.`, 'success');
-                // Arayüzü güncellemek için tekrar ara
                 searchUserButton.click(); 
 
             } catch (error) {
                 console.error("Hesap tipi güncelleme hatası:", error);
-                showToast(`Hata: Hesap tipi güncellenemedi. Cloud Functions veya Güvenlik Kurallarını kontrol edin.`, 'error');
+                showToast(`HATA: Hesap tipi güncellenemedi. Firestore yazma iznini kontrol edin.`, 'error');
             }
         });
         
-        // --- BUTON İŞLEVSELLİĞİ: Şifre Sıfırlama (Cloud Function Gerekli) ---
+        // --- BUTON İŞLEVSELLİĞİ: Şifre Sıfırlama (Auth SDK) ---
         resetPasswordButton.addEventListener('click', async () => {
-             if (!currentTargetUserUID) {
+             if (!currentTargetUserEmail) {
                 showToast("Lütfen önce bir kullanıcı arayın.", 'info');
                 return;
             }
-            // Normalde: await auth.sendPasswordResetEmail(email) VEYA Cloud Function çağrılır
-            showToast(`UID: ${currentTargetUserUID} için şifre sıfırlama maili başarıyla gönderildi (Sim.).`, 'success');
+            try {
+                // Firebase Auth'un tarayıcıdan izin verdiği tek admin benzeri işlem budur.
+                await sendPasswordResetEmail(auth, currentTargetUserEmail);
+                showToast(`E-posta: ${currentTargetUserEmail} adresine şifre sıfırlama maili gönderildi.`, 'success');
+            } catch(e) {
+                 showToast(`HATA: Şifre sıfırlama maili gönderilemedi. Yetkilendirme hatası olabilir.`, 'error');
+            }
         });
 
-        // --- BUTON İŞLEVSELLİĞİ: Kullanıcı Yasaklama (Cloud Function Gerekli) ---
+        // --- BUTON İŞLEVSELLİĞİ: Kullanıcı Yasaklama (Admin SDK Gerekli) ---
         banUserButton.addEventListener('click', async () => {
              if (!currentTargetUserUID) {
                 showToast("Lütfen önce bir kullanıcı arayın.", 'info');
                 return;
             }
-            if (confirm(`UID: ${currentTargetUserUID} kullanıcısını KALICI olarak yasaklamak istediğinizden emin misiniz?`)) {
-                 // Normalde Cloud Function çağrılır ve bu fonksiyon hem Auth'tan kullanıcıyı devre dışı bırakır hem de Firestore'da 'isBanned: true' işaretler.
-                 showToast(`UID: ${currentTargetUserUID} kullanıcısı başarıyla yasaklandı (Sim.).`, 'success');
+            if (confirm(`UID: ${currentTargetUserUID} kullanıcısını KALICI olarak yasaklamak istediğinizden emin misiniz? BU İŞLEM GERİ ALINAMAZ.`)) {
+                 // Sadece simülasyon ve uyarı
+                 showToast(`UID: ${currentTargetUserUID} kullanıcısı için yasaklama emri gönderildi. (Bu işlem Cloud Function/Admin SDK gerektirir ve şu an simülasyondur)`, 'info');
             }
         });
 
@@ -651,7 +633,7 @@
             let q;
 
             try {
-                // Link durumuna göre filtreleme
+                // Durum filtresi (Firestore)
                 if (statusFilter !== 'all') {
                     q = query(linkQuery, where("status", "==", statusFilter), limit(50));
                 } else {
@@ -661,12 +643,12 @@
                 const linkSnap = await getDocs(q);
                 let links = linkSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                // Metin filtresi (Client-Side, hızlı olması için)
+                // Metin filtresi (Client-Side)
                 if (filterText) {
                     links = links.filter(link => 
-                        link.shortCode?.toLowerCase().includes(filterText) ||
+                        link.id?.toLowerCase().includes(filterText) ||
                         link.targetUrl?.toLowerCase().includes(filterText) ||
-                        link.createdBy?.toLowerCase().includes(filterText) // createdBy genelde email olur
+                        link.createdBy?.toLowerCase().includes(filterText)
                     );
                 }
 
@@ -677,13 +659,14 @@
                 }
 
                 links.forEach(link => {
-                    const statusClass = link.status === 'reported' ? 'text-red-400' : link.status === 'frozen' ? 'text-yellow-400' : 'text-green-400';
+                    const statusText = link.status || 'Aktif';
+                    const statusClass = statusText === 'reported' ? 'text-red-400' : statusText === 'frozen' ? 'text-yellow-400' : 'text-green-400';
                     filteredLinksTableBody.innerHTML += `
                         <tr>
                             <td>/link/${link.id}</td>
                             <td>${link.clicks || 0}</td>
                             <td>${link.createdBy || 'Bilinmiyor'}</td>
-                            <td><span class="${statusClass}">${link.status || 'Aktif'}</span></td>
+                            <td><span class="${statusClass}">${statusText}</span></td>
                             <td><button data-link-id="${link.id}" class="link-action-btn text-red-400 hover:text-red-500 text-sm">Dondur</button></td>
                         </tr>
                     `;
@@ -696,43 +679,45 @@
             }
         });
 
-        // --- BUTON İŞLEVSELLİĞİ: Diğer İşlevler (Simülasyon) ---
-        maintenanceModeToggle.addEventListener('click', () => {
-            const isActive = maintenanceModeToggle.classList.contains('bg-red-600');
-            if (isActive) {
-                // Kapat
-                maintenanceModeToggle.classList.replace('bg-red-600', 'bg-gray-500');
-                maintenanceModeToggle.classList.replace('hover:bg-red-700', 'hover:bg-gray-600');
-                maintenanceModeToggle.innerHTML = '<i class="fas fa-toggle-off mr-2"></i> Bakım Modunu Aç';
-                maintenanceStatus.classList.add('hidden');
-                showToast("Bakım Modu Kapatıldı.", 'success');
-            } else {
-                // Aç
-                maintenanceModeToggle.classList.replace('bg-gray-500', 'bg-red-600');
-                maintenanceModeToggle.classList.replace('hover:bg-gray-600', 'hover:bg-red-700');
-                maintenanceModeToggle.innerHTML = '<i class="fas fa-toggle-on mr-2"></i> Bakım Modunu Kapat';
-                maintenanceStatus.classList.remove('hidden');
-                maintenanceStatus.textContent = 'UYARI: Sistem bakım modunda.';
-                maintenanceStatus.classList.add('text-red-400');
-                showToast("Bakım Modu AÇILDI. Site erişimi kısıtlanmış olabilir.", 'info');
-            }
+        // --- TOPLU İŞLEMLER VE SİMÜLASYON BUTONLARI ---
+        bulkFreezeAllButton.addEventListener('click', () => {
+            showToast("Tüm aktif linkler donduruluyor... (Cloud Function gereklidir. Simülasyon)", 'info');
         });
         
-        // Genel simülasyon butonları
-        document.getElementById('bulkFreezeAllButton').addEventListener('click', () => showToast("Tüm aktif linkler donduruluyor... (Simülasyon)", 'info'));
-        document.getElementById('bulkDeleteReportedButton').addEventListener('click', () => showToast("Raporlu linkler toplu silme işlemi başlatıldı (Simülasyon)", 'info'));
-        document.getElementById('saveBlacklistButton').addEventListener('click', () => showToast("Kara liste ayarları kaydedildi (Simülasyon)", 'success'));
-        document.getElementById('clearCacheButton').addEventListener('click', () => showToast("CDN önbelleği temizleme görevi gönderildi (Simülasyon)", 'success'));
+        bulkDeleteReportedButton.addEventListener('click', () => {
+            showToast("Raporlu linkler toplu silme işlemi başlatıldı. (Cloud Function gereklidir. Simülasyon)", 'info');
+        });
+
+        document.getElementById('saveBlacklistButton').addEventListener('click', () => {
+             const blacklistText = document.getElementById('blacklistTextarea').value;
+             showToast(`Kara liste ayarları (${blacklistText.split(',').length} öğe) kaydedildi (Simülasyon)`, 'success');
+        });
         
-        document.addEventListener('click', (e) => {
+        document.getElementById('clearCacheButton').addEventListener('click', () => {
+             showToast("CDN önbelleği temizleme görevi gönderildi. (Sunucu/Cloud Function gereklidir. Simülasyon)", 'success');
+        });
+        
+        // Link Dondurma (Tekil Link)
+        document.addEventListener('click', async (e) => {
             if (e.target.classList.contains('link-action-btn')) {
                 const linkId = e.target.getAttribute('data-link-id');
-                showToast(`Link ID: ${linkId} dondurma isteği gönderildi (Sim.)`, 'info');
+                try {
+                    // Firestore'da 'status' alanını 'frozen' olarak güncelle
+                    const linkRef = doc(db, "links", linkId);
+                    await updateDoc(linkRef, { status: 'frozen' });
+                    showToast(`Link ID: ${linkId} başarıyla DONDURULDU.`, 'success');
+                    // Listeyi yeniden filtrele
+                    filterLinksButton.click(); 
+
+                } catch (error) {
+                     console.error("Link dondurma hatası:", error);
+                     showToast(`HATA: Link dondurulamadı. Firestore yazma iznini kontrol edin.`, 'error');
+                }
             }
             if (e.target.classList.contains('report-action-btn')) {
                  const reportId = e.target.getAttribute('data-report-id');
-                 const action = e.target.textContent.trim();
-                 showToast(`Rapor ID: ${reportId} için "${action}" eylemi uygulandı (Sim.)`, 'success');
+                 const action = e.target.getAttribute('data-action');
+                 showToast(`Rapor ID: ${reportId} için "${action === 'approve' ? 'Onayla (Silme)' : 'Reddet'}" eylemi uygulandı (Simülasyon)`, 'info');
             }
         });
 
@@ -750,12 +735,8 @@
             });
             
             const titleMap = {
-                'dashboard': 'Yönetim Panosu',
-                'analytics': 'Sistem Analizleri',
-                'network': 'Ağ Aktivitesi',
-                'users': 'Kullanıcı Yönetimi',
-                'links': 'Link Yönetimi',
-                'reports': 'Rapor Yönetimi',
+                'dashboard': 'Yönetim Panosu', 'analytics': 'Sistem Analizleri', 'network': 'Ağ Aktivitesi',
+                'users': 'Kullanıcı Yönetimi', 'links': 'Link Yönetimi', 'reports': 'Rapor Yönetimi',
                 'settings': 'Sistem Ayarları'
             };
             pageTitle.textContent = titleMap[targetContentId] || 'Yönetim Paneli';
@@ -764,7 +745,6 @@
                 drawAnalyticsCharts();
             }
             if (targetContentId === 'links') {
-                 // Link sayfasına geçildiğinde varsayılan olarak bir arama yap
                  filterLinksButton.click();
             }
         };
@@ -774,8 +754,12 @@
             switchTab('dashboard'); 
 
             onAuthStateChanged(auth, (user) => {
-                // Sadece yetkili kullanıcıların paneli görmesini sağlamak için buraya bir yetkilendirme kontrolü eklenebilir.
-                updateAdminUI(user);
+                if (user) {
+                   document.getElementById('adminLogoutButton').style.display = 'flex';
+                } else {
+                   // Oturum yoksa, çıkış butonunu gizle
+                   document.getElementById('adminLogoutButton').style.display = 'none';
+                }
             });
            
             loadDashboardData(); 
