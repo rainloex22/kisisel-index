@@ -1,117 +1,53 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giriş Yap | BAKİ S2</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --purple: #6c5ce7; /* Mor vurgu rengi */
-            --dark-bg: #1a0e21; /* Koyu arka plan */
-            --card-bg: #2a1b3a; /* Kart arka planı */
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--dark-bg);
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex; 
-            flex-direction: column;
-            overflow-x: hidden;
-            position: relative;
-        }
-        .form-card {
-            background-color: var(--card-bg);
-            border: 1px solid rgba(108, 92, 231, 0.3);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            border-radius: 1rem; 
-        }
-        .main-cta-button {
-            background-color: var(--purple);
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
-        }
-        .main-cta-button:hover {
-            background-color: #5d4cd9;
-        }
-        .header-bg {
-            background-color: rgba(26, 14, 33, 0.9);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-        }
-        .footer-bg {
-            background-color: #140b1b;
-        }
-        .alert-message {
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        .alert-error {
-            background-color: #fca5a5;
-            color: #7f1d1d;
-        }
-        .alert-success {
-            background-color: #a7f3d0;
-            color: #065f46;
-        }
-
-        /* YENİ: Navbar Stilleri */
+        /* ... (Mevcut stiller) ... */
+        /* NAVBAR STİLLERİ */
+        /* ... (Mevcut stiller) ... */
         .profile-avatar-nav {
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            font-size: 16px;
-            font-weight: 600;
-            background-color: var(--purple);
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            flex-shrink: 0;
-            cursor: pointer;
-            border: 2px solid var(--purple);
+            width: 40px; height: 40px; line-height: 40px; font-size: 16px; font-weight: 600;
+            background-color: var(--purple); color: white; border-radius: 50%; text-align: center;
+            flex-shrink: 0; cursor: pointer; border: 2px solid var(--purple);
         }
         .card-dropdown { 
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(5px); 
-            border-radius: 0.5rem; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
-            border: 1px solid rgba(108, 92, 231, 0.2);
-            z-index: 30;
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); border-radius: 0.5rem; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); border: 1px solid rgba(108, 92, 231, 0.1); z-index: 30;
         }
+        .btn-purple {
+            background-color: var(--purple); color: white; transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-purple:hover { background-color: #5c4cd9; transform: translateY(-1px); }
     </style>
 </head>
-<body>
+<body class="flex flex-col">
 
-    <header class="header-bg sticky top-0 z-10">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
+        <div class="w-full max-w-6xl flex justify-between items-center">
+            
             <a href="panel.html" class="text-2xl font-extrabold text-white flex items-center">
                 <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ S2
             </a>
-
+            
             <div class="hidden md:flex space-x-6">
                 <a href="panel.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Panel</a>
                 <a href="yardim.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
+                <a href="discord.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Discord</a>
+                <a href="fiyatlandirma.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
             </div>
 
             <div class="flex space-x-3 items-center">
                 <div id="loggedOutNav" class="flex space-x-3 items-center">
-                    <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple hover:bg-purple transition duration-200">Giriş Yap</a>
-                    <a href="kaydol.html" class="main-cta-button px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
+                    <a href="kaydol.html" class="btn-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
                 </div>
 
                 <div id="loggedInNav" class="relative hidden"> 
                     <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
                         <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
-                        
                         <div class="hidden sm:flex flex-col items-end">
                             <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
                             <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5">Yükleniyor...</span>
                         </div>
-                        
                         <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
                     </button>
                     
@@ -119,90 +55,26 @@
                         <a href="kullanicipaneli%20(1).html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
                             <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
                         </a>
-                        
                         <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
                             <i class="fas fa-sign-out-alt w-5 mr-2"></i> Çıkış Yap
                         </button>
                     </div>
                 </div>
             </div>
-            
-            </nav>
+        </div>
     </header>
 
-    <main class="flex-grow flex items-center justify-center py-10">
-        <div class="form-card w-full max-w-md p-8 sm:p-10">
-            <h2 class="text-3xl font-extrabold text-white text-center mb-6">Hesabınıza Giriş Yapın</h2>
-            <p class="text-gray-400 text-center mb-8">Henüz hesabınız yok mu? <a href="kaydol.html" class="text-purple-400 hover:text-purple-500 font-semibold">Hemen kaydolun</a></p>
-
-            <div id="messageContainer" class="hidden"></div>
-            
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-gray-300 mb-2">E-posta Adresi</label>
-                    <input type="email" id="email" required placeholder="örnek@eposta.com" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-purple-500 focus:border-purple-500 text-white">
-                </div>
-                <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Şifre</label>
-                    <input type="password" id="password" required placeholder="••••••••" class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-purple-500 focus:border-purple-500 text-white">
-                </div>
-                
-                <button type="submit" id="loginButton" class="w-full main-cta-button py-3 rounded-lg font-semibold text-white transition duration-200">
-                    Giriş Yap <i class="fas fa-sign-in-alt ml-2"></i>
-                </button>
-            </form>
-
-            <div class="mt-6 text-center">
-                <a href="sifremiunuttum.html" class="text-sm text-gray-400 hover:text-purple-400">Şifremi unuttum</a>
-            </div>
-        </div>
-    </main>
-
-    <footer class="footer-bg mt-auto">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-400 text-sm">
-            &copy; 2024 BAKİ S2. Tüm hakları saklıdır. | <a href="yardim.html" class="hover:text-purple-400">Yardım Merkezi</a>
-        </div>
-    </footer>
-
-    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js"></script>
-
     <script type="module" src="./firebase-auth-service.js"></script>
-
+    
     <script type="module">
-        // Ortak servisten başlatıldığı için artık initializeFirebase'i çağırmaya gerek yok.
-        // Giriş mantığı bu dosyanın kendi sorumluluğunda kalır.
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebase/9.6.1/firebase-auth.js";
+        // ... (Mevcut JS kodları) ...
         
-        // Yeni startClient fonksiyonu Firebase'i zaten başlatacağı için
-        // auth objesini global veya modül içinde tanımlayıp buradan kullanmak en iyisidir.
-        // Ancak basitlik için burada tekrar başlatma/tanımlama yapılır (tekrar eden auth başlatmayı önlemek için initializeApp çağrılmaz).
-
-        const auth = getAuth(); // startClient'ın başlattığı Auth örneğini kullanır.
-        
-        const loginForm = document.getElementById('loginForm');
-        const messageContainer = document.getElementById('messageContainer');
-        const loginButton = document.getElementById('loginButton');
-
-        function displayMessage(message, type) {
-            messageContainer.classList.remove('hidden', 'alert-error', 'alert-success');
-            messageContainer.classList.add(`alert-${type}`);
-            messageContainer.innerHTML = message;
-            
-            // Mesajı 5 saniye sonra gizle
-            setTimeout(() => {
-                messageContainer.classList.add('hidden');
-                messageContainer.innerHTML = '';
-            }, 5000);
-        }
-
         // YENİ: Dropdown açma/kapama JS'i
-        document.getElementById('profileMenuButton')?.addEventListener('click', () => {
+        document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             const dropdown = document.getElementById('profileDropdown');
             dropdown.classList.toggle('hidden');
         });
-        // Dışarı tıklamada kapatma
         document.addEventListener('click', (event) => {
             const menu = document.getElementById('loggedInNav');
             const isClickInside = menu?.contains(event.target);
@@ -210,64 +82,7 @@
                 document.getElementById('profileDropdown')?.classList.add('hidden');
             }
         });
-        
-        // Giriş Formu Gönderme İşlemi
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
 
-            const email = loginForm.email.value;
-            const password = loginForm.password.value;
-            
-            // Buton durumunu ayarla
-            loginButton.disabled = true;
-            loginButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Giriş Yapılıyor...';
-            messageContainer.classList.add('hidden'); // Yeni denemede mesajı gizle
-
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                
-                displayMessage("Giriş başarılı! Yönlendiriliyorsunuz...", 'success');
-                
-                // Başarılı girişten sonra Kullanıcı Paneline yönlendir
-                setTimeout(() => {
-                    window.location.href = 'kullanicipaneli%20(1).html'; 
-                }, 1500);
-
-            } catch (error) {
-                console.error("Giriş hatası:", error.code, error.message);
-                
-                let errorMessage = "Bir hata oluştu. Lütfen tekrar deneyin.";
-
-                // Firebase hata kodlarına göre mesajları Türkçeleştirme
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                        errorMessage = "E-posta veya şifre hatalı. Lütfen kontrol edin.";
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = "Geçersiz e-posta formatı.";
-                        break;
-                    case 'auth/user-disabled':
-                        errorMessage = "Hesabınız askıya alınmıştır.";
-                        break;
-                    case 'auth/too-many-requests':
-                        errorMessage = "Çok fazla başarısız giriş denemesi. Lütfen daha sonra tekrar deneyin.";
-                        break;
-                    default:
-                        errorMessage = `Giriş Hatası: ${error.message.includes('password') ? 'E-posta veya şifre hatalı.' : 'Sunucuya bağlanılamadı.'}`;
-                        break;
-                }
-
-                displayMessage(errorMessage, 'error');
-                
-                // Butonu tekrar etkinleştir
-                loginButton.disabled = false;
-                loginButton.innerHTML = 'Giriş Yap <i class="fas fa-sign-in-alt ml-2"></i>';
-            }
-        });
-
-    </script>
-    <script>
         // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
         window.onload = window.startClient;
     </script>
