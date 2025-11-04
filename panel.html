@@ -8,12 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --purple: #6c5ce7; /* Mor vurgu rengi */
-        }
+        :root { --purple: #6c5ce7; }
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #1a0e21; /* Daha mor-siyah arası bir arka plan */
+            background-color: #1a0e21; 
             color: #ffffff;
             min-height: 100vh;
             display: flex; 
@@ -26,73 +24,59 @@
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
         }
-        .main-cta-button {
+        .btn-purple {
             background-color: var(--purple);
             box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
-        .main-cta-button:hover {
-            background-color: #5d4cd9;
+        .btn-purple:hover {
+            background-color: #5c4cd9;
+            transform: translateY(-1px);
         }
-        .main-content {
-            flex-grow: 1;
+        .card-panel {
+            background-color: #2a1b3a; 
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
-        .footer-bg {
-            background-color: #140b1b;
-        }
-        
         /* YENİ: Navbar Stilleri */
         .profile-avatar-nav {
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            font-size: 16px;
-            font-weight: 600;
-            background-color: var(--purple); /* Mor arka plan */
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            flex-shrink: 0;
-            cursor: pointer;
-            border: 2px solid var(--purple); /* Çerçeve rengi */
+            width: 40px; height: 40px; line-height: 40px; font-size: 16px; font-weight: 600;
+            background-color: var(--purple); color: white; border-radius: 50%; text-align: center;
+            flex-shrink: 0; cursor: pointer; border: 2px solid var(--purple);
         }
         .card-dropdown { 
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(5px); 
-            border-radius: 0.5rem; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
-            border: 1px solid rgba(108, 92, 231, 0.2); /* Hafif mor çerçeve */
-            z-index: 30; /* Navbar'dan yüksek olsun */
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); border-radius: 0.5rem; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); border: 1px solid rgba(108, 92, 231, 0.2); z-index: 30;
         }
     </style>
 </head>
-<body>
-
-    <header class="header-bg sticky top-0 z-10">
+<body class="min-h-screen flex flex-col">
+    <header class="header-bg sticky top-0 z-20">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <a href="panel.html" class="text-2xl font-extrabold text-white flex items-center">
                 <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ S2
             </a>
 
             <div class="hidden md:flex space-x-6">
-                <a href="panel.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Panel</a>
-                <a href="yardim.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
-                </div>
+                <a href="panel.html" class="text-purple-500 transition duration-200 font-medium">Panel</a> <a href="yardim.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
+                <a href="discord.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Discord</a>
+                <a href="fiyatlandirma.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
+            </div>
 
             <div class="flex space-x-3 items-center">
                 <div id="loggedOutNav" class="flex space-x-3 items-center">
                     <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple hover:bg-purple transition duration-200">Giriş Yap</a>
-                    <a href="kaydol.html" class="main-cta-button px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
+                    <a href="kaydol.html" class="btn-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a> 
                 </div>
 
                 <div id="loggedInNav" class="relative hidden"> 
                     <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
                         <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
-                        
                         <div class="hidden sm:flex flex-col items-end">
                             <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
                             <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5">Yükleniyor...</span>
                         </div>
-                        
                         <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
                     </button>
                     
@@ -100,71 +84,35 @@
                         <a href="kullanicipaneli%20(1).html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
                             <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
                         </a>
-                        
                         <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
                             <i class="fas fa-sign-out-alt w-5 mr-2"></i> Çıkış Yap
                         </button>
                     </div>
                 </div>
             </div>
-            
-            </nav>
+        </nav>
     </header>
-
-    <main class="main-content container mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <section class="text-center">
-            <h1 class="text-5xl font-extrabold mb-4">Hoş Geldiniz!</h1>
-            <p class="text-xl text-gray-400 mb-8">Burada sitemize ait tüm özelliklere erişebilir ve hizmetlerimizden yararlanabilirsiniz.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-purple-500 transition duration-300">
-                    <i class="fas fa-link text-3xl text-purple-500 mb-4"></i>
-                    <h3 class="text-xl font-semibold mb-2">Hızlı Bağlantılar</h3>
-                    <p class="text-gray-400">En sık kullandığınız araçlara tek tıkla ulaşın.</p>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-purple-500 transition duration-300">
-                    <i class="fas fa-chart-line text-3xl text-purple-500 mb-4"></i>
-                    <h3 class="text-xl font-semibold mb-2">Performans Analizi</h3>
-                    <p class="text-gray-400">Verilerinizi takip edin ve büyümeyi izleyin.</p>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-purple-500 transition duration-300">
-                    <i class="fas fa-headset text-3xl text-purple-500 mb-4"></i>
-                    <h3 class="text-xl font-semibold mb-2">7/24 Destek</h3>
-                    <p class="text-gray-400">Ne zaman ihtiyacınız olursa yanınızdayız.</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer-bg mt-auto">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-400 text-sm">
-            &copy; 2024 BAKİ S2. Tüm hakları saklıdır. | <a href="yardim.html" class="hover:text-purple-400">Yardım Merkezi</a>
-        </div>
-    </footer>
-
     <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-auth.js"></script>
     <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js"></script>
-
     <script type="module" src="./firebase-auth-service.js"></script>
 
-    <script>
+    <script type="module">
         // YENİ: Dropdown açma/kapama JS'i
-        document.getElementById('profileMenuButton')?.addEventListener('click', () => {
+        document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             const dropdown = document.getElementById('profileDropdown');
             dropdown.classList.toggle('hidden');
         });
-        // Dışarı tıklamada kapatma
         document.addEventListener('click', (event) => {
-            const menu = document.getElementById('loggedInNav');
+            const menu = document.getElementById('loggedInNav'); // ID'yi güncelledik
             const isClickInside = menu?.contains(event.target);
             if (!isClickInside) {
                 document.getElementById('profileDropdown')?.classList.add('hidden');
             }
         });
 
-        // YENİ: Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
-        // Eski 'updateNavbar' ve 'onAuthStateChanged' mantığı bu çağrı ile değiştirildi.
+        // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
         window.onload = window.startClient;
     </script>
 </body>
