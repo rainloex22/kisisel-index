@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fiyatlandırma | BAKİ S2</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -19,9 +17,13 @@
             display: flex;
             flex-direction: column;
         }
-        .header-bg { background-color: rgba(26, 14, 33, 0.9); backdrop-filter: blur(5px); }
+        .header-bg { 
+            background-color: rgba(26, 14, 33, 0.9); 
+            backdrop-filter: blur(5px); 
+            -webkit-backdrop-filter: blur(5px);
+        }
         .price-card { 
-            background-color: #2a1b3a; /* Koyu tema ile uyumlu */
+            background-color: #2a1b3a; 
             border-radius: 1rem; 
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); 
             transition: transform 0.3s ease; 
@@ -29,7 +31,7 @@
         .price-card:hover { transform: translateY(-5px); }
         .price-card-premium { 
             border: 2px solid var(--purple); 
-            background: rgba(108, 92, 231, 0.15); /* Hafif mor arka plan */
+            background: rgba(108, 92, 231, 0.15);
         }
         .btn-purple {
             background-color: var(--purple);
@@ -40,7 +42,31 @@
             background-color: #5c4cd9;
             transform: translateY(-1px);
         }
-        /* Mesaj Kutusu Stili */
+        /* YENİ: Navbar Stilleri */
+        .profile-avatar-nav {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: var(--purple);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            border: 2px solid var(--purple);
+        }
+        .card-dropdown { 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(5px); 
+            border-radius: 0.5rem; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
+            border: 1px solid rgba(108, 92, 231, 0.2);
+            z-index: 30;
+        }
+
+        /* Mesaj Kutusu Stili (Modal ile çakışmasın diye basitleştirildi) */
         #messageBox {
             visibility: hidden;
             position: fixed;
@@ -78,25 +104,49 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Navbar (Dinamik) -->
-    <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
-        <div class="w-full max-w-6xl flex justify-between items-center">
-            <a href="panel.html" class="text-3xl font-extrabold text-white flex items-center">
-                <i class="fas fa-terminal mr-2 text-purple"></i> BAKİ S2
+    <header class="header-bg sticky top-0 z-20">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="panel.html" class="text-2xl font-extrabold text-white flex items-center">
+                <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ S2
             </a>
-            <nav class="hidden md:flex space-x-6 text-lg">
-                <!-- Kullanıcı Paneli Eklendi -->
-                <a href="panel.html" class="text-gray-300 hover:text-purple transition duration-200">Kullanıcı Paneli</a>
-                <a href="yardim.html" class="text-gray-300 hover:text-purple transition duration-200">Yardım Merkezi</a>
-                <a href="discord.html" class="text-gray-300 hover:text-purple transition duration-200">Discord</a>
-                <a href="fiyatlandirma.html" class="text-purple transition duration-200">Fiyatlandırma</a>
-            </nav>
-            <!-- Kimlik doğrulama butonları buraya JS ile yüklenecek -->
-            <div id="authButtonsContainer" class="flex space-x-3">
-                <!-- Yer tutucu: Yükleniyor... -->
-                <div class="px-5 py-2 rounded-lg font-semibold text-gray-500">Yükleniyor...</div>
+
+            <div class="hidden md:flex space-x-6">
+                <a href="panel.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Panel</a>
+                <a href="yardim.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
+                <a href="discord.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Discord</a>
+                <a href="fiyatlandirma.html" class="text-purple-500 transition duration-200 font-medium">Fiyatlandırma</a>
             </div>
-        </div>
+
+            <div class="flex space-x-3 items-center">
+                <div id="loggedOutNav" class="flex space-x-3 items-center">
+                    <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple hover:bg-purple transition duration-200">Giriş Yap</a>
+                    <a href="kaydol.html" class="btn-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a> 
+                </div>
+
+                <div id="loggedInNav" class="relative hidden"> 
+                    <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
+                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
+                        
+                        <div class="hidden sm:flex flex-col items-end">
+                            <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
+                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5">Yükleniyor...</span>
+                        </div>
+                        
+                        <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
+                    </button>
+                    
+                    <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
+                        <a href="kullanicipaneli%20(1).html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
+                            <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
+                        </a>
+                        
+                        <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
+                            <i class="fas fa-sign-out-alt w-5 mr-2"></i> Çıkış Yap
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
     </header>
 
     <main class="flex-grow flex flex-col items-center py-20 px-4">
@@ -154,14 +204,12 @@
         </a>
     </main>
     
-    <!-- Mesaj Kutusu -->
     <div id="messageBox"></div>
 
     <footer class="bg-gray-900 text-gray-500 text-center p-4 mt-auto">
         © 2025 BAKİ S2 Yönetim Hizmetleri.
     </footer>
 
-    <!-- Satın Alma Modalı -->
     <div id="purchaseModal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
         <div class="modal-content rounded-xl shadow-2xl w-full max-w-md p-6 relative">
             
@@ -193,150 +241,20 @@
         </div>
     </div>
 
-    <!-- Firebase Kodu -->
+    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js"></script>
+
+    <script type="module" src="./firebase-auth-service.js"></script>
+
     <script type="module">
-        // Gerekli Firebase fonksiyonlarını içe aktar (v11.6.1 kullanıldı)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        
-        // --- Zorunlu Global Değişkenlerin Alınması ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const globalFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Kullanıcının hardcoded ayarları (yedek olarak - Bu kısımlar Canvas ortamında otomatik sağlanır)
-        const hardcodedConfig = {
-            apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
-            authDomain: "baki-s2-yonetim.firebaseapp.com",
-            projectId: "baki-s2-yonetim",
-            storageBucket: "baki-s2-yonetim.firebasestorage.app",
-            messagingSenderId: "692508919425",
-            appId: "1:692508919425:web:fac963c81c11b7be70af80",
-            measurementId: "G-Q52XG8GLB2"
-        };
-
-        <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-app.js"></script>
-<script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-auth.js"></script>
-<script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js"></script>
-
-<script type="module" src="./firebase-auth-service.js"></script>
-
-<script>
-    // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
-    window.onload = window.startClient;
-</script>
-        
-        // Yapılandırmayı belirle
-        const firebaseConfig = globalFirebaseConfig || hardcodedConfig;
-        let auth;
-        let isConfigAvailable = !!firebaseConfig.apiKey;
-
-        // --- DOM Elementlerini Başlat ---
-        const messageBox = document.getElementById('messageBox');
-        const authButtonsContainer = document.getElementById('authButtonsContainer');
-
+        // --- Modal Fonksiyonları ---
         const modal = document.getElementById('purchaseModal');
         const modalPlanName = document.getElementById('modalPlanName');
         const modalPlanPrice = document.getElementById('modalPlanPrice');
         const modalLoginBtn = document.getElementById('modalLoginBtn');
         const modalRegisterBtn = document.getElementById('modalRegisterBtn');
 
-
-        // --- Mesaj Gösterme Fonksiyonu ---
-        function showMessage(message, type = 'success') {
-            if (!messageBox) return;
-
-            messageBox.classList.remove('message-success', 'message-error');
-            messageBox.innerHTML = message;
-            const colorClass = type === 'success' ? 'message-success' : 'message-error';
-            messageBox.classList.add(colorClass);
-
-            messageBox.classList.add('message-show');
-            
-            setTimeout(() => {
-                messageBox.classList.remove('message-show');
-            }, 5000);
-        }
-
-        // --- Header UI Güncelleme Fonksiyonu ---
-        function updateHeaderUI(user) {
-            authButtonsContainer.innerHTML = ''; // Mevcut içeriği temizle
-
-            if (user && user.isAnonymous === false) {
-                // Oturum Açık: Panel ve Çıkış Yap butonlarını göster
-                // Kullanıcının e-postasının ilk kısmını veya UID'sini göster
-                const panelText = user.email ? user.email.split('@')[0] : (user.uid.substring(0, 4) + '...');
-                
-                authButtonsContainer.innerHTML = `
-                    <a href="panel.html" class="hidden sm:inline-block px-4 py-2 text-white transition duration-200 rounded-lg font-bold border border-purple hover:bg-purple/10">${panelText}</a>
-                    <button id="logoutButton" class="bg-red-600 px-5 py-2 rounded-lg font-semibold text-white hover:bg-red-700 transition duration-200">Çıkış Yap</button>
-                `;
-
-                // Çıkış yapma işlevini butona bağla
-                document.getElementById('logoutButton').addEventListener('click', handleLogout);
-
-            } else {
-                // Oturum Kapalı (veya Anonim): Giriş Yap ve Kaydol butonlarını göster
-                authButtonsContainer.innerHTML = `
-                    <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-white transition duration-200 rounded-lg font-bold border border-purple hover:bg-purple/10">Giriş Yap</a>
-                    <a href="kaydol.html" class="bg-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
-                `;
-            }
-        }
-        
-        // --- Çıkış Yapma İşlemi ---
-        async function handleLogout() {
-            if (!auth) return;
-            try {
-                await signOut(auth);
-                showMessage("Başarıyla çıkış yaptınız.", "success");
-                // Çıkış sonrası giriş sayfasına yönlendir
-                setTimeout(() => window.location.href = 'girisyap.html', 1500); 
-            } catch (error) {
-                console.error("Çıkış yapma hatası:", error);
-                showMessage("Çıkış yapma işlemi sırasında bir hata oluştu.", "error");
-            }
-        }
-
-        // --- Firebase Başlatma ve Oturum Kontrolü ---
-        if (isConfigAvailable) {
-            try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                
-                onAuthStateChanged(auth, (user) => {
-                    if (user && user.isAnonymous === false) {
-                        // Gerçek kullanıcı giriş yapmış
-                        updateHeaderUI(user);
-                    } else {
-                        // Kullanıcı anonim veya çıkış yapmış
-                        updateHeaderUI(null);
-
-                        // Custom token varsa otomatik giriş yapmayı dene
-                        if (initialAuthToken) {
-                            signInWithCustomToken(auth, initialAuthToken).catch(e => {
-                                console.error("Özel token ile giriş başarısız, anonim olarak deneniyor:", e);
-                                signInAnonymously(auth).catch(e => console.error("Anonim giriş başarısız:", e));
-                            });
-                        } else if (!user || user.isAnonymous) {
-                            // Custom token yoksa veya zaten anonimse, anonim olarak oturum aç
-                            signInAnonymously(auth).catch(e => console.error("Anonim giriş başarısız:", e));
-                        }
-                    }
-                });
-
-            } catch (e) {
-                console.error("Firebase başlatma hatası:", e);
-                isConfigAvailable = false;
-                updateHeaderUI(null);
-                showMessage("Hata: Firebase yapılandırması başarısız.", "error");
-            }
-        } else {
-            console.error("Firebase yapılandırması mevcut değil.");
-            updateHeaderUI(null);
-        }
-
-        // --- Modal Fonksiyonları ---
         window.openPurchaseModal = function(planName, planPrice) {
             
             // Modal içeriğini güncelle
@@ -380,6 +298,26 @@
                 closePurchaseModal();
             }
         });
+
+        // YENİ: Dropdown açma/kapama JS'i
+        document.getElementById('profileMenuButton')?.addEventListener('click', () => {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('hidden');
+        });
+        // Dışarı tıklamada kapatma
+        document.addEventListener('click', (event) => {
+            const menu = document.getElementById('loggedInNav');
+            const isClickInside = menu?.contains(event.target);
+            if (!isClickInside) {
+                document.getElementById('profileDropdown')?.classList.add('hidden');
+            }
+        });
+        
+        // Eski showMessage fonksiyonu kaldırıldı, modal fonksiyonları korundu.
+        // Hata mesajı gösterme mantığı yeni Firebase service'te veya ilgili sayfalarda yönetilecektir.
+        
+        // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
+        window.onload = window.startClient;
     </script>
 </body>
 </html>
