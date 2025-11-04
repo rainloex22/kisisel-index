@@ -1,68 +1,460 @@
-<body class="min-h-screen">
-    
-    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js"></script>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Paneli | BAKİ S2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Varsayılan Temalar */
+            --purple: #6c5ce7;
+            --dark-bg: #1a0e21;
+            --card-bg: #1f112c;
+            --sidebar-bg: #140b1b;
+            --accent-purple: #9c84ff;
 
-    <script type="module" src="./firebase-auth-service.js"></script>
-    
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebase/9.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebase/9.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js";
+            /* Aktif Tema Renkleri (JS ile güncellenecek) */
+            --active-theme-color: var(--purple);
+            --active-bg-color: var(--dark-bg);
+            --active-card-color: var(--card-bg);
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--active-bg-color); /* Tema Renkleri Kullanımı */
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header-bg { 
+            background-color: rgba(26, 14, 33, 0.9);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .profile-avatar-nav {
+            width: 40px; height: 40px; line-height: 40px; font-size: 16px; font-weight: 600;
+            background-color: var(--purple); color: white; border-radius: 50%; text-align: center;
+            flex-shrink: 0; cursor: pointer; border: 2px solid var(--purple);
+        }
+        .card-dropdown { 
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); border-radius: 0.5rem; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); border: 1px solid rgba(108, 92, 231, 0.2); z-index: 30;
+        }
+        /* Dashboard Stilleri */
+        .sidebar { background-color: var(--sidebar-bg); }
+        .sidebar-nav-item { transition: background-color 0.2s, color 0.2s; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
+        .sidebar-nav-item:hover { background-color: rgba(108, 92, 231, 0.1); }
+        .sidebar-nav-item.active { background-color: var(--purple); color: white; font-weight: 600; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
+        .dashboard-card { background-color: var(--card-bg); border: 1px solid rgba(108, 92, 231, 0.3); }
+        .form-input { 
+            background-color: #3b2f4f; 
+            border: 1px solid transparent; 
+            color: white; 
+            transition: border-color 0.3s;
+        }
+        .form-input:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 1px var(--purple);
+            outline: none;
+        }
+        .btn-primary { 
+            background-color: var(--purple); 
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover { background-color: #5c4cd9; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <header class="header-bg sticky top-0 z-20">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="panel.html" class="text-2xl font-extrabold text-white flex items-center">
+                <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ S2
+            </a>
+
+            <div class="hidden md:flex space-x-6">
+                <a href="panel.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Panel</a>
+                <a href="yardim.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
+                <a href="discord.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Discord</a>
+                <a href="fiyatlandirma.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
+            </div>
+
+            <div id="authButtonsContainer" class="flex space-x-3 items-center">
+                
+                <div id="loggedOutNav" class="flex space-x-3 items-center hidden">
+                    <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple hover:bg-purple/10 transition duration-200">Giriş Yap</a>
+                    <a href="kaydol.html" class="btn-register px-5 py-2 rounded-lg font-semibold text-white bg-purple-600 hover:bg-purple-700">Kaydol</a> 
+                </div>
+
+                <div id="loggedInNav" class="relative hidden"> 
+                    <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
+                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">..</span> 
+                        <div class="hidden sm:flex flex-col items-end">
+                            <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor..</span>
+                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5 bg-green-500/20 text-green-300">Üye</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
+                    </button>
+                    
+                    <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
+                        <a href="kullanicipaneli.html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
+                            <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
+                        </a>
+                        <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
+                            <i class="fas fa-sign-out-alt w-5 mr-2"></i> Çıkış Yap
+                        </button>
+                    </div>
+                </div>
+            </div>
+            </nav>
+    </header>
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-10 flex">
         
-        // ... (Firebase config ve initializeApp kısmı) ... 
+        <aside class="w-64 mr-8 p-4 sidebar rounded-xl hidden md:block flex-shrink-0 h-full sticky top-24 self-start">
+            <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">Panel Menüsü</h2>
+            <nav class="space-y-2">
+                <div data-content="dashboard" class="sidebar-nav-item active flex items-center">
+                    <i class="fas fa-chart-bar w-5 mr-3"></i> Genel Bakış
+                </div>
+                <div data-content="links" class="sidebar-nav-item flex items-center">
+                    <i class="fas fa-link w-5 mr-3"></i> Bağlantı Yönetimi
+                </div>
+                <div data-content="profile" class="sidebar-nav-item flex items-center">
+                    <i class="fas fa-user-circle w-5 mr-3"></i> Profil Ayarları
+                </div>
+                <div data-content="settings" class="sidebar-nav-item flex items-center">
+                    <i class="fas fa-cogs w-5 mr-3"></i> Hesap Ayarları
+                </div>
+                <button id="quickCreateLinkBtn" class="w-full btn-primary py-2 rounded-lg font-semibold text-white text-sm mt-4 flex items-center justify-center">
+                    <i class="fas fa-plus mr-2"></i> Yeni Bağlantı Oluştur
+                </button>
+            </nav>
+        </aside>
+
+        <section class="flex-grow">
+            <div id="dashboardContent" class="content-tab">
+                <h1 class="text-4xl font-extrabold mb-6 text-accent-purple">Merhaba, <span id="welcome_user_name">Kullanıcı</span>!</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="dashboard-card p-6 rounded-xl">
+                        <p class="text-gray-400 text-sm">Toplam Görüntülenme</p>
+                        <p class="text-3xl font-bold mt-1" id="total_views">0</p>
+                    </div>
+                    <div class="dashboard-card p-6 rounded-xl">
+                        <p class="text-gray-400 text-sm">Aktif Bağlantı Sayısı</p>
+                        <p class="text-3xl font-bold mt-1" id="active_links_count">0</p>
+                    </div>
+                    <div class="dashboard-card p-6 rounded-xl">
+                        <p class="text-gray-400 text-sm">Hesap Türü</p>
+                        <p class="text-3xl font-bold mt-1 text-green-400" id="account_type">Ücretsiz</p>
+                    </div>
+                </div>
+                <div class="mt-8 dashboard-card p-6 rounded-xl">
+                    <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Son Hareketler</h2>
+                    <p class="text-gray-500">Henüz bir hareket bulunmamaktadır.</p>
+                </div>
+            </div>
+
+            <div id="linksContent" class="content-tab hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-4xl font-extrabold text-accent-purple">Bağlantı Yönetimi</h1>
+                    <button id="openNewLinkModalBtn" class="btn-primary py-2 px-4 rounded-lg font-semibold text-white">
+                        <i class="fas fa-plus mr-2"></i> Yeni Bağlantı
+                    </button>
+                </div>
+                <div class="dashboard-card p-6 rounded-xl">
+                    <p class="text-gray-500">Bağlantılarınız bu alanda listelenecektir.</p>
+                    </div>
+            </div>
+
+            <div id="profileContent" class="content-tab hidden">
+                <h1 class="text-4xl font-extrabold mb-6 text-accent-purple">Profil Ayarları</h1>
+                <form id="profileForm" class="dashboard-card p-8 rounded-xl space-y-4 max-w-lg">
+                    <div>
+                        <label for="display_name" class="block text-sm font-medium text-gray-300 mb-1">Görünen İsim</label>
+                        <input type="text" id="display_name" name="display_name" class="form-input w-full p-3 rounded-lg" placeholder="Adınız Soyadınız">
+                    </div>
+                    <div>
+                        <label for="profile_email" class="block text-sm font-medium text-gray-300 mb-1">E-posta (Değiştirilemez)</label>
+                        <input type="email" id="profile_email" name="profile_email" class="form-input w-full p-3 rounded-lg opacity-70 cursor-not-allowed" readonly>
+                    </div>
+                    <div>
+                        <label for="avatar_url" class="block text-sm font-medium text-gray-300 mb-1">Avatar (URL)</label>
+                        <input type="url" id="avatar_url" name="avatar_url" class="form-input w-full p-3 rounded-lg" placeholder="Profil fotoğrafı linki">
+                    </div>
+                    <button type="submit" class="btn-primary py-3 rounded-lg font-bold text-white w-full">
+                        <i class="fas fa-save mr-2"></i> Profilimi Kaydet
+                    </button>
+                    <p id="profileStatus" class="text-sm text-center pt-2 text-green-400"></p>
+                </form>
+            </div>
+
+            <div id="settingsContent" class="content-tab hidden">
+                <h1 class="text-4xl font-extrabold mb-6 text-accent-purple">Hesap Ayarları</h1>
+                <div class="dashboard-card p-8 rounded-xl space-y-6 max-w-lg">
+                    <div class="border-b border-gray-700 pb-4">
+                        <h2 class="text-xl font-semibold mb-2">Şifre Değiştirme</h2>
+                        <button class="btn-primary py-2 px-4 rounded-lg font-semibold text-sm">
+                            <i class="fas fa-key mr-2"></i> Şifremi Güncelle
+                        </button>
+                        <p class="text-gray-400 text-sm mt-2">Şifre sıfırlama e-postası göndermek için buraya tıklayın.</p>
+                    </div>
+                    <div class="pt-4">
+                        <h2 class="text-xl font-semibold mb-2 text-red-400">Hesabı Sil</h2>
+                        <button class="bg-red-600 hover:bg-red-700 py-2 px-4 rounded-lg font-semibold text-sm text-white">
+                            <i class="fas fa-trash-alt mr-2"></i> Hesabımı Sil
+                        </button>
+                        <p class="text-gray-400 text-sm mt-2">Bu işlem geri alınamaz. Lütfen dikkatli olun.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+    
+    <div id="linkModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="dashboard-card p-8 rounded-xl w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-4">Yeni Bağlantı Oluştur</h2>
+            <form id="linkForm" class="space-y-4">
+                <div>
+                    <label for="link_name" class="block text-sm font-medium text-gray-300 mb-1">Bağlantı Adı</label>
+                    <input type="text" id="link_name" name="link_name" required class="form-input w-full p-3 rounded-lg">
+                </div>
+                <div>
+                    <label for="link_url" class="block text-sm font-medium text-gray-300 mb-1">Hedef URL</label>
+                    <input type="url" id="link_url" name="link_url" required class="form-input w-full p-3 rounded-lg">
+                </div>
+                <div class="flex justify-end space-x-3 mt-4">
+                    <button type="button" onclick="closeLinkModal()" class="py-2 px-4 rounded-lg text-gray-400 hover:bg-gray-700">İptal</button>
+                    <button type="submit" class="btn-primary py-2 px-4 rounded-lg font-bold text-white">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <footer class="bg-gray-900 text-gray-500 text-center p-4 mt-auto">
+        © 2025 BAKİ S2 Yönetim Hizmetleri.
+    </footer>
+
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
+    <script type="module" src="./firebase-auth-service.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- KULLANICININ SAĞLADIĞI YAPILANDIRMA ---
         const firebaseConfig = {
-            // Buraya gerçek Firebase yapılandırmanızı yapıştırın
             apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
             authDomain: "baki-s2-yonetim.firebaseapp.com",
             projectId: "baki-s2-yonetim",
             storageBucket: "baki-s2-yonetim.firebasestorage.app",
             messagingSenderId: "692508919425",
             appId: "1:692508919425:web:fac963c81c11b7be70af80",
+            measurementId: "G-Q52XG8GLB2"
         };
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = getFirestore(app); // Firestore başlatıldı
 
+        // --- Yardımcı Fonksiyonlar ---
+        function getInitials(name) {
+            if (!name) return '..';
+            const parts = name.split(' ');
+            if (parts.length > 1) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return name[0].toUpperCase();
+        }
 
-        // --- Güvenlik ve Oturum Kontrolü (ANA DEĞİŞİKLİK) ---
-        onAuthStateChanged(auth, (user) => {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const mainContentWrapper = document.getElementById('mainContentWrapper');
+        function getRoleBadge(role) {
+            let base = "text-xs font-medium rounded-full px-2 py-0.5 mt-0.5 ";
+            switch(role) {
+                case 'Yönetici': return base + 'bg-red-500/20 text-red-300';
+                case 'Premium': return base + 'bg-yellow-500/20 text-yellow-300';
+                default: return base + 'bg-green-500/20 text-green-300'; // Üye
+            }
+        }
 
-            if (user && user.isAnonymous === false) {
-                // Kullanıcı Giriş Yapmışsa:
-                loadingOverlay.classList.add('hidden');
-                mainContentWrapper.classList.remove('hidden');
+        // --- Navbar Güncelleme ---
+        function updateHeaderUI(user) {
+            const loggedInNav = document.getElementById('loggedInNav');
+            const loggedOutNav = document.getElementById('loggedOutNav');
+            
+            if (user && !user.isAnonymous) {
+                loggedInNav.classList.remove('hidden');
+                loggedOutNav.classList.add('hidden');
+
+                const initialsEl = document.getElementById('nav_profile_initials');
+                const displayNameEl = document.getElementById('nav_display_name');
+                const roleEl = document.getElementById('nav_user_role');
                 
-                // Firestore verilerini çekme fonksiyonunu çağır
-                fetchUserData(user); 
+                // Varsayılan değerler
+                let displayName = user.email ? user.email.split('@')[0] : 'Kullanıcı';
+                let userRole = 'Üye'; // Varsayılan: Üye
+                
+                // Kullanıcı verisini Firestore'dan çek (Arayüzde gösterilecek isim ve rol için)
+                const userDocRef = doc(db, "users", user.uid);
+                getDoc(userDocRef).then(docSnap => {
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        displayName = userData.displayName || displayName;
+                        userRole = userData.role || userRole;
+                        if (initialsEl) initialsEl.textContent = getInitials(displayName);
+                        if (displayNameEl) displayNameEl.textContent = displayName;
+                        if (roleEl) {
+                            roleEl.textContent = userRole;
+                            roleEl.className = getRoleBadge(userRole);
+                        }
+                        // Paneldeki karşılama mesajını güncelle
+                        const welcomeUser = document.getElementById('welcome_user_name');
+                        if (welcomeUser) welcomeUser.textContent = displayName;
+
+                        const profileEmailEl = document.getElementById('profile_email');
+                        const displayNameInputEl = document.getElementById('display_name');
+                        if (profileEmailEl) profileEmailEl.value = user.email;
+                        if (displayNameInputEl) displayNameInputEl.value = userData.displayName || '';
+
+                    } else {
+                         // Firestore'da kaydı yoksa varsayılan bilgileri kullan
+                         if (initialsEl) initialsEl.textContent = getInitials(displayName);
+                         if (displayNameEl) displayNameEl.textContent = displayName;
+                         if (roleEl) {
+                            roleEl.textContent = userRole;
+                            roleEl.className = getRoleBadge(userRole);
+                         }
+                         const profileEmailEl = document.getElementById('profile_email');
+                         if (profileEmailEl) profileEmailEl.value = user.email;
+                    }
+                }).catch(e => {
+                    console.error("Kullanıcı verisi çekilemedi:", e);
+                });
+
                 
             } else {
-                // Kullanıcı Giriş Yapmamış veya Anonimse:
-                // Güvenlik: Giriş sayfasına yönlendir.
-                console.log("Yetkisiz erişim denemesi. Giriş sayfasına yönlendiriliyor.");
+                // Logged Out State
+                loggedInNav.classList.add('hidden');
+                loggedOutNav.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            signOut(auth).then(() => {
+                window.location.href = 'girisyap.html'; 
+            }).catch((error) => {
+                console.error("Çıkış Yapma Hatası:", error);
+            });
+        }
+
+        // --- Güvenlik Kontrolü ve Dinleyiciler ---
+        const navItems = document.querySelectorAll('.sidebar-nav-item');
+        const contentTabs = document.querySelectorAll('.content-tab');
+        const quickCreateLinkBtn = document.getElementById('quickCreateLinkBtn');
+        const openNewLinkModalBtn = document.getElementById('openNewLinkModalBtn');
+        const profileStatusEl = document.getElementById('profileStatus');
+        const linkModal = document.getElementById('linkModal');
+
+
+        onAuthStateChanged(auth, (user) => {
+            updateHeaderUI(user);
+
+            // KRİTİK: Kullanıcı Paneli Koruması
+            if (!user || user.isAnonymous) {
+                // Kullanıcı Giriş yapmamışsa veya anonimse yönlendir
                 window.location.href = 'girisyap.html'; 
             }
         });
+
+        // Dropdown ve Logout olayları
+        document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
+        document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('profileDropdown')?.classList.toggle('hidden');
+        });
+        document.addEventListener('click', (event) => {
+            const menu = document.getElementById('loggedInNav');
+            const isClickInside = menu?.contains(event.target);
+            if (!isClickInside) {
+                document.getElementById('profileDropdown')?.classList.add('hidden');
+            }
+        });
+
+        // --- Form İşlemleri ---
+        const profileForm = document.getElementById('profileForm');
+        profileForm?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const displayName = document.getElementById('display_name').value.trim();
+            const avatarUrl = document.getElementById('avatar_url').value.trim();
+
+            profileStatusEl.textContent = 'Kaydediliyor...';
+            
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                await setDoc(userDocRef, {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: displayName,
+                    avatarUrl: avatarUrl,
+                    role: 'Üye', // Rolü sadece ilk girişte Üye olarak ayarla
+                    updatedAt: new Date()
+                }, { merge: true }); // Merge ile sadece gönderilen alanlar güncellenir
+
+                profileStatusEl.textContent = '✅ Profil başarıyla güncellendi!';
+                updateHeaderUI(user); // Navbar'ı hemen güncelle
+                setTimeout(() => profileStatusEl.textContent = '', 3000);
+
+            } catch (error) {
+                console.error("Profil kaydedilirken hata:", error);
+                profileStatusEl.textContent = `Hata: ${error.message}`;
+            }
+        });
+
+
+        // --- Navigasyon ve Olay Dinleyicileri ---
         
-        // --- Çıkış Yap Butonu Olayı ---
-        document.getElementById('logoutButton').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                // Çıkış başarılı
-                window.location.href = 'girisyap.html';
-            }).catch((error) => {
-                console.error("Çıkış hatası:", error);
-                alert("Çıkış işlemi sırasında bir hata oluştu.");
+        const switchTab = (targetContentId) => {
+            contentTabs.forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(`${targetContentId}Content`).classList.remove('hidden');
+            
+            navItems.forEach(item => {
+                if (item.getAttribute('data-content') === targetContentId) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
             });
+        };
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', () => switchTab(item.getAttribute('data-content')));
+        });
+
+        // Modal Aç/Kapat
+        window.openLinkModal = function(linkData) {
+            linkModal.classList.remove('hidden', 'opacity-0');
+            linkModal.classList.add('opacity-100');
+        }
+        window.closeLinkModal = function() {
+            linkModal.classList.remove('opacity-100');
+            linkModal.classList.add('opacity-0');
+            setTimeout(() => linkModal.classList.add('hidden'), 300);
+        }
+
+        quickCreateLinkBtn.addEventListener('click', () => {
+             openLinkModal(null);
+             switchTab('links');
         });
         
-        // ... (fetchUserData, saveProfile, switchTab, linkModal fonksiyonları buraya eklenecek/korunacak) ...
+        openNewLinkModalBtn.addEventListener('click', () => openLinkModal(null));
 
-        // Sayfa yüklendiğinde Firebase'i başlat
-        // NOT: initializeFirebase kaldırıldı, onAuthStateChanged direkt çağırılıyor.
-        // window.onload = initializeFirebase; 
     </script>
 </body>
 </html>
