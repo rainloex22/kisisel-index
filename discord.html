@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discord Sunucumuza Katılın | BAKİ S2</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -22,7 +20,11 @@
             display: flex;
             flex-direction: column;
         }
-        .header-bg { background-color: rgba(26, 14, 33, 0.9); backdrop-filter: blur(5px); }
+        .header-bg { 
+            background-color: rgba(26, 14, 33, 0.9); 
+            backdrop-filter: blur(5px); 
+            -webkit-backdrop-filter: blur(5px);
+        }
         .discord-card {
             background: rgba(255, 255, 255, 0.05); 
             border-radius: 1.5rem; 
@@ -41,40 +43,87 @@
         .stat-glow {
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
+
+        /* YENİ: Navbar Stilleri */
+        .profile-avatar-nav {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: var(--purple);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            border: 2px solid var(--purple);
+        }
+        .card-dropdown { 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(5px); 
+            border-radius: 0.5rem; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
+            border: 1px solid rgba(108, 92, 231, 0.2);
+            z-index: 30;
+        }
+        .btn-purple {
+            background-color: var(--purple);
+            color: white;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-purple:hover {
+            background-color: #5c4cd9;
+            transform: translateY(-1px);
+        }
     </style>
-<script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-app.js"></script>
-<script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-auth.js"></script>
-<script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js"></script>
-
-<script type="module" src="./firebase-auth-service.js"></script>
-
-<script>
-    // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
-    window.onload = window.startClient;
-</script>
 </head>
 <body class="min-h-screen flex flex-col">
-    <!-- Navbar -->
-    <header class="header-bg p-4 flex justify-center sticky top-0 z-20">
-        <div class="w-full max-w-6xl flex justify-between items-center">
-            <a href="panel.html" class="text-3xl font-extrabold text-white flex items-center">
-                <i class="fas fa-terminal mr-2 text-purple"></i> BAKİ S2
+    <header class="header-bg sticky top-0 z-20">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="panel.html" class="text-2xl font-extrabold text-white flex items-center">
+                <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ S2
             </a>
-            <nav class="hidden md:flex space-x-6 text-lg">
-                <!-- Kullanıcı Paneli Bağlantısı Eklendi -->
-                <a href="kullanicipaneli.html" class="text-gray-300 hover:text-purple transition duration-200">Kullanıcı Paneli</a>
-                <a href="yardim.html" class="text-gray-300 hover:text-purple transition duration-200">Yardım Merkezi</a>
-                <a href="discord.html" class="text-purple transition duration-200">Discord</a>
-                <a href="fiyatlandirma.html" class="text-gray-300 hover:text-purple transition duration-200">Fiyatlandirma</a>
-            </nav>
-            <div class="flex space-x-3">
-                <a href="girisyap.html" class="hidden sm:inline-block px-4 py-2 text-gray-300 hover:text-white transition duration-200 rounded-lg">Giriş Yap</a>
-                <a href="kaydol.html" class="bg-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a>
+
+            <div class="hidden md:flex space-x-6">
+                <a href="panel.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Panel</a>
+                <a href="yardim.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
+                <a href="discord.html" class="text-purple-500 transition duration-200 font-medium">Discord</a>
+                <a href="fiyatlandirma.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
             </div>
-        </div>
+
+            <div class="flex space-x-3 items-center">
+                <div id="loggedOutNav" class="flex space-x-3 items-center">
+                    <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple hover:bg-purple transition duration-200">Giriş Yap</a>
+                    <a href="kaydol.html" class="btn-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a> 
+                </div>
+
+                <div id="loggedInNav" class="relative hidden"> 
+                    <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
+                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
+                        
+                        <div class="hidden sm:flex flex-col items-end">
+                            <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
+                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5">Yükleniyor...</span>
+                        </div>
+                        
+                        <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
+                    </button>
+                    
+                    <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
+                        <a href="kullanicipaneli%20(1).html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
+                            <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
+                        </a>
+                        
+                        <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
+                            <i class="fas fa-sign-out-alt w-5 mr-2"></i> Çıkış Yap
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
     </header>
 
-    <!-- İçerik Alanı: Discord Tanıtımı -->
     <main class="flex-grow flex flex-col items-center justify-center py-20 px-4">
         <div class="discord-card p-8 md:p-12 w-full max-w-2xl text-center">
             
@@ -85,17 +134,14 @@
                 Tüm kullanıcılarımızla bir araya geliyoruz! Destek almak, en son güncellemeleri öğrenmek, önerilerde bulunmak veya sadece sohbet etmek için bize katılın.
             </p>
 
-            <!-- İstatistikler Bölümü (DİNAMİK VERİ) -->
             <div class="grid grid-cols-2 gap-4 mb-10 text-white">
                 <div class="p-4 bg-gray-900 rounded-xl">
-                    <!-- Gerçek Üye Sayısı burada gösterilecek -->
                     <p id="member-count" class="text-3xl font-extrabold stat-glow">
                         <i class="fas fa-spinner fa-spin"></i>
                     </p>
                     <p class="text-gray-400 text-sm">Toplam Üye</p>
                 </div>
                 <div class="p-4 bg-gray-900 rounded-xl">
-                    <!-- Çevrimiçi (Online) Üye Sayısı burada gösterilecek -->
                     <p id="online-count" class="text-3xl font-extrabold stat-glow">
                         <i class="fas fa-spinner fa-spin"></i>
                     </p>
@@ -103,13 +149,10 @@
                 </div>
             </div>
             
-            <!-- Yeni Hizmet Bildirimi: 7/24 Hizmet -->
             <p class="text-xl font-bold text-green-400 mb-8 text-center -mt-4">
                 <i class="fas fa-headset mr-2"></i> 7/24 Aktif Hizmet
             </p>
 
-            <!-- Katılım Butonu -->
-            <!-- GERÇEK DİSCORD BAĞLANTISI -->
             <a href="https://discord.gg/YuHbprEFDE" target="_blank" class="btn-discord w-full inline-flex items-center justify-center px-8 py-4 rounded-xl font-bold text-white text-xl shadow-lg transition duration-300">
                 <i class="fab fa-discord mr-3"></i>
                 Hemen Katıl!
@@ -123,12 +166,18 @@
         </a>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-gray-900 text-gray-500 text-center p-4 mt-auto">
         © 2025 BAKİ S2 Yönetim Hizmetleri.
     </footer>
     
-    <script>
+    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js"></script>
+
+    <script type="module" src="./firebase-auth-service.js"></script>
+
+    <script type="module">
+        // Discord API İstatistik Çekme (Orijinal Koddan Alındı)
         document.addEventListener('DOMContentLoaded', () => {
             // Sayfa yüklendiğinde body opacity'sini 1'e ayarla (fade-in)
             document.body.style.opacity = '1';
@@ -169,7 +218,6 @@
 
             /**
              * Büyük sayıları okunabilir formatta döndürür (örneğin 3500 -> 3.5K).
-             * Bu örnekte sadece binlik ayıracı kullanıyorum.
              * @param {number|string} num
              * @returns {string}
              */
@@ -181,7 +229,25 @@
             }
 
             fetchDiscordStats();
+
+            // YENİ: Dropdown açma/kapama JS'i
+            document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
+                e.stopPropagation(); // Butona tıklanınca document click olayını tetiklemesin
+                const dropdown = document.getElementById('profileDropdown');
+                dropdown.classList.toggle('hidden');
+            });
+            // Dışarı tıklamada kapatma
+            document.addEventListener('click', (event) => {
+                const menu = document.getElementById('loggedInNav');
+                const isClickInside = menu?.contains(event.target);
+                if (!isClickInside) {
+                    document.getElementById('profileDropdown')?.classList.add('hidden');
+                }
+            });
         });
+        
+        // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
+        window.onload = window.startClient;
     </script>
 </body>
 </html>
