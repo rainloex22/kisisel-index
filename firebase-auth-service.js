@@ -4,16 +4,15 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebase/9.6.
 
 // !!! BURAYA KENDİ FIREBASE YAPILANDIRMANIZI EKLEYİNİZ !!!
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
+    authDomain: "baki-s2-yonetim.firebaseapp.com",
+    projectId: "baki-s2-yonetim",
+    storageBucket: "baki-s2-yonetim.firebasestorage.app",
+    messagingSenderId: "692508919425",
+    appId: "1:692508919425:web:fac963c81c11b7be70af80"
 };
 
 let auth, db;
-let isConfigAvailable = false;
 
 /**
  * Kullanıcının adının baş harflerini hesaplar (Özel 'MA' kuralı dahil).
@@ -53,12 +52,15 @@ async function updateNavbarUI(user) {
         // Firestore'dan ek bilgileri çek (Örn: isPremium ve güncel displayName)
         if (db) {
             try {
+                // Not: Kullanıcı UID'si ile 'users' koleksiyonunda arama yapıldığı varsayılmıştır.
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    isPremium = data.isPremium === true;
+                    // isPremium alanı veritabanından çekilir.
+                    isPremium = data.isPremium === true; 
                     if (data.displayName) { 
+                        // Veritabanındaki displayname'i tercih et
                         displayName = data.displayName;
                     }
                 }
@@ -69,7 +71,7 @@ async function updateNavbarUI(user) {
         
         // Kullanıcı Adı ve Hesap Türü
         const roleText = isPremium ? 'Premium' : 'Standart';
-        // Premium için sarı (yellow-500), Standart için gri (gray-500)
+        // Premium için sarı, Standart için gri/mor
         const roleClass = isPremium ? 'bg-yellow-500 text-gray-900' : 'bg-gray-500 text-white';
         const initials = getInitials(displayName); 
         
@@ -77,20 +79,12 @@ async function updateNavbarUI(user) {
         const navProfileInitials = document.getElementById('nav_profile_initials');
         const navDisplayName = document.getElementById('nav_display_name');
         const navUserRole = document.getElementById('nav_user_role');
-        const navDisplayNameMobile = document.getElementById('nav_display_name_mobile');
-        const navUserRoleMobile = document.getElementById('nav_user_role_mobile');
 
         if (navProfileInitials) navProfileInitials.textContent = initials;
         if (navDisplayName) navDisplayName.textContent = displayName;
         if (navUserRole) {
             navUserRole.textContent = roleText;
             navUserRole.className = `text-xs font-medium rounded-full px-2 py-0.5 mt-0.5 ${roleClass}`;
-        }
-        // Mobil görünüm için de güncelle
-        if (navDisplayNameMobile) navDisplayNameMobile.textContent = displayName;
-        if (navUserRoleMobile) {
-            navUserRoleMobile.textContent = roleText;
-            navUserRoleMobile.className = `text-xs font-medium rounded-full px-2 py-0.5 mt-0.5 block ${roleClass}`;
         }
 
         // Göster/Gizle
@@ -111,7 +105,7 @@ async function handleLogout() {
     if (!auth) return;
     try {
         await signOut(auth);
-        // İsteğe bağlı: Çıkış yaptıktan sonra anasayfaya yönlendir
+        // Çıkış yaptıktan sonra anasayfaya (panel.html) yönlendir
         window.location.href = 'panel.html'; 
     } catch (error) {
         console.error("Çıkış hatası:", error);
@@ -126,7 +120,6 @@ function startClient() {
         const app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         db = getFirestore(app);
-        isConfigAvailable = true;
         
         // Oturum dinleyicisini kur
         onAuthStateChanged(auth, (user) => {
@@ -138,7 +131,8 @@ function startClient() {
 
     } catch (e) {
         console.error("Firebase başlatma hatası:", e);
-        updateNavbarUI(null);
+        // Yapılandırma hatası durumunda bile oturum kapalı Navbar'ı göster
+        updateNavbarUI(null); 
     }
 }
 
