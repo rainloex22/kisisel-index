@@ -363,6 +363,22 @@
             monthlyToggle.addEventListener('click', () => updatePrices('monthly'));
             annualToggle.addEventListener('click', () => updatePrices('annual'));
 
+            // Olay dinleyicileri
+          monthlyToggle.addEventListener('click', () => {
+           if (isAnnual) {
+         isAnnual = false;
+          updatePricing();
+            }
+              });
+            
+                  // YENİ EKLENECEK KOD (Yıllık Ödeme Butonu için):
+           annualToggle.addEventListener('click', () => {
+                      if (!isAnnual) { // Eğer zaten yıllık modda değilse
+           isAnnual = true;
+                     updatePricing();
+              }
+           });
+
             // Başlangıçta aylık fiyatları yükle
             updatePrices('monthly');
 
