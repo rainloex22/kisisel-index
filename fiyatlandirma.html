@@ -214,6 +214,17 @@
             appId: "1:692508919425:web:fac963c81c11b7be70af80",
             measurementId: "G-Q52XG8GLB2"
         };
+
+        <script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-app.js"></script>
+<script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-auth.js"></script>
+<script type="module" src="https://www.gstatic.com/firebase/9.6.1/firebase-firestore.js"></script>
+
+<script type="module" src="./firebase-auth-service.js"></script>
+
+<script>
+    // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
+    window.onload = window.startClient;
+</script>
         
         // Yapılandırmayı belirle
         const firebaseConfig = globalFirebaseConfig || hardcodedConfig;
