@@ -51,7 +51,6 @@
             background-color: rgba(108, 92, 231, 0.1);
             border-radius: 0.5rem;
         }
-        /* Yükleme Ekranı Stilleri */
         #loadingOverlay {
             background-color: #110915; 
             z-index: 1000; 
@@ -91,7 +90,7 @@
                     <i class="fas fa-chart-line w-6 mr-3"></i> Yönetim Panosu
                 </a>
                 <a href="#" class="nav-item flex items-center p-3 text-gray-300 hover:text-white transition duration-200" data-content="users">
-                    <i class="fas fa-users w-6 mr-3"></i> Kullanıcılar (Firebase)
+                    <i class="fas fa-users w-6 mr-3"></i> Kullanıcı Yönetimi
                 </a>
                 <a href="#" class="nav-item flex items-center p-3 text-gray-300 hover:text-white transition duration-200" data-content="links">
                     <i class="fas fa-link w-6 mr-3"></i> Link Yönetimi
@@ -140,21 +139,82 @@
             </div>
             
             <div id="usersContent" class="content-tab hidden">
-                <h3 class="text-2xl font-bold text-white mb-4">Kullanıcı Yönetimi</h3>
-                <p class="text-gray-300">Bu bölüm sadece arayüzdür. Gerçek kullanıcı listesini göstermek için Firebase Yönetim API'leri veya Cloud Functions kullanmanız gerekir.</p>
-                <div class="mt-4 p-4 admin-card">
-                    <p class="text-yellow-400"><i class="fas fa-exclamation-triangle mr-2"></i> **UYARI:** Bu ekrandan kullanıcı verisi çekilemez. İşlemlerinizi Firebase Console üzerinden yapın.</p>
+                <h3 class="text-2xl font-bold text-white mb-4">Kullanıcı Yönetimi <i class="fas fa-user-shield ml-2 text-purple-400"></i></h3>
+                <p class="text-gray-300 mb-6">Kullanıcıları arayın, durumlarını görüntüleyin ve moderasyon işlemlerini gerçekleştirin.</p>
+
+                <div class="admin-card p-6 mb-6">
+                    <h4 class="text-xl font-bold mb-3">🔍 Kullanıcı Arama</h4>
+                    <div class="flex space-x-3">
+                        <input type="email" id="userSearchEmail" placeholder="Kullanıcı E-posta Adresi..." class="flex-grow p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-purple-500 focus:border-purple-500 text-white">
+                        <button id="searchUserButton" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-5 rounded-lg transition duration-200">
+                            Ara
+                        </button>
+                    </div>
+                    <div id="userSearchResult" class="mt-4 text-gray-300">Arama sonuçları burada gösterilecek.</div>
+                </div>
+
+                <div class="admin-card p-6">
+                    <h4 class="text-xl font-bold mb-3">📝 Moderasyon Eylemleri</h4>
+                    <p class="text-yellow-400 mb-4"><i class="fas fa-exclamation-triangle mr-2"></i> **NOT:** Bu işlevler için Firebase Admin SDK veya Cloud Functions gereklidir.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                            <i class="fas fa-ban mr-2"></i> Hesabı Askıya Al
+                        </button>
+                        <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                            <i class="fas fa-crown mr-2"></i> Admin Yetkisi Ver
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div id="linksContent" class="content-tab hidden">
-                <h3 class="text-2xl font-bold text-white mb-4">Link Yönetimi</h3>
-                <p class="text-gray-300">Bu bölümde, tüm kısaltılmış linkleri görebilir ve linkleri devre dışı bırakma gibi yönetimsel görevleri yürütebilirsiniz (Firebase verilerine erişim gerektirir).</p>
+                <h3 class="text-2xl font-bold text-white mb-4">Link Yönetimi <i class="fas fa-clipboard-list ml-2 text-yellow-400"></i></h3>
+                <p class="text-gray-300 mb-6">Sistemdeki linkleri denetleyin ve potansiyel olarak zararlı/istenmeyen içerikleri yönetin.</p>
+
+                <div class="admin-card p-6 mb-6">
+                    <h4 class="text-xl font-bold mb-3">🔗 En Son Oluşturulan Linkler</h4>
+                    <div id="latestLinksList" class="space-y-3">
+                        <p class="text-gray-400">Veriler yükleniyor...</p>
+                        <div class="flex justify-between items-center p-3 bg-gray-700 rounded-lg">
+                            <span class="text-sm">kisa.link/abcde</span>
+                            <button class="text-red-400 hover:text-red-500 text-sm font-semibold">Sil</button>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-700 rounded-lg">
+                            <span class="text-sm">kisa.link/fghij</span>
+                            <button class="text-red-400 hover:text-red-500 text-sm font-semibold">Sil</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-card p-6">
+                    <h4 class="text-xl font-bold mb-3">🚨 Rapor Edilen Linkler</h4>
+                    <p class="text-gray-400">Şu anda incelenmeyi bekleyen **0** rapor bulunmaktadır.</p>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-lg mt-4 transition duration-200">
+                        Raporları Görüntüle (Varsayımsal)
+                    </button>
+                </div>
             </div>
 
             <div id="settingsContent" class="content-tab hidden">
-                <h3 class="text-2xl font-bold text-white mb-4">Sistem Ayarları</h3>
-                <p class="text-gray-300">Siteyi bakım moduna alma, duyuru metinlerini güncelleme veya genel ayarları değiştirme işlemleri bu kısımda yapılabilir.</p>
+                <h3 class="text-2xl font-bold text-white mb-4">Sistem Ayarları <i class="fas fa-server ml-2 text-green-400"></i></h3>
+                <p class="text-gray-300 mb-6">Uygulamanın genel ayarlarını ve bakım modunu yönetin.</p>
+
+                <div class="admin-card p-6 mb-6">
+                    <h4 class="text-xl font-bold mb-3">👷 Bakım Modu</h4>
+                    <p class="text-gray-400 mb-3">Tüm kullanıcı girişlerini ve link oluşturmayı geçici olarak durdurur.</p>
+                    <button id="maintenanceModeToggle" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-5 rounded-lg transition duration-200">
+                        <i class="fas fa-toggle-off mr-2"></i> Bakım Modunu Aç
+                    </button>
+                    <p id="maintenanceStatus" class="mt-3 text-sm text-green-400 hidden"><i class="fas fa-check-circle mr-1"></i> Sistem bakım modundadır.</p>
+                </div>
+
+                <div class="admin-card p-6">
+                    <h4 class="text-xl font-bold mb-3">📣 Genel Duyuru Ayarları</h4>
+                    <textarea id="announcementText" rows="3" placeholder="Tüm kullanıcılara gösterilecek duyuru metnini buraya yazın..." class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 focus:ring-purple-500 focus:border-purple-500 text-white"></textarea>
+                    <button id="saveAnnouncementButton" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-5 rounded-lg mt-3 transition duration-200">
+                        Duyuruyu Yayınla
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -166,10 +226,10 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // KRİTİK DÜZELTME: Firebase Config ve Başlatma doğrudan buraya eklendi
+        // Firebase Config ve Başlatma
         const firebaseConfig = {
             apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
             authDomain: "baki-s2-yonetim.firebaseapp.com",
@@ -190,6 +250,14 @@
         const navItems = document.querySelectorAll('.nav-item');
         const contentTabs = document.querySelectorAll('.content-tab');
         const pageTitle = document.getElementById('pageTitle');
+
+        // YENİ ELEMANLAR
+        const searchUserButton = document.getElementById('searchUserButton');
+        const userSearchEmail = document.getElementById('userSearchEmail');
+        const userSearchResult = document.getElementById('userSearchResult');
+        const maintenanceModeToggle = document.getElementById('maintenanceModeToggle');
+        const maintenanceStatus = document.getElementById('maintenanceStatus');
+        const latestLinksList = document.getElementById('latestLinksList');
         
         // --- Kullanıcı Arayüzü Güncellemesi (Firebase durumuna göre) ---
         function updateAdminUI(user) {
@@ -205,25 +273,94 @@
         // --- Veri Çekme Fonksiyonu (Yönetim Panosu) ---
         async function loadDashboardData() {
             try {
-                // Firestore verilerini çekme
+                // Toplam Kullanıcı Sayısı
                 const usersSnapshot = await getDocs(collection(db, "users"));
                 document.getElementById('totalUsers').textContent = usersSnapshot.size.toLocaleString('tr-TR');
 
+                // Toplam Link Sayısı (Maksimum 50 link çeker)
                 const linksSnapshot = await getDocs(collection(db, "links"));
                 document.getElementById('totalLinks').textContent = linksSnapshot.size.toLocaleString('tr-TR');
 
+                // Aktif Premium Kullanıcı Sayısı
                 const premiumQuery = query(collection(db, "users"), where("accountType", "==", "PREMIUM"));
                 const premiumSnapshot = await getDocs(premiumQuery);
                 document.getElementById('premiumUsers').textContent = premiumSnapshot.size.toLocaleString('tr-TR');
 
             } catch (e) {
                 console.error("Yönetim verileri yüklenirken hata:", e);
-                // Genellikle Güvenlik Kuralı İhlali (Security Rules) nedeniyle HATA döner
-                document.getElementById('totalUsers').textContent = 'HATA';
-                document.getElementById('totalLinks').textContent = 'HATA';
-                document.getElementById('premiumUsers').textContent = 'HATA';
+                document.getElementById('totalUsers').textContent = 'HATA (İzin Yok)';
+                document.getElementById('totalLinks').textContent = 'HATA (İzin Yok)';
+                document.getElementById('premiumUsers').textContent = 'HATA (İzin Yok)';
             }
         }
+        
+        // --- YENİ ÖZELLİK: Kullanıcı Arama İşlevi (Client-side) ---
+        searchUserButton.addEventListener('click', async () => {
+            const email = userSearchEmail.value.trim();
+            userSearchResult.innerHTML = 'Kullanıcı aranıyor...';
+
+            if (!email) {
+                userSearchResult.innerHTML = '<span class="text-red-400">Lütfen bir e-posta adresi girin.</span>';
+                return;
+            }
+
+            try {
+                // Firebase Auth'tan kullanıcının varlığını kontrol et
+                const methods = await fetchSignInMethodsForEmail(auth, email);
+
+                if (methods && methods.length > 0) {
+                    // Kullanıcı Firestore'dan çekilir (Firestore'da 'users' koleksiyonu olmalıdır)
+                    const userQuery = query(collection(db, "users"), where("email", "==", email));
+                    const userSnap = await getDocs(userQuery);
+
+                    if (!userSnap.empty) {
+                        const userData = userSnap.docs[0].data();
+                        userSearchResult.innerHTML = `
+                            <div class="mt-4 p-4 border border-green-500 rounded-lg bg-gray-800">
+                                <h5 class="font-bold text-green-400">Kullanıcı Bulundu: ${email}</h5>
+                                <p>Hesap Tipi: <span class="font-semibold">${userData.accountType || 'TEMEL'}</span></p>
+                                <p>Kayıt Tarihi: ${userData.createdAt ? new Date(userData.createdAt.seconds * 1000).toLocaleDateString() : 'Bilinmiyor'}</p>
+                                <p class="text-yellow-400">UID: ${userSnap.docs[0].id}</p>
+                            </div>
+                        `;
+                    } else {
+                        userSearchResult.innerHTML = `<span class="text-yellow-400">E-posta Auth'da var, ancak Firestore'da 'users' kaydı bulunamadı.</span>`;
+                    }
+                } else {
+                    userSearchResult.innerHTML = `<span class="text-red-400">Bu e-posta adresine kayıtlı bir kullanıcı bulunamadı.</span>`;
+                }
+
+            } catch (error) {
+                console.error("Kullanıcı arama hatası:", error);
+                userSearchResult.innerHTML = `<span class="text-red-400">Hata oluştu: ${error.message}</span>`;
+            }
+        });
+
+        // --- YENİ ÖZELLİK: Bakım Modu İşlevi (Sadece Arayüz Örneği) ---
+        maintenanceModeToggle.addEventListener('click', () => {
+            const isActive = maintenanceModeToggle.classList.contains('bg-red-600');
+            
+            if (isActive) {
+                // Kapat
+                maintenanceModeToggle.classList.remove('bg-red-600', 'hover:bg-red-700');
+                maintenanceModeToggle.classList.add('bg-gray-500', 'hover:bg-gray-600');
+                maintenanceModeToggle.innerHTML = '<i class="fas fa-toggle-off mr-2"></i> Bakım Modunu Aç';
+                maintenanceStatus.classList.add('hidden');
+            } else {
+                // Aç
+                maintenanceModeToggle.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+                maintenanceModeToggle.classList.add('bg-red-600', 'hover:bg-red-700');
+                maintenanceModeToggle.innerHTML = '<i class="fas fa-toggle-on mr-2"></i> Bakım Modunu Kapat';
+                maintenanceStatus.classList.remove('hidden');
+                maintenanceStatus.textContent = 'UYARI: Sistem bakım modunda. Canlıya almanız gerekebilir.';
+                maintenanceStatus.classList.remove('text-green-400');
+                maintenanceStatus.classList.add('text-red-400');
+
+            }
+
+            // Gerçek bakım modu işlemi için Firestore'da bir ayar belgesini güncellemeniz gerekir.
+        });
+
 
         // --- Sayfa Geçişleri (Tab Switching) ---
         const switchTab = (targetContentId) => {
@@ -267,15 +404,13 @@
 
         // --- Başlatma ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Paneli gösterme görevi yukarıdaki basit script'e devredildi.
             switchTab('dashboard'); 
 
-            // Firebase durumunu dinle (Bu asenkron çalışır, UI hemen açılmıştır)
+            // Firebase durumunu dinle
             onAuthStateChanged(auth, (user) => {
                 updateAdminUI(user);
             });
            
-            // Veri çekme işlemini başlat
             loadDashboardData(); 
         });
 
