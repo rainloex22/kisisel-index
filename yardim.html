@@ -16,7 +16,6 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            /* KRİTİK DÜZELTME: opacity: 0 kaldırıldı */
             transition: opacity 0.5s ease-in-out;
         }
         .header-bg { 
@@ -30,10 +29,19 @@
             border-radius: 1rem; 
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); 
         }
-        .text-purple-active { color: var(--purple); font-weight: 600; }
+        /* Aktif Navigasyon Stili */
+        .nav-active, .nav-link:hover { 
+            color: var(--purple) !important; 
+            font-weight: 600; 
+            border-bottom: 2px solid var(--purple);
+        }
+        /* Footer Stili */
+        .footer-style {
+            background-color: #110915; /* Koyu arka plan */
+            border-top: 1px solid #3a2a4d; /* İnce üst çizgi */
+        }
         .btn-logout { background-color: #ef4444; }
         .btn-logout:hover { background-color: #dc2626; }
-        /* Navbar Stilleri */
         .profile-avatar-nav {
             width: 40px; height: 40px; line-height: 40px; font-size: 16px; font-weight: 600;
             background-color: var(--purple); color: white; border-radius: 50%; text-align: center;
@@ -47,17 +55,14 @@
             background-color: var(--purple); color: white; transition: background-color 0.3s ease, transform 0.2s ease;
         }
         .btn-purple:hover { background-color: #5c4cd9; transform: translateY(-1px); }
-        
-        /* Mesaj Kutusu Stili (Kısaltıldı) */
-        #messageBox {
-            visibility: hidden; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            z-index: 1000; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            opacity: 0; transition: opacity 0.3s, visibility 0.3s; color: white; font-weight: 600;
-            background-color: #2a1b3a; /* Varsayılan koyu arka plan */
+        .main-cta-button {
+             background-color: #5c4cd9; /* Varsayılan CTA rengi */
+             transition: background-color 0.3s ease, transform 0.2s ease;
         }
-        .message-success { background-color: #10b981; }
-        .message-error { background-color: #ef4444; }
-        .message-show { visibility: visible; opacity: 1; }
+        .main-cta-button:hover {
+            background-color: #6c5ce7;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -69,10 +74,10 @@
         </a>
 
         <div class="hidden md:flex space-x-8">
-            <a href="panel.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Ana Panel</a>
-            <a href="fiyatlandirma.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
-            <a href="kullanicipaneli.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Kullanıcı Paneli</a>
-            <a href="yardim.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
+            <a href="panel.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium pb-2">Ana Panel</a>
+            <a href="fiyatlandirma.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium pb-2">Fiyatlandırma</a>
+            <a href="kullanicipaneli.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium pb-2">Kullanıcı Paneli</a>
+            <a href="yardim.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium pb-2">Yardım</a>
         </div>
 
         <div class="flex space-x-3 items-center">
@@ -198,18 +203,39 @@
     </div>
 </footer>
 
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
-    <script type="module" src="./firebase-auth-service.js"></script>
     
     <script type="module">
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { app } from "./firebase-auth-service.js"; 
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Firebase ve Auth Başlatma (Kendi kendine yeten yapı)
+        setLogLevel('Debug');
+        const firebaseConfigString = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+        // Örnek bir yedek yapılandırma (boş bırakılabilir)
+        const userProvidedConfig = { projectId: "baki-s2-yonetim", apiKey: "dummy-key" };
+        const firebaseConfig = firebaseConfigString ? JSON.parse(firebaseConfigString) : userProvidedConfig;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // Oturum açma (Canvas ortamı için zorunlu)
+        async function setupAuth() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Firebase Authentication Error:", error);
+            }
+        }
+        setupAuth();
+
+
         const loggedOutNav = document.getElementById('loggedOutNav');
         const loggedInNav = document.getElementById('loggedInNav');
 
@@ -224,6 +250,7 @@
 
         async function updateHeaderUI(user) {
             if (loggedOutNav && loggedInNav) {
+                // Kullanıcının anonim olup olmadığını kontrol et (anonim ise giriş yapılmamış gibi davran)
                 if (user && !user.isAnonymous) {
                     // 1. KULLANICI GİRİŞ YAPMIŞ DURUMDA
                     loggedOutNav.classList.add('hidden');
@@ -233,7 +260,7 @@
                     const navUserRole = document.getElementById('nav_user_role');
                     const navProfileInitials = document.getElementById('nav_profile_initials');
                     
-                    let displayName = user.displayName || user.email.split('@')[0];
+                    let displayName = user.displayName || user.email?.split('@')[0] || "Kullanıcı";
                     let accountType = "STANDART";
                     
                     // Firestore'dan Hesap Türünü çek
@@ -248,11 +275,11 @@
 
                     // Bilgileri yerleştir
                     if (navDisplayName) navDisplayName.textContent = displayName;
-                    if (navUserRole) navUserRole.textContent = accountType;
+                    if (navUserRole) navUserRole.textContent = accountType.toUpperCase(); // Rolü büyük harf yap
                     if (navProfileInitials) navProfileInitials.textContent = getInitials(displayName);
 
                 } else {
-                    // 2. KULLANICI GİRİŞ YAPMAMIŞ DURUMDA
+                    // 2. KULLANICI GİRİŞ YAPMAMIŞ VEYA ANONİM DURUMDA
                     loggedOutNav.classList.remove('hidden');
                     loggedInNav.classList.add('hidden');
                 }
@@ -263,10 +290,27 @@
         async function handleLogout() {
             try {
                 await signOut(auth);
+                // Çıkış yaptıktan sonra giriş sayfasına yönlendir.
                 window.location.href = 'girisyap.html'; 
             } catch (error) {
                 console.error("Çıkış hatası:", error);
             }
+        }
+        
+        // Aktif Navigasyon Linkini Belirleyen Fonksiyon
+        function setActiveNavLink() {
+            const currentPath = window.location.pathname.split('/').pop() || 'panel.html'; // Varsayılan: panel.html
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                link.classList.remove('nav-active');
+
+                // Basit dosya adı karşılaştırması
+                if (linkPath === currentPath) {
+                    link.classList.add('nav-active');
+                } 
+            });
         }
 
         // --- Oturum Durumu Değişikliği Dinleyicisi ---
@@ -274,13 +318,13 @@
             updateHeaderUI(user);
         });
 
-        // Tüm olay dinleyicilerini DOMContentLoaded içine al
         document.addEventListener('DOMContentLoaded', () => {
+            setActiveNavLink(); // Navigasyon vurgusunu ayarla
             
             // Logout butonuna olayı bağlama
             document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
 
-            // --- YARDIM SAYFASINA ÖZEL: Akordiyon (Sıkça Sorulan Sorular) Logic ---
+            // --- Akordiyon (Sıkça Sorulan Sorular) Logic ---
             document.querySelectorAll('.accordion-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const targetId = item.getAttribute('data-target');
@@ -290,7 +334,7 @@
                     const isCurrentlyHidden = content.classList.contains('hidden');
                     
                     // Tüm açık olanları kapat ve iconları sıfırla
-                    document.querySelectorAll('.accordion-item p').forEach(p => p.classList.add('hidden'));
+                    document.querySelectorAll('.accordion-item p:not(.hidden)').forEach(p => p.classList.add('hidden'));
                     document.querySelectorAll('.accordion-item i').forEach(i => i.classList.remove('rotate-180'));
 
                     if (isCurrentlyHidden) {
@@ -308,6 +352,7 @@
                 dropdown.classList.toggle('hidden');
             });
 
+            // Sayfanın herhangi bir yerine tıklayınca menüyü kapat
             document.addEventListener('click', (event) => {
                 const menu = document.getElementById('loggedInNav');
                 const isClickInside = menu?.contains(event.target);
@@ -316,43 +361,6 @@
                 }
             });
         });
-
-        // Sayfa yüklendiğinde aktif linki belirleyen fonksiyon
-function setActiveNavLink() {
-    // URL'den dosya adını alıyoruz (örneğin: "index.html")
-    const currentPath = window.location.pathname.split('/').pop(); 
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    navLinks.forEach(link => {
-        const linkPath = link.getAttribute('href');
-
-        // Önceki vurguyu temizle
-        link.classList.remove('nav-active');
-
-        // Linkin yolu, mevcut sayfanın yoluyla eşleşiyor mu?
-        if (linkPath === currentPath) {
-            link.classList.add('nav-active');
-        } 
-        
-        // KRİTİK NOT: Eğer ana sayfanız "panel.html" değil de sadece "/" ise 
-        // ve URL boş geliyorsa, "panel.html" linkini vurgula.
-        if (currentPath === '' && linkPath === 'panel.html') {
-            link.classList.add('nav-active');
-        }
-    });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    // ... var olan diğer başlangıç kodları (örneğin: switchTab('dashboard');) ...
-    
-    // 💡 Yeni eklenen fonksiyon çağrısı
-    setActiveNavLink(); 
-
-    // ... onAuthStateChanged ve diğer kodlarınız ...
-});
-
-        // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
-        window.onload = window.startClient;
 
     </script>
 </body>
