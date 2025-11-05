@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel | BAKİ S2</title>
+    <title>Ana Sayfa | BAKİ S2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
@@ -11,91 +11,95 @@
         :root { --purple: #6c5ce7; }
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #1a0e21; 
+            /* Yeni BG: Daha derin, daha zengin bir koyu mor */
+            background-color: #0d0617; 
             color: #ffffff;
             min-height: 100vh;
             display: flex; 
             flex-direction: column;
             overflow-x: hidden;
             position: relative;
+            opacity: 0; /* Fade-in efekti için başlangıç */
         }
         .header-bg {
-            background-color: rgba(26, 14, 33, 0.9);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            /* Daha belirgin blur */
+            background-color: rgba(13, 6, 23, 0.9); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
         }
         .btn-purple {
             background-color: var(--purple);
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            /* Daha belirgin gölge */
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.6); 
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
         }
         .btn-purple:hover {
             background-color: #5c4cd9;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(108, 92, 231, 0.8);
         }
         .card-panel {
-            background-color: #2a1b3a; 
-            border: 1px solid rgba(108, 92, 231, 0.3);
-            border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease;
+            /* Daha yumuşak kart arka planı ve yuvarlak köşeler */
+            background-color: #1a0e21; 
+            border: 1px solid rgba(108, 92, 231, 0.4);
+            border-radius: 1.5rem; 
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); 
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
         }
         .card-panel:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
         }
         /* Navbar Stilleri */
         .profile-avatar-nav {
             width: 40px; height: 40px; line-height: 40px; font-size: 16px; font-weight: 600;
             background-color: var(--purple); color: white; border-radius: 50%; text-align: center;
             flex-shrink: 0; cursor: pointer; border: 2px solid var(--purple);
+            overflow: hidden; /* Resim için eklendi */
         }
         .card-dropdown { 
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); border-radius: 0.5rem; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); border: 1px solid rgba(108, 92, 231, 0.2); z-index: 30;
+            background: rgba(26, 14, 33, 0.9); /* Header BG ile uyumlu */
+            backdrop-filter: blur(10px); border-radius: 0.75rem; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8); border: 1px solid rgba(108, 92, 231, 0.3); z-index: 30;
+        }
+        .hero-heading {
+            text-shadow: 0 0 10px rgba(108, 92, 231, 0.4);
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
     <header class="header-bg sticky top-0 z-20">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <a href="panel.html" class="text-2xl font-extrabold text-white flex items-center">
-                <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ S2
+            <a href="panel.html" class="text-3xl font-extrabold text-white flex items-center tracking-wider">
+                <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ <span class="text-gray-400 font-light">S2</span>
             </a>
 
-            <div class="hidden md:flex space-x-6">
-                <a href="panel" class="text-purple-500 transition duration-200 font-medium">Panel</a> <a href="yardim" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
-                <a href="discord" class="text-white hover:text-purple-400 transition duration-200 font-medium">Discord</a>
-                <a href="fiyatlandirma" class="text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
-                <a href="kullanicipaneli" class="text-white hover:text-purple-400 transition duration-200 font-medium">Kullanıcı Paneli</a>
-                <a href="gizlilik-politikasi" class="text-white hover:text-purple-400 transition duration-200 font-medium">Gizlilik Politikası</a>
-                <a href="iade-iptal" class="text-white hover:text-purple-400 transition duration-200 font-medium">İade/İptal</a>
-                <a href="hizmet" class="text-white hover:text-purple-400 transition duration-200 font-medium">Hizmet Durumu</a>
-                <a href="kullanim-sartlari" class="text-white hover:text-purple-400 transition duration-200 font-medium">Kullanım Şartları</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="panel.html" class="text-purple-400 transition duration-200 font-medium border-b-2 border-purple-500 pb-1">Ana Panel</a>
+                <a href="fiyatlandirma.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
+                <a href="yardim.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
             </div>
 
-<div class="flex space-x-3 items-center">
+            <div class="flex space-x-3 items-center">
 
-                <div id="loggedOutNav" class="flex space-x-3 items-center">
-
-                    <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple hover:bg-purple transition duration-200">Giriş Yap</a>
-
-                    <a href="kaydol.html" class="btn-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a> 
-
+                <div id="loggedOutNav" class="flex space-x-4 items-center">
+                    <a href="girisyap.html" class="px-6 py-2 rounded-lg font-semibold text-white border border-purple-500 hover:bg-purple-600 transition duration-200">Giriş Yap</a>
+                    <a href="kaydol.html" class="btn-purple px-6 py-2 rounded-lg font-semibold text-white">Kaydol</a> 
                 </div>
 
                 <div id="loggedInNav" class="relative hidden"> 
-                    <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
+                    <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-800 transition duration-200 focus:outline-none">
                         <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
                         <div class="hidden sm:flex flex-col items-end">
                             <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
-                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5">Yükleniyor...</span>
+                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5" style="background-color: rgba(108, 92, 231, 0.3);">Yükleniyor...</span>
                         </div>
                         <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
                     </button>
-                    
+                     
                     <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
-                        <a href="kullanicipaneli%20(1).html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
-                            <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
+                        <a href="kullanicipaneli.html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
+                            <i class="fas fa-chart-line w-5 mr-2 text-purple-400"></i> Kontrol Paneli
                         </a>
                         <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
                             <i class="fas fa-sign-out-alt w-5 mr-2"></i> Çıkış Yap
@@ -106,262 +110,227 @@
         </nav>
     </header>
 
-    <main class="flex-grow container mx-auto px-4 py-16">
+    <main class="flex-grow container mx-auto px-4 py-20">
         
-        <div class="text-center mb-16">
-            <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-4">
-                Tüm Bağlantılarınız <span class="text-purple-500">Tek Bir Yerde</span>
+        <div class="text-center mb-24">
+            <h1 class="hero-heading text-5xl md:text-7xl font-extrabold leading-tight mb-6">
+                Tüm Bağlantılarınız <br>
+                <span class="text-purple-400">Tek Bir Yerde</span>
             </h1>
-            <p class="text-xl text-gray-400 max-w-3xl mx-auto mb-8">
-                BAKİ S2 ile Instagram, TikTok, Twitter gibi sosyal medya profillerinizin biyografi alanını en verimli şekilde kullanın. Saniyeler içinde link ağınızı oluşturun.
+            <p class="text-xl text-gray-400 max-w-4xl mx-auto mb-10">
+                BAKİ S2 ile Instagram, TikTok, Twitter gibi sosyal medya profillerinizin biyografi alanını en verimli şekilde kullanın. Saniyeler içinde **kişiselleştirilmiş link ağınızı** oluşturun ve trafiğinizi ölçün.
             </p>
-            <a href="kaydol.html" class="btn-purple inline-block px-10 py-4 text-xl rounded-full font-bold shadow-lg shadow-purple/50">
-                <i class="fas fa-rocket mr-2"></i> Ücretsiz Başla!
+            <a href="kaydol.html" class="btn-purple inline-block px-12 py-4 text-xl rounded-full font-extrabold shadow-2xl shadow-purple-600/50">
+                <i class="fas fa-arrow-right-to-bracket mr-3"></i> Hesabını Oluştur!
             </a>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
             
-            <div class="card-panel p-6 text-center">
-                <i class="fas fa-link text-4xl text-purple-400 mb-4"></i>
-                <h3 class="text-xl font-semibold mb-3">Sınırsız Bağlantı</h3>
-                <p class="text-gray-400">Tek bir biyografi linkiyle tüm sosyal medya hesaplarınıza, web sitelerinize ve içeriklerinize trafik çekin.</p>
+            <div class="card-panel p-8 text-center bg-opacity-50">
+                <i class="fas fa-link text-5xl text-purple-400 mb-5"></i>
+                <h3 class="text-2xl font-bold mb-3">Sınırsız Bağlantı</h3>
+                <p class="text-gray-300">Tek bir biyografi linkiyle tüm sosyal medya hesaplarınıza, web sitelerinize ve içeriklerinize trafik çekin.</p>
             </div>
             
-            <div class="card-panel p-6 text-center">
-                <i class="fas fa-chart-line text-4xl text-purple-400 mb-4"></i>
-                <h3 class="text-xl font-semibold mb-3">Detaylı Analiz</h3>
-                <p class="text-gray-400">Hangi bağlantınızın kaç kez tıklandığını, hangi ülkenin ziyaret ettiğini anlık olarak takip edin.</p>
+            <div class="card-panel p-8 text-center">
+                <i class="fas fa-chart-line text-5xl text-purple-400 mb-5"></i>
+                <h3 class="text-2xl font-bold mb-3">Detaylı Analiz</h3>
+                <p class="text-gray-300">Hangi bağlantınızın kaç kez tıklandığını, hangi ülkenin ziyaret ettiğini anlık olarak takip edin.</p>
             </div>
             
-            <div class="card-panel p-6 text-center">
-                <i class="fas fa-paint-brush text-4xl text-purple-400 mb-4"></i>
-                <h3 class="text-xl font-semibold mb-3">Özel Tasarım</h3>
-                <p class="text-gray-400">Renkleri, yazı tiplerini ve arkaplanı dilediğiniz gibi kişiselleştirerek markanızla uyumlu hale getirin.</p>
+            <div class="card-panel p-8 text-center">
+                <i class="fas fa-palette text-5xl text-purple-400 mb-5"></i>
+                <h3 class="text-2xl font-bold mb-3">Kişiselleştirme</h3>
+                <p class="text-gray-300">Renkleri, yazı tiplerini ve arkaplanı dilediğiniz gibi kişiselleştirerek markanızla tam uyumlu hale getirin.</p>
             </div>
 
         </div>
         
-<div class="text-center mt-16 p-10 card-panel">
-    <h2 class="text-3xl font-bold mb-4">Hemen Şimdi Link Ağınızı Kurun!</h2>
-    
-    <a href="kaydol" class="btn-purple inline-block px-8 py-3 rounded-lg font-bold mr-4">
-        <i class="fas fa-user-plus mr-2"></i> Kaydol
-    </a>
-    
-    <a href="iletisim" class="btn-purple inline-block px-8 py-3 rounded-lg font-bold">
-        <i class="fas fa-envelope mr-2"></i> İletişim
-    </a>
-</div>
+        <div class="text-center mt-24 p-12 card-panel">
+            <h2 class="text-4xl font-bold mb-6">Fırsatları Kaçırma!</h2>
+            
+            <a href="kaydol.html" class="btn-purple inline-block px-10 py-3 rounded-lg font-bold mr-6 text-lg">
+                <i class="fas fa-user-plus mr-2"></i> Hemen Kaydol
+            </a>
+            
+            <a href="iletisim.html" class="inline-block px-10 py-3 rounded-lg font-bold text-white border border-gray-500 hover:bg-gray-700 transition duration-200 text-lg">
+                <i class="fas fa-envelope mr-2"></i> İletişim
+            </a>
+        </div>
 
-    <footer class="bg-gray-900 text-gray-500 text-center p-4 mt-auto">
-        © 2025 BAKİ S2 Yönetim Hizmetleri.
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 p-8 mt-auto border-t border-purple-900/50">
+        <div class="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
+            
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">BAKİ S2</h4>
+                <p class="text-sm">Tüm dijital bağlantılarınızı tek bir merkezde toplayın. Hız, güvenlik ve analiz odaklı çözüm.</p>
+            </div>
+
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">Yasal</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="gizlilik-politikasi.html" class="hover:text-purple-400 transition duration-200">Gizlilik Politikası</a></li>
+                    <li><a href="kullanim-sartlari.html" class="hover:text-purple-400 transition duration-200">Kullanım Şartları</a></li>
+                    <li><a href="iade-iptal.html" class="hover:text-purple-400 transition duration-200">İade/İptal</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">Site Haritası</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="panel.html" class="hover:text-purple-400 transition duration-200">Panel</a></li>
+                    <li><a href="fiyatlandirma.html" class="hover:text-purple-400 transition duration-200">Fiyatlandırma</a></li>
+                    <li><a href="yardim.html" class="hover:text-purple-400 transition duration-200">Yardım Merkezi</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">İletişim</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="discord" class="hover:text-purple-400 transition duration-200"><i class="fab fa-discord mr-2"></i> Discord</a></li>
+                    <li><a href="hizmet.html" class="hover:text-purple-400 transition duration-200"><i class="fas fa-shield-alt mr-2"></i> Hizmet Durumu</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="text-center text-sm mt-10 border-t border-gray-700 pt-6">
+            © 2025 BAKİ S2. Tüm hakları saklıdır.
+        </div>
     </footer>
 
     <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
     <script type="module" src="./firebase-auth-service.js"></script>
 
-<script type="module">
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { app } from "./firebase-auth-service.js"; // firebase-auth-service.js dosyanızdaki app objesini içe aktarın
+    <script type="module">
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { app } from "./firebase-auth-service.js";
 
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const authButtons = document.getElementById('authButtons');
-    const loggedInNav = document.getElementById('loggedInNav');
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        const loggedOutNav = document.getElementById('loggedOutNav'); 
+        const loggedInNav = document.getElementById('loggedInNav');
 
-    function getInitials(name) {
-        if (!name) return '??';
-        const parts = name.split(' ');
-        if (parts.length > 1) {
-            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        function getInitials(name) {
+            if (!name) return '??';
+            const parts = name.split(' ');
+            if (parts.length > 1) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+            return name[0].toUpperCase();
         }
-        return name[0].toUpperCase();
-    }
 
-    /**
-     * Header UI'yı kullanıcı oturum durumuna göre günceller.
-     * @param {Object|null} user - Firebase User objesi veya null
-     */
-    async function updateHeaderUI(user) {
-        if (authButtons && loggedInNav) {
-            if (user && !user.isAnonymous) {
-                // 1. KULLANICI GİRİŞ YAPMIŞ DURUMDA
-                authButtons.classList.add('hidden');
-                loggedInNav.classList.remove('hidden');
+        /**
+         * Header UI'yı kullanıcı oturum durumuna göre günceller.
+         * @param {Object|null} user - Firebase User objesi veya null
+         */
+        async function updateHeaderUI(user) {
+            if (loggedOutNav && loggedInNav) {
+                if (user && !user.isAnonymous) {
+                    // 1. KULLANICI GİRİŞ YAPMIŞ DURUMDA
+                    loggedOutNav.classList.add('hidden');
+                    loggedInNav.classList.remove('hidden');
 
-                const navDisplayName = document.getElementById('navDisplayName');
-                const navAccountType = document.getElementById('navAccountType');
-                const navProfilePicture = document.getElementById('navProfilePicture');
-                
-                let displayName = user.displayName || user.email.split('@')[0];
-                let accountType = "STANDART"; // Varsayılan değer
-                let photoURL = user.photoURL || '';
-                
-                // Firestore'dan Hesap Türünü çek
-                try {
-                    const docSnap = await getDoc(doc(db, "users", user.uid));
-                    if (docSnap.exists()) {
-                        accountType = docSnap.data().accountType || "STANDART";
+                    const navDisplayName = document.getElementById('nav_display_name');
+                    const navAccountType = document.getElementById('nav_user_role');
+                    const navProfileInitials = document.getElementById('nav_profile_initials');
+                    
+                    let displayName = user.displayName || user.email.split('@')[0];
+                    let accountType = "Standart"; 
+                    let photoURL = user.photoURL || '';
+                    
+                    // Firestore'dan Hesap Türünü çek
+                    try {
+                        const docSnap = await getDoc(doc(db, "users", user.uid));
+                        if (docSnap.exists()) {
+                            accountType = docSnap.data().accountType || "Standart";
+                        }
+                    } catch (e) {
+                        console.error("Firestore veri çekme hatası:", e);
                     }
-                } catch (e) {
-                    console.error("Firestore veri çekme hatası:", e);
-                }
 
-                // Bilgileri yerleştir
-                navDisplayName.textContent = displayName;
-                navAccountType.textContent = accountType;
-
-                // Profil Fotoğrafı/Baş Harfler
-                if (navProfilePicture) {
-                    if (photoURL) {
-                        navProfilePicture.innerHTML = `<img src="${photoURL}" alt="Profil Fotoğrafı" class="h-full w-full object-cover">`;
-                    } else {
-                        navProfilePicture.innerHTML = `<span class="text-white text-base font-bold">${getInitials(displayName)}</span>`;
+                    // Bilgileri yerleştir
+                    if (navDisplayName) navDisplayName.textContent = displayName;
+                    if (navAccountType) {
+                        navAccountType.textContent = accountType.toUpperCase();
+                        // Rol rengi ayarlama
+                        if (accountType.toUpperCase() === 'PREMIUM') {
+                            navAccountType.style.backgroundColor = 'rgba(255, 193, 7, 0.3)';
+                            navAccountType.style.color = '#FFC107';
+                        } else if (accountType.toUpperCase() === 'ADMIN') {
+                            navAccountType.style.backgroundColor = 'rgba(255, 50, 50, 0.3)';
+                            navAccountType.style.color = '#FF3232';
+                        } else {
+                            navAccountType.style.backgroundColor = 'rgba(108, 92, 231, 0.3)';
+                            navAccountType.style.color = '#ffffff';
+                        }
                     }
-                }
-                
-                // Çıkış butonuna olayı bağla
-                document.getElementById('logoutButton')?.addEventListener('click', handleLogout);
+                    
+                    // Profil Fotoğrafı/Baş Harfler
+                    if (navProfileInitials) {
+                        if (photoURL) {
+                            navProfileInitials.style.backgroundImage = `url(${photoURL})`;
+                            navProfileInitials.style.backgroundSize = 'cover';
+                            navProfileInitials.textContent = ''; 
+                            navProfileInitials.style.border = '2px solid #ffffff'; 
+                        } else {
+                            navProfileInitials.textContent = getInitials(displayName);
+                            navProfileInitials.style.backgroundImage = 'none';
+                            navProfileInitials.style.border = '2px solid var(--purple)';
+                        }
+                    }
+                    
+                    // Çıkış butonuna olayı bağla
+                    document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
 
-            } else {
-                // 2. KULLANICI GİRİŞ YAPMAMIŞ DURUMDA
-                authButtons.classList.remove('hidden');
-                loggedInNav.classList.add('hidden');
+                } else {
+                    // 2. KULLANICI GİRİŞ YAPMAMIŞ DURUMDA
+                    loggedOutNav.classList.remove('hidden');
+                    loggedInNav.classList.add('hidden');
+                }
             }
         }
-    }
 
-    // Çıkış Yapma Fonksiyonu
-    async function handleLogout() {
-        try {
-            await signOut(auth);
-            // Çıkış yapıldıktan sonra giriş sayfasına yönlendir
-            window.location.href = 'girisyap.html';
-        } catch (error) {
-            console.error("Çıkış hatası:", error);
-            alert("Çıkış yaparken bir hata oluştu: " + error.message);
-        }
-    }
-
-    // --- Oturum Durumu Değişikliği Dinleyicisi ---
-    onAuthStateChanged(auth, (user) => {
-        updateHeaderUI(user);
-    });
-    
-    // YENİ: Dropdown açma/kapama JS'i
-    document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const dropdown = document.getElementById('profileDropdown');
-        dropdown.classList.toggle('hidden');
-    });
-    document.addEventListener('click', (event) => {
-        const menu = document.getElementById('loggedInNav');
-        const isClickInside = menu?.contains(event.target);
-        if (!isClickInside) {
-            document.getElementById('profileDropdown')?.classList.add('hidden');
-        }
-    });
-
-    // Sayfa yüklendiğinde body opacity'sini 1'e ayarla (fade-in) - (Eğer ilgili CSS varsa)
-    document.addEventListener('DOMContentLoaded', () => {
-        if(document.body.style.opacity === '0') {
-             document.body.style.opacity = '1';
-        }
-    });
-
-    /**
-     * Header UI'yı kullanıcı oturum durumuna göre günceller.
-     * @param {Object|null} user - Firebase User objesi veya null
-     */
-    async function updateHeaderUI(user) {
-        if (authButtons && loggedInNav) {
-            if (user && !user.isAnonymous) {
-                // 1. KULLANICI GİRİŞ YAPMIŞ DURUMDA
-                authButtons.classList.add('hidden');
-                loggedInNav.classList.remove('hidden');
-
-                const navDisplayName = document.getElementById('navDisplayName');
-                const navAccountType = document.getElementById('navAccountType');
-                const navProfilePicture = document.getElementById('navProfilePicture');
-                
-                let displayName = user.displayName || user.email.split('@')[0];
-                let accountType = "STANDART"; // Varsayılan değer
-                let photoURL = user.photoURL || '';
-                
-                // Firestore'dan Hesap Türünü çek
-                try {
-                    const docSnap = await getDoc(doc(db, "users", user.uid));
-                    if (docSnap.exists()) {
-                        accountType = docSnap.data().accountType || "STANDART";
-                    }
-                } catch (e) {
-                    console.error("Firestore veri çekme hatası:", e);
-                }
-
-                // Bilgileri yerleştir
-                navDisplayName.textContent = displayName;
-                navAccountType.textContent = accountType;
-
-                // Profil Fotoğrafı/Baş Harfler
-                if (navProfilePicture) {
-                    if (photoURL) {
-                        navProfilePicture.innerHTML = `<img src="${photoURL}" alt="Profil Fotoğrafı" class="h-full w-full object-cover">`;
-                    } else {
-                        navProfilePicture.innerHTML = `<span class="text-white text-base font-bold">${getInitials(displayName)}</span>`;
-                    }
-                }
-                
-                // Çıkış butonuna olayı bağla
-                document.getElementById('logoutButton')?.addEventListener('click', handleLogout);
-
-            } else {
-                // 2. KULLANICI GİRİŞ YAPMAMIŞ DURUMDA
-                authButtons.classList.remove('hidden');
-                loggedInNav.classList.add('hidden');
+        // Çıkış Yapma Fonksiyonu
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                window.location.href = 'girisyap.html';
+            } catch (error) {
+                console.error("Çıkış hatası:", error);
+                alert("Çıkış yaparken bir hata oluştu: " + error.message);
             }
         }
-    }
 
-    // Çıkış Yapma Fonksiyonu
-    async function handleLogout() {
-        try {
-            await signOut(auth);
-            // Çıkış yapıldıktan sonra giriş sayfasına yönlendir
-            window.location.href = 'girisyap.html';
-        } catch (error) {
-            console.error("Çıkış hatası:", error);
-            alert("Çıkış yaparken bir hata oluştu: " + error.message);
-        }
-    }
+        // --- Oturum Durumu Değişikliği Dinleyicisi ---
+        onAuthStateChanged(auth, (user) => {
+            updateHeaderUI(user);
+        });
+        
+        // Dropdown açma/kapama JS'i
+        document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', (event) => {
+            const menu = document.getElementById('loggedInNav');
+            const isClickInside = menu?.contains(event.target);
+            if (!isClickInside) {
+                document.getElementById('profileDropdown')?.classList.add('hidden');
+            }
+        });
 
-    // --- Oturum Durumu Değişikliği Dinleyicisi ---
-    onAuthStateChanged(auth, (user) => {
-        updateHeaderUI(user);
-    });
-    
-    // YENİ: Dropdown açma/kapama JS'i
-    document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const dropdown = document.getElementById('profileDropdown');
-        dropdown.classList.toggle('hidden');
-    });
-    document.addEventListener('click', (event) => {
-        const menu = document.getElementById('loggedInNav');
-        const isClickInside = menu?.contains(event.target);
-        if (!isClickInside) {
-            document.getElementById('profileDropdown')?.classList.add('hidden');
-        }
-    });
-
-    // Sayfa yüklendiğinde body opacity'sini 1'e ayarla (fade-in) - (Eğer ilgili CSS varsa)
-    document.addEventListener('DOMContentLoaded', () => {
-        if(document.body.style.opacity === '0') {
-             document.body.style.opacity = '1';
-        }
-    });
-</script>
+        // Sayfa yüklendiğinde body opacity'sini 1'e ayarla (fade-in)
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.style.transition = 'opacity 0.5s ease-in-out';
+            document.body.style.opacity = '1';
+        });
+    </script>
 </body>
 </html>
