@@ -19,7 +19,7 @@
             flex-direction: column;
             overflow-x: hidden;
             position: relative;
-            /* 🔴 GÖRÜNMEZLİK KALDIRILDI */
+            /* Görünmezlik kaldırıldı. */
         }
         .header-bg {
             /* Daha belirgin blur */
@@ -49,6 +49,18 @@
         .card-panel:hover {
             transform: translateY(-8px); 
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+        /* 💡 YENİ: CTA Bölümü için Vurgulu Stil */
+        .cta-highlight {
+            background-color: #281440; /* Kartlardan daha farklı, mora yakın arka plan */
+            border: 2px solid #a78bfa; /* Canlı mor bir vurgu çerçevesi */
+            box-shadow: 0 10px 30px rgba(167, 139, 250, 0.4); /* Daha belirgin mor gölge */
+            transition: box-shadow 0.4s ease; /* Sadece gölgeye geçiş ekledik */
+            transform: none !important; /* Hover hareketini iptal ettik */
+        }
+        .cta-highlight:hover {
+            transform: none !important;
+            box-shadow: 0 10px 30px rgba(167, 139, 250, 0.6);
         }
         /* Navbar Stilleri */
         .profile-avatar-nav {
@@ -147,14 +159,14 @@
 
         </div>
         
-        <div class="text-center mt-24 p-12 card-panel">
-            <h2 class="text-4xl font-bold mb-6">Fırsatları Kaçırma!</h2>
+        <div class="text-center mt-24 p-12 card-panel cta-highlight">
+            <h2 class="text-5xl font-bold mb-6">Fırsatları Kaçırma!</h2>
             
-            <a href="kaydol.html" class="btn-purple inline-block px-10 py-3 rounded-lg font-bold mr-6 text-lg">
+            <a href="kaydol.html" class="btn-purple inline-block px-12 py-4 rounded-lg font-bold mr-6 text-xl">
                 <i class="fas fa-user-plus mr-2"></i> Hemen Kaydol
             </a>
             
-            <a href="iletisim.html" class="inline-block px-10 py-3 rounded-lg font-bold text-white border border-gray-500 hover:bg-gray-700 transition duration-200 text-lg">
+            <a href="iletisim.html" class="inline-block px-12 py-4 rounded-lg font-bold text-white border border-gray-500 hover:bg-gray-700 transition duration-200 text-xl">
                 <i class="fas fa-envelope mr-2"></i> İletişim
             </a>
         </div>
@@ -209,13 +221,12 @@
     <script type="module">
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // 🔴 BURADAKİ İMPORT BAĞLANTISININ DOĞRU OLDUĞUNDAN EMİN OLUN
+        // 🚨 KRİTİK NOT: Buradaki dosya yolunun DOĞRU olduğundan emin olun.
         import { app } from "./firebase-auth-service.js"; 
 
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Element tanımlamalarını DOMContentLoaded beklemeden yapıyoruz
         const loggedOutNav = document.getElementById('loggedOutNav'); 
         const loggedInNav = document.getElementById('loggedInNav');
         const navDisplayName = document.getElementById('nav_display_name');
@@ -255,7 +266,6 @@
                 if (navDisplayName) navDisplayName.textContent = displayName;
                 if (navAccountType) {
                     navAccountType.textContent = accountType.toUpperCase();
-                    // Rol rengi ayarlama
                     if (accountType.toUpperCase() === 'PREMIUM') {
                         navAccountType.style.backgroundColor = 'rgba(255, 193, 7, 0.3)';
                         navAccountType.style.color = '#FFC107';
@@ -282,7 +292,6 @@
                 }
                 
                 if (logoutButtonNav) {
-                    // Olayı birden fazla kez bağlamamak için klonlama yapıyoruz
                     const clone = logoutButtonNav.cloneNode(true);
                     logoutButtonNav.parentNode.replaceChild(clone, logoutButtonNav);
                     document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
@@ -304,12 +313,10 @@
             }
         }
 
-        // Oturum Durumu Değişikliği Dinleyicisi
         onAuthStateChanged(auth, (user) => {
             updateHeaderUI(user);
         });
         
-        // Dropdown açma/kapama JS'i
         document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
             e.stopPropagation();
             document.getElementById('profileDropdown')?.classList.toggle('hidden');
