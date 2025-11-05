@@ -384,16 +384,13 @@
         // Enable debug logging for Firestore
         setLogLevel('Debug');
 
-        // --- GLOBAL CONFIGURATION (MANDATORY) ---
+        // --- GLOBAL CONFIGURATION (MANDATORY - Canvas Variablesını Kullanın) ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-smmgo-app-id';
-        const firebaseConfig = {
-            apiKey: "AIzaSyDr5OUxQYMwPTNsUH3SjWUYr5ML51mQIZQ",
-            authDomain: "smm-go-50a17.firebaseapp.com",
-            projectId: "smm-go-50a17",
-            storageBucket: "smm-go-50a17.firebasestorage.app",
-            messagingSenderId: "731144225117",
-            appId: "1:731144225117:web:bcb39f04d446225beda8b4",
-        };
+        
+        // __firebase_config'i JSON olarak ayrıştırma (HATANIN KAYNAĞI BURASIYDI)
+        const firebaseConfigString = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+        const firebaseConfig = JSON.parse(firebaseConfigString);
+        
         const customToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
         // Simülasyon Yönetici E-postası
@@ -588,19 +585,29 @@
         // --- FIREBASE INITIALIZATION & AUTH LISTENER ---
         async function initializeFirebase() {
             loadingOverlay.classList.remove('hidden');
+            
+            // Eğer Firebase yapılandırması boşsa, uygulamanın çalışmayacağını belirt
+            if (Object.keys(firebaseConfig).length === 0) {
+                 console.error("Firebase başlatma hatası: Global __firebase_config bulunamadı veya boş.");
+                 loadingOverlay.classList.add('hidden');
+                 showModal("Hata", "Uygulama başlatılamadı. Firebase yapılandırması eksik.");
+                 return;
+            }
+
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 isFirebaseInitialized = true;
 
-                // Canvas ortamında otomatik auth token kullanma
+                // Canvas ortamında otomatik auth token kullanma (ÖNCELİK!)
                 if (customToken) {
                     await signInWithCustomToken(auth, customToken);
                     console.log("Custom token ile oturum açıldı.");
                 } else {
+                    // Token yoksa anonim oturum aç (Yedek)
                     await signInAnonymously(auth);
-                    console.log("Anonim olarak oturum açıldı. Auth listener kullanıcıyı yakalayacak.");
+                    console.log("Anonim olarak oturum açıldı.");
                 }
 
                 // Auth durumu değişimini izle
@@ -613,7 +620,8 @@
                         
                         // Kullanıcı bilgilerini güncelle
                         document.getElementById('user-display-name').textContent = user.displayName || user.email;
-                        document.getElementById('user-id').textContent = `ID: ${user.uid}`;
+                        // Kullanıcı ID'sinin tamamını göster (Diğer kullanıcıların bulması için önemli)
+                        document.getElementById('user-id').textContent = `ID: ${user.uid}`; 
                         document.getElementById('admin-status').textContent = appState.isAdmin ? 'Yönetici' : 'Müşteri';
                         
                         userInfoSidebar.classList.remove('hidden');
@@ -638,7 +646,7 @@
             } catch (error) {
                 console.error("Firebase başlatma hatası:", error);
                 loadingOverlay.classList.add('hidden');
-                showModal("Hata", "Uygulama başlatılamadı. Konsolu kontrol edin.");
+                showModal("Hata", `Uygulama başlatılamadı. Hata: ${error.message}`);
             }
         }
         
@@ -952,7 +960,7 @@
                     <span class="${statusColor} font-bold px-2 py-0.5 rounded-full">${order.status}</span>
                 </div>
                 <p class="text-gray-600">${order.category} / ${order.serviceName} - Miktar: ${order.quantity.toLocaleString()}</p>
-                <p class="text-gray-400 font-mono break-all">User ID: ${order.userId.substring(0, 8)}...</p>
+                <p class="text-gray-400 font-mono break-all">User ID: ${order.userId}</p>
             `;
             return element;
         }
@@ -966,7 +974,7 @@
                     <span class="bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full">${ticket.status}</span>
                 </div>
                 <p class="text-gray-600 font-semibold">${ticket.ticketSubject}</p>
-                <p class="text-gray-400 font-mono break-all">User ID: ${ticket.userId.substring(0, 8)}...</p>
+                <p class="text-gray-400 font-mono break-all">User ID: ${ticket.userId}</p>
             `;
             return element;
         }
