@@ -19,7 +19,7 @@
             flex-direction: column;
             overflow-x: hidden;
             position: relative;
-            opacity: 0; /* Fade-in efekti için başlangıç */
+            /* 🔴 GÖRÜNMEZLİK KALDIRILDI */
         }
         .header-bg {
             /* Daha belirgin blur */
@@ -209,12 +209,13 @@
     <script type="module">
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { app } from "./firebase-auth-service.js"; // app objesinin burada tanımlı olması gerekir
+        // 🔴 BURADAKİ İMPORT BAĞLANTISININ DOĞRU OLDUĞUNDAN EMİN OLUN
+        import { app } from "./firebase-auth-service.js"; 
 
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // 🚨 İyileştirme: Tüm DOM elementlerini bir kez ve global olarak tanımlıyoruz.
+        // Element tanımlamalarını DOMContentLoaded beklemeden yapıyoruz
         const loggedOutNav = document.getElementById('loggedOutNav'); 
         const loggedInNav = document.getElementById('loggedInNav');
         const navDisplayName = document.getElementById('nav_display_name');
@@ -231,14 +232,10 @@
             return name[0].toUpperCase();
         }
 
-        /**
-         * Header UI'yı kullanıcı oturum durumuna göre günceller.
-         */
         async function updateHeaderUI(user) {
             if (!loggedOutNav || !loggedInNav) return;
 
             if (user && !user.isAnonymous) {
-                // 1. KULLANICI GİRİŞ YAPMIŞ DURUMDA
                 loggedOutNav.classList.add('hidden');
                 loggedInNav.classList.remove('hidden');
 
@@ -246,7 +243,6 @@
                 let accountType = "STANDART"; 
                 let photoURL = user.photoURL || '';
                 
-                // Firestore'dan Hesap Türünü çek
                 try {
                     const docSnap = await getDoc(doc(db, "users", user.uid));
                     if (docSnap.exists()) {
@@ -256,7 +252,6 @@
                     console.error("Firestore veri çekme hatası:", e);
                 }
 
-                // Bilgileri yerleştir
                 if (navDisplayName) navDisplayName.textContent = displayName;
                 if (navAccountType) {
                     navAccountType.textContent = accountType.toUpperCase();
@@ -273,7 +268,6 @@
                     }
                 }
                 
-                // Profil Fotoğrafı/Baş Harfler
                 if (navProfileInitials) {
                     if (photoURL) {
                         navProfileInitials.style.backgroundImage = `url(${photoURL})`;
@@ -287,22 +281,19 @@
                     }
                 }
                 
-                // Çıkış butonuna olayı bağla
                 if (logoutButtonNav) {
-                    // Olayı birden fazla kez bağlamamak için önlem alınmıştır
+                    // Olayı birden fazla kez bağlamamak için klonlama yapıyoruz
                     const clone = logoutButtonNav.cloneNode(true);
                     logoutButtonNav.parentNode.replaceChild(clone, logoutButtonNav);
                     document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
                 }
 
             } else {
-                // 2. KULLANICI GİRİŞ YAPMAMIŞ DURUMDA
                 loggedOutNav.classList.remove('hidden');
                 loggedInNav.classList.add('hidden');
             }
         }
 
-        // Çıkış Yapma Fonksiyonu
         async function handleLogout() {
             try {
                 await signOut(auth);
@@ -313,7 +304,7 @@
             }
         }
 
-        // --- Oturum Durumu Değişikliği Dinleyicisi ---
+        // Oturum Durumu Değişikliği Dinleyicisi
         onAuthStateChanged(auth, (user) => {
             updateHeaderUI(user);
         });
@@ -321,8 +312,7 @@
         // Dropdown açma/kapama JS'i
         document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
             e.stopPropagation();
-            const dropdown = document.getElementById('profileDropdown');
-            dropdown.classList.toggle('hidden');
+            document.getElementById('profileDropdown')?.classList.toggle('hidden');
         });
         document.addEventListener('click', (event) => {
             const menu = document.getElementById('loggedInNav');
@@ -330,12 +320,6 @@
             if (!isClickInside) {
                 document.getElementById('profileDropdown')?.classList.add('hidden');
             }
-        });
-
-        // Sayfa yüklendiğinde body opacity'sini 1'e ayarla (fade-in)
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.style.transition = 'opacity 0.5s ease-in-out';
-            document.body.style.opacity = '1';
         });
     </script>
 </body>
