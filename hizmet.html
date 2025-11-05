@@ -17,8 +17,17 @@
             display: flex; 
             flex-direction: column;
             overflow-x: hidden;
+            opacity: 0; 
+            transition: opacity 0.5s ease-in-out;
         }
-        .header-bg { background-color: rgba(26, 14, 33, 0.9); backdrop-filter: blur(5px); }
+        body.loaded {
+            opacity: 1;
+        }
+        .header-bg { 
+            background-color: rgba(26, 14, 33, 0.9); 
+            backdrop-filter: blur(5px); 
+            -webkit-backdrop-filter: blur(5px);
+        }
         .status-card { 
             background-color: #2a1b3a; 
             border: 1px solid rgba(108, 92, 231, 0.3);
@@ -29,10 +38,129 @@
         .status-major { background-color: #dc2626; } /* Kırmızı */
         .status-degraded { background-color: #f59e0b; } /* Turuncu */
         .timeline-item { border-left: 3px solid #6c5ce7; }
-        /* Diğer sayfalardaki Navbar ve Footer stilleri buraya dahil edilmelidir */
+
+        /* Navbar Stilleri */
+        .profile-avatar-nav {
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: var(--purple);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            border: 2px solid var(--purple);
+        }
+        .card-dropdown { 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(5px); 
+            border-radius: 0.5rem; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
+            border: 1px solid rgba(108, 92, 231, 0.2);
+            z-index: 30;
+        }
+        .btn-purple {
+            background-color: var(--purple);
+            color: white;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-purple:hover {
+            background-color: #5c4cd9;
+            transform: translateY(-1px);
+        }
+        /* Mobile Menu */
+        #mobileMenu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+        #mobileMenu.open {
+            transform: translateX(0);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
+    <!-- Mobile Menu Toggle Button -->
+    <button id="mobileMenuButton" class="md:hidden p-2 text-white fixed top-5 right-4 z-50 rounded-full bg-purple-600 hover:bg-purple-700 transition duration-200">
+        <i class="fas fa-bars text-xl"></i>
+    </button>
+
+    <!-- Mobile Navigation Menu -->
+    <div id="mobileMenu" class="fixed top-0 right-0 h-full w-64 bg-[#1a0e21] shadow-2xl z-40 p-6 flex flex-col pt-20">
+        <button id="closeMobileMenuButton" class="absolute top-4 right-4 text-white text-2xl">
+            <i class="fas fa-times"></i>
+        </button>
+        <a href="panel.html" class="text-white hover:text-purple-400 py-3 border-b border-gray-700 font-medium">Ana Panel</a>
+        <a href="fiyatlandirma.html" class="text-white hover:text-purple-400 py-3 border-b border-gray-700 font-medium">Fiyatlandırma</a>
+        <a href="kullanicipaneli.html" class="text-white hover:text-purple-400 py-3 border-b border-gray-700 font-medium">Kullanıcı Paneli</a>
+        <a href="yardim.html" class="text-white hover:text-purple-400 py-3 mb-6 border-b border-gray-700 font-medium">Yardım</a>
+        
+        <div id="loggedOutMobile" class="flex flex-col space-y-4">
+            <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple hover:bg-purple transition duration-200 text-center">Giriş Yap</a>
+            <a href="kaydol.html" class="btn-purple px-5 py-2 rounded-lg font-semibold text-white text-center">Kaydol</a> 
+        </div>
+
+        <div id="loggedInMobile" class="hidden flex flex-col space-y-4">
+            <a href="kullanicipaneli.html" class="btn-purple w-full text-center py-2 rounded-lg font-semibold text-white">Kontrol Paneli</a>
+            <button id="logoutButtonMobile" class="w-full text-center py-2 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition duration-200">Çıkış Yap</button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header-bg sticky top-0 z-20">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="panel.html" class="text-2xl font-extrabold text-white flex items-center">
+                <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ S2
+            </a>
+
+            <div class="hidden md:flex space-x-8">
+                <a href="panel.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Ana Panel</a>
+                <a href="fiyatlandirma.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
+                <a href="kullanicipaneli.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Kullanıcı Paneli</a>
+                <a href="yardim.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
+                <a href="#" class="text-purple-400 transition duration-200 font-medium border-b-2 border-purple-500 pb-1">Hizmet</a>
+            </div>
+
+            <div class="hidden md:flex space-x-3 items-center">
+                <!-- LOGGED OUT DESKTOP -->
+                <div id="loggedOutNav" class="flex space-x-3 items-center">
+                    <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple hover:bg-purple transition duration-200">Giriş Yap</a>
+                    <a href="kaydol.html" class="btn-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a> 
+                </div>
+
+                <!-- LOGGED IN DESKTOP - PROFİL DROPDOWN BURADA -->
+                <div id="loggedInNav" class="relative hidden"> 
+                    <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
+                        <!-- Kullanıcı Baş Harfleri (Avatar) -->
+                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
+                        
+                        <!-- İsim ve Rol -->
+                        <div class="hidden sm:flex flex-col items-end">
+                            <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
+                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5">Yükleniyor...</span>
+                        </div>
+                        
+                        <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
+                    </button>
+                    
+                    <!-- Dropdown Menü İçeriği -->
+                    <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
+                        <a href="kullanicipaneli.html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
+                            <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
+                        </a>
+                        
+                        <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
+                            <i class="fas fa-sign-out-alt w-5 mr-2"></i> Çıkış Yap
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
     <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-16 flex justify-center">
         <div class="max-w-4xl w-full">
             <div class="text-center mb-10">
@@ -43,7 +171,8 @@
 
             <div class="status-card p-6 md:p-8 mb-10">
                 <h2 class="text-3xl font-bold text-white mb-4 flex items-center">
-                    <span class="status-up w-4 h-4 rounded-full mr-3 animate-pulse"></span> Tüm Hizmetler Çalışıyor
+                    <span class="status-up w-4 h-4 rounded-full mr-3 animate-pulse" id="overall-status-indicator"></span> 
+                    <span id="overall-status-text">Tüm Hizmetler Çalışıyor</span>
                 </h2>
                 <p class="text-gray-300">Sistemlerimizde şu anda herhangi bir sorun bulunmamaktadır. Eğer bir sorun yaşıyorsanız, lütfen destek ekibimizle iletişime geçin.</p>
                 <a href="yardim.html" class="inline-block mt-4 text-purple-400 hover:text-white transition duration-200">
@@ -54,40 +183,349 @@
             <section class="mb-10">
                 <h3 class="text-2xl font-bold text-purple-400 mb-4 border-b border-gray-700 pb-2">Bileşen Durumları</h3>
                 
-                <div class="status-card p-5 mb-4 flex justify-between items-center">
-                    <span class="text-white font-medium">Link Yönlendirme Servisi (Core)</span>
-                    <span class="status-up text-white text-sm font-semibold px-3 py-1 rounded-full">Çalışıyor</span>
-                </div>
-                
-                <div class="status-card p-5 mb-4 flex justify-between items-center">
-                    <span class="text-white font-medium">Kullanıcı Veritabanı (Firebase)</span>
-                    <span class="status-up text-white text-sm font-semibold px-3 py-1 rounded-full">Çalışıyor</span>
-                </div>
-                
-                <div class="status-card p-5 mb-4 flex justify-between items-center">
-                    <span class="text-white font-medium">API ve Analiz Servisi</span>
-                    <span class="status-degraded text-white text-sm font-semibold px-3 py-1 rounded-full">Performans Düşüklüğü</span>
+                <!-- Bileşenler burada dinamik olarak doldurulacaktır -->
+                <div id="component-list" class="space-y-4">
+                    <!-- Statik Örnekler (Dinamik veri yüklenene kadar gösterilir) -->
+                    <div class="status-card p-5 flex justify-between items-center">
+                        <span class="text-white font-medium">Link Yönlendirme Servisi (Core)</span>
+                        <span class="status-up text-white text-sm font-semibold px-3 py-1 rounded-full">Yükleniyor...</span>
+                    </div>
+                    
+                    <div class="status-card p-5 flex justify-between items-center">
+                        <span class="text-white font-medium">Kullanıcı Veritabanı (Firebase)</span>
+                        <span class="status-up text-white text-sm font-semibold px-3 py-1 rounded-full">Yükleniyor...</span>
+                    </div>
                 </div>
             </section>
 
             <section>
                 <h3 class="text-2xl font-bold text-purple-400 mb-6 border-b border-gray-700 pb-2">Geçmiş Olaylar</h3>
                 
-                <div class="timeline-item p-4 pl-8 relative mb-6 status-card">
-                    <div class="absolute -left-2 top-4 w-4 h-4 status-major rounded-full border-2 border-[#1a0e21]"></div>
-                    <p class="text-lg font-semibold text-red-400 mb-1">Büyük Kesinti: API Erişim Sorunları</p>
-                    <p class="text-gray-300 text-sm">2025/08/15 - 14:00: API sunucusundaki bir yazılım hatası nedeniyle analiz servisi 2 saat boyunca erişilemez oldu. Sorun giderildi.</p>
+                <!-- Geçmiş Olaylar buraya dinamik olarak doldurulacaktır -->
+                <div id="incident-list" class="space-y-4">
+                    <p class="text-gray-400 p-4 status-card text-center">Geçmiş olaylar yükleniyor...</p>
                 </div>
-                
-                <div class="timeline-item p-4 pl-8 relative mb-6 status-card">
-                    <div class="absolute -left-2 top-4 w-4 h-4 status-up rounded-full border-2 border-[#1a0e21]"></div>
-                    <p class="text-lg font-semibold text-green-400 mb-1">Çözüldü: İyileştirilmiş Performans</p>
-                    <p class="text-gray-300 text-sm">2025/10/20 - 02:30: Veritabanı optimizasyonu tamamlandı. Link yönlendirme hızında %15 iyileşme gözlemlendi.</p>
-                </div>
-
             </section>
         </div>
     </main>
 
-    </body>
+    <!-- FOOTER -->
+    <footer class="footer-style text-gray-300 p-8 mt-auto bg-gray-900 bg-opacity-30">
+        <div class="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
+            
+            <div>
+                <h4 class="text-xl font-bold text-white mb-4">BAKİ S2</h4>
+                <p class="text-sm">Tüm dijital bağlantılarınızı tek bir merkezde toplayın. Hız, güvenlik ve analiz odaklı çözüm.</p>
+            </div>
+
+            <div>
+                <h4 class="text-xl font-bold text-white mb-4">Yasal</h4>
+                <ul class="space-y-2">
+                    <li><a href="gizlilik-politikasi.html" class="text-sm hover:text-purple-400 transition duration-200">Gizlilik Politikası</a></li>
+                    <li><a href="kullanim-sartlari.html" class="text-sm hover:text-purple-400 transition duration-200">Kullanım Şartları</a></li>
+                    <li><a href="iade-iptal.html" class="text-sm hover:text-purple-400 transition duration-200">İade/İptal</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-xl font-bold text-white mb-4">Site Haritası</h4>
+                <ul class="space-y-2">
+                    <li><a href="panel.html" class="text-sm hover:text-purple-400 transition duration-200">Panel</a></li>
+                    <li><a href="fiyatlandirma.html" class="text-sm hover:text-purple-400 transition duration-200">Fiyatlandırma</a></li>
+                    <li><a href="yardim.html" class="text-sm hover:text-purple-400 transition duration-200">Yardım Merkezi</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-xl font-bold text-white mb-4">İletişim</h4>
+                <ul class="space-y-2">
+                    <li><a href="discord.html" class="text-sm hover:text-purple-400 transition duration-200"><i class="fab fa-discord mr-2"></i> Discord</a></li>
+                    <li><a href="hizmet.html" class="text-sm hover:text-purple-400 transition duration-200"><i class="fas fa-shield-alt mr-2"></i> Hizmet Durumu</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="text-center text-sm mt-10 border-t border-gray-700 pt-6">
+            © 2025 BAKİ S2. Tüm hakları saklıdır.
+        </div>
+    </footer>
+    
+    <!-- SINGLE FILE FIREBASE & STATUS SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- FIREBASE CONFIGURATION & GLOBALS ---
+        // Canvas ortamından gelen yapılandırma bilgileri
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const FIREBASE_CONFIG = Object.keys(firebaseConfig).length > 0 ? firebaseConfig : {
+            apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
+            authDomain: "baki-s2-yonetim.firebaseapp.com",
+            projectId: "baki-s2-yonetim",
+            storageBucket: "baki-s2-yonetim.firebasestorage.app",
+            messagingSenderId: "692508919425",
+            appId: "1:692508919425:web:fac963c81c11b7be70af80",
+            measurementId: "G-Q52XG8GLB2"
+        };
+        
+        // Firestore path için kullanılan App ID'si (projectId kullanıldı)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : FIREBASE_CONFIG.projectId || 'default-app-id';
+
+        // Canvas ortamından gelen başlangıç yetkilendirme tokenı (zorunlu)
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        let app;
+        let auth;
+        let db;
+        let userId = null;
+
+        const loggedOutNav = document.getElementById('loggedOutNav');
+        const loggedInNav = document.getElementById('loggedInNav');
+        const loggedOutMobile = document.getElementById('loggedOutMobile');
+        const loggedInMobile = document.getElementById('loggedInMobile');
+        
+        const componentList = document.getElementById('component-list');
+        const incidentList = document.getElementById('incident-list');
+        const overallStatusIndicator = document.getElementById('overall-status-indicator');
+        const overallStatusText = document.getElementById('overall-status-text');
+
+        function getInitials(name) {
+            if (!name) return '??';
+            const parts = name.trim().split(/\s+/);
+            if (parts.length > 1) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+            return name[0].toUpperCase();
+        }
+
+        async function startClient() {
+            // Firebase başlatma
+            app = initializeApp(FIREBASE_CONFIG);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth hatası (Token/Anonim Giriş):", error);
+            }
+            
+            // Oturum durumunu dinle ve UI'yı güncelle
+            onAuthStateChanged(auth, (user) => {
+                userId = user?.uid || null;
+                updateHeaderUI(user);
+                document.body.classList.add('loaded'); // Oturum kontrolü tamamlandıktan sonra sayfayı göster
+            });
+        }
+
+        async function updateHeaderUI(user) {
+            const isLoggedIn = user && !user.isAnonymous;
+
+            if (loggedOutNav && loggedInNav) {
+                loggedOutNav.classList.toggle('hidden', isLoggedIn);
+                loggedInNav.classList.toggle('hidden', !isLoggedIn);
+                loggedOutMobile.classList.toggle('hidden', isLoggedIn);
+                loggedInMobile.classList.toggle('hidden', !isLoggedIn);
+            }
+
+            if (isLoggedIn) {
+                const navDisplayName = document.getElementById('nav_display_name');
+                const navUserRole = document.getElementById('nav_user_role');
+                const navProfileInitials = document.getElementById('nav_profile_initials');
+                
+                let displayName = user.displayName || user.email?.split('@')[0] || 'Kullanıcı';
+                let accountType = "STANDART"; 
+                
+                try {
+                    // Güvenlik kurallarına uygun Firestore yolu: /artifacts/{appId}/users/{userId}/profile/data
+                    const docPath = `artifacts/${appId}/users/${user.uid}/profile`;
+                    const docSnap = await getDoc(doc(db, docPath, 'data')); 
+                    
+                    if (docSnap.exists()) {
+                        const profileData = docSnap.data();
+                        accountType = profileData.accountType || "STANDART";
+                        displayName = profileData.displayName || displayName;
+                    }
+                } catch (e) {
+                    console.error("Firestore veri çekme hatası (Kullanıcı Rolü):", e);
+                }
+
+                if (navDisplayName) navDisplayName.textContent = displayName;
+                if (navUserRole) navUserRole.textContent = accountType;
+                if (navProfileInitials) navProfileInitials.textContent = getInitials(displayName);
+                
+                document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout); 
+                document.getElementById('logoutButtonMobile')?.addEventListener('click', handleLogout); 
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                document.body.classList.remove('loaded');
+                await signOut(auth);
+                setTimeout(() => {
+                    window.location.href = 'girisyap.html';
+                }, 500); 
+            } catch (error) {
+                console.error("Çıkış hatası:", error);
+                document.body.classList.add('loaded');
+            }
+        }
+        
+        // --- STATUS DATA LOGIC (FIRESTORE) ---
+        
+        // Bileşenlerin durumunu gösteren basit bir harita fonksiyonu
+        function renderComponent(component) {
+            const statusClass = {
+                'UP': 'status-up',
+                'MAJOR_OUTAGE': 'status-major',
+                'DEGRADED_PERFORMANCE': 'status-degraded',
+                'MAINTENANCE': 'bg-blue-500'
+            }[component.status] || 'bg-gray-500';
+
+            const statusText = {
+                'UP': 'Çalışıyor',
+                'MAJOR_OUTAGE': 'Büyük Kesinti',
+                'DEGRADED_PERFORMANCE': 'Performans Düşüklüğü',
+                'MAINTENANCE': 'Bakım'
+            }[component.status] || 'Bilinmiyor';
+
+            return `
+                <div class="status-card p-5 flex justify-between items-center">
+                    <span class="text-white font-medium">${component.name}</span>
+                    <span class="${statusClass} text-white text-sm font-semibold px-3 py-1 rounded-full">${statusText}</span>
+                </div>
+            `;
+        }
+
+        // Olayların (Incident) zaman çizelgesini gösteren basit bir harita fonksiyonu
+        function renderIncident(incident) {
+            const statusClass = {
+                'RESOLVED': 'status-up',
+                'INVESTIGATING': 'status-degraded',
+                'MAJOR_OUTAGE': 'status-major',
+            }[incident.type] || 'bg-gray-500';
+
+            const statusTitle = {
+                'RESOLVED': `<span class="text-green-400">Çözüldü: ${incident.title}</span>`,
+                'INVESTIGATING': `<span class="text-yellow-400">Araştırılıyor: ${incident.title}</span>`,
+                'MAJOR_OUTAGE': `<span class="text-red-400">Büyük Kesinti: ${incident.title}</span>`,
+            }[incident.type] || incident.title;
+
+            return `
+                <div class="timeline-item p-4 pl-8 relative mb-6 status-card">
+                    <div class="absolute -left-2 top-4 w-4 h-4 ${statusClass} rounded-full border-2 border-[#1a0e21]"></div>
+                    <p class="text-lg font-semibold mb-1">${statusTitle}</p>
+                    <p class="text-gray-300 text-sm">${incident.date} - ${incident.time}: ${incident.description}</p>
+                </div>
+            `;
+        }
+        
+        // Firestore'dan durum verilerini çeken ana fonksiyon
+        async function fetchStatusData() {
+            // Global durum verisinin Firestore yolu: /artifacts/{appId}/public/data/status/latest
+            const statusDocRef = doc(db, `artifacts/${appId}/public/data/status`, 'latest');
+            // Bileşen listesinin yolu: /artifacts/{appId}/public/data/components
+            const componentsColRef = collection(db, `artifacts/${appId}/public/data/components`);
+            // Olay (Incident) listesinin yolu: /artifacts/{appId}/public/data/incidents
+            const incidentsColRef = collection(db, `artifacts/${appId}/public/data/incidents`);
+
+            try {
+                // 1. Genel Durumu Çek
+                const statusSnap = await getDoc(statusDocRef);
+                const overallStatus = statusSnap.exists() ? statusSnap.data().overallStatus : 'UP';
+
+                if (overallStatus === 'MAJOR_OUTAGE') {
+                    overallStatusIndicator.classList.remove('status-up');
+                    overallStatusIndicator.classList.add('status-major');
+                    overallStatusText.textContent = 'Kritik Sorunlar Mevcut';
+                } else if (overallStatus === 'DEGRADED_PERFORMANCE') {
+                    overallStatusIndicator.classList.remove('status-up');
+                    overallStatusIndicator.classList.add('status-degraded');
+                    overallStatusText.textContent = 'Bazı Hizmetlerde Performans Düşüklüğü';
+                } else {
+                    overallStatusIndicator.classList.add('status-up');
+                    overallStatusText.textContent = 'Tüm Hizmetler Çalışıyor';
+                }
+                overallStatusIndicator.classList.remove('animate-pulse'); // Yüklemeyi bitir
+
+                // 2. Bileşen Durumlarını Çek
+                const componentsQuery = query(componentsColRef);
+                const componentsSnapshot = await getDocs(componentsQuery);
+                const components = componentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                if (components.length > 0) {
+                    componentList.innerHTML = components.map(renderComponent).join('');
+                } else {
+                    componentList.innerHTML = `<p class="text-gray-400 p-4 status-card text-center">Bileşen durumu bilgisi bulunamadı.</p>`;
+                }
+
+                // 3. Geçmiş Olayları Çek ve Tarihe göre sırala (İSTEMCİ TARAFINDA)
+                const incidentsQuery = query(incidentsColRef);
+                const incidentsSnapshot = await getDocs(incidentsQuery);
+                let incidents = incidentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Olayları tarihe göre (date ve time alanı kullanılarak) en yeniden eskiye sırala
+                incidents.sort((a, b) => {
+                    // Basit bir string karşılaştırması tarih ve saati baz alacaktır.
+                    const dateTimeA = `${a.date} ${a.time || '00:00'}`;
+                    const dateTimeB = `${b.date} ${b.time || '00:00'}`;
+                    return dateTimeB.localeCompare(dateTimeA); // En yeni üste
+                });
+
+                if (incidents.length > 0) {
+                    incidentList.innerHTML = incidents.map(renderIncident).join('');
+                } else {
+                    incidentList.innerHTML = `<p class="text-gray-400 p-4 status-card text-center">Henüz raporlanmış bir olay bulunmamaktadır.</p>`;
+                }
+
+            } catch (error) {
+                console.error("Durum verileri çekilirken hata oluştu:", error);
+                componentList.innerHTML = `<p class="text-red-400 p-4 status-card text-center">Veri yüklenemedi. Lütfen konsolu kontrol edin.</p>`;
+                incidentList.innerHTML = `<p class="text-red-400 p-4 status-card text-center">Veri yüklenemedi. Lütfen konsolu kontrol edin.</p>`;
+            }
+        }
+
+        // --- DOMContentLoaded Events ---
+        document.addEventListener('DOMContentLoaded', () => {
+            startClient(); // Firebase başlatma ve oturum dinlemeyi başlat
+            
+            // Verilerin çekilmesi için biraz bekleme ekleyelim (Auth'tan sonra çalışması idealdir)
+            // Ancak bu sayfada auth tamamlanana kadar body gizlendiği için, auth içinde de çağırabilirdik.
+            // Şimdilik burada kalabilir, çünkü startClient() içinde onAuthStateChanged var.
+            // Veri çekme işlemini de doğrudan çağırıyoruz.
+            
+            // Dropdown açma/kapama
+            document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                document.getElementById('profileDropdown')?.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (event) => {
+                const dropdown = document.getElementById('profileDropdown');
+                const button = document.getElementById('profileMenuButton');
+                if (dropdown && !dropdown.contains(event.target) && button && !button.contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+
+            // Mobile Menu Logic
+            const mobileMenu = document.getElementById('mobileMenu');
+            document.getElementById('mobileMenuButton')?.addEventListener('click', () => {
+                mobileMenu.classList.add('open');
+            });
+            document.getElementById('closeMobileMenuButton')?.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+
+            // Status datayı çekme işlemi, sayfa yüklendiğinde başlatılır
+            fetchStatusData();
+        });
+    </script>
+</body>
 </html>
