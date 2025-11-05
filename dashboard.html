@@ -11,18 +11,18 @@
         /* TEMA RENKLERİ */
         :root {
             --primary-color: #5d3f6a; /* Kapalı Mor Vurgu */
-            --bg-dark: #1e1e2d;       /* Koyu Arka Plan */
-            --bg-card: #27293d;       /* Koyu Kart Arka Planı */
-            --text-light: #e0e0e0;    /* Açık Metin */
+            --bg-dark: #1e1e2d;        /* Koyu Arka Plan */
+            --bg-card: #27293d;        /* Koyu Kart Arka Planı */
+            --text-light: #e0e0e0;     /* Açık Metin */
             --text-secondary: #a9a9b6; /* İkincil Metin */
-            --border-dark: #3b3b51;   /* Koyu Sınır */
+            --border-dark: #3b3b51;    /* Koyu Sınır */
             --danger-color: #e74c3c;  /* Kırmızı (Çıkış Butonu) */
             --success-color: #28a745; /* Yeşil (Başarılı) */
             --warning-color: #ffc107; /* Sarı (Uyarı) */
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        /* GENEL STİL */
+        /* GENEL STİL (Öncekiyle aynı) */
         body { 
             font-family: 'Roboto', sans-serif; 
             background-color: var(--bg-dark); 
@@ -33,7 +33,7 @@
             min-height: 100vh;
         }
 
-        /* 1. KENAR ÇUBUĞU (SIDEBAR) STİLİ */
+        /* KENAR ÇUBUĞU (Öncekiyle aynı) */
         .sidebar {
             width: 250px;
             background-color: var(--bg-card);
@@ -83,7 +83,7 @@
             background-color: #c0392b;
         }
 
-        /* 2. ANA İÇERİK (MAIN CONTENT) STİLİ */
+        /* ANA İÇERİK (Öncekiyle aynı) */
         .main-content {
             flex-grow: 1;
             padding: 40px;
@@ -104,7 +104,7 @@
             font-weight: 700;
         }
         
-        /* BİLGİ KARTLARI (STATUS CARDS) */
+        /* BİLGİ KARTLARI (Öncekiyle aynı) */
         .status-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -117,6 +117,10 @@
             border-radius: 8px;
             box-shadow: var(--shadow);
             border-top: 5px solid;
+            transition: transform 0.3s; /* Yeni: Hover efekti */
+        }
+        .info-card:hover {
+            transform: translateY(-5px);
         }
         .info-card h3 {
             margin-top: 0;
@@ -131,7 +135,7 @@
             margin-top: 5px;
         }
 
-        /* Kart Renkleri */
+        /* Kart Renkleri (Öncekiyle aynı) */
         .card-primary { border-top-color: var(--primary-color); color: var(--primary-color);}
         .card-success { border-top-color: var(--success-color); color: var(--success-color);}
         .card-warning { border-top-color: var(--warning-color); color: var(--warning-color);}
@@ -141,7 +145,7 @@
         .card-warning .card-value { color: var(--warning-color); }
 
 
-        /* YÖNERGE KUTUSU */
+        /* YÖNERGE KUTUSU (Öncekiyle aynı) */
         .instruction-box { 
             border: 1px solid var(--border-dark);
             background-color: var(--bg-card); 
@@ -166,7 +170,7 @@
             display: block;
         }
         
-        /* MOBİL UYUMLULUK */
+        /* MOBİL UYUMLULUK (Öncekiyle aynı) */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .sidebar {
@@ -197,7 +201,7 @@
     <div class="logo">Baki Hosting</div>
     
     <a href="dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Panelim</a>
-    <a href="#" class="nav-link"><i class="fas fa-file-upload"></i> Dosya Yön.</a>
+    <a href="#dosya-yukle" id="fileUploadLink" class="nav-link"><i class="fas fa-file-upload"></i> Dosya Yön.</a>
     <a href="#" class="nav-link"><i class="fas fa-question-circle"></i> Destek</a>
     <a href="#" class="nav-link"><i class="fas fa-cog"></i> Ayarlar</a>
 
@@ -214,14 +218,16 @@
         
         <div class="info-card card-primary">
             <h3>Site Adresiniz</h3>
-            <div class="card-value" id="siteUrl">Yükleniyor...</div>
-            <p style="font-size: 0.9em; margin: 0; color: var(--text-secondary);">Alt klasörde yayınlanacak.</p>
+            <a id="siteUrlLink" target="_blank" style="text-decoration: none;">
+                <div class="card-value" id="siteUrl">Yükleniyor...</div>
+            </a>
+            <p style="font-size: 0.9em; margin: 0; color: var(--text-secondary);">Alt klasörde yayınlanacak. (Tıklanabilir)</p>
         </div>
 
         <div class="info-card card-success">
             <h3>Hizmet Durumu</h3>
             <div class="card-value" id="serviceStatus">Dosya Bekleniyor</div>
-            <p style="font-size: 0.9em; margin: 0; color: var(--text-secondary);">Yayın için dosyanızı gönderin.</p>
+            <p style="font-size: 0.9em; margin: 0; color: var(--text-secondary);" id="serviceMessage">Yayın için dosyanızı gönderin.</p>
         </div>
 
         <div class="info-card card-warning">
@@ -232,13 +238,13 @@
     </div>
     
     <h2><i class="fas fa-paper-plane"></i> Dosya Gönderim Yönergesi</h2>
-    <div class="instruction-box">
+    <div class="instruction-box" id="uploadInstructions">
         <h3>Sitenizin Yayınlanması İçin Son Adım</h3>
         <p>Web sitenizi (HTML, CSS, JS) tek bir **.zip** dosyası halinde sıkıştırdıktan sonra, lütfen bu dosyayı aşağıdaki e-posta adresine gönderin.</p>
         
         <p style="font-weight: bold; margin-top: 15px; color: var(--text-light);">Gönderim Adresi:</p>
         
-        <a href="mailto:SİZİN_EPOSTA_ADRESİNİZ@example.com" class="email-address">SİZİN_EPOSTA_ADRESİNİZ@example.com</a>
+        <a href="mailto:admin@bakikara.xyz" class="email-address">admin@bakikara.xyz</a>
         
         <p style="font-size: 0.9em; color: var(--text-secondary);">Dosyanız bize ulaştığında, maks. 24 saat içinde siteniz yayına alınır ve size onay e-postası gönderilir.</p>
     </div>
@@ -246,27 +252,79 @@
 </div>
 
 <script type="module">
-    // Firebase kütüphanelerini içe aktarırken path'in doğru olduğundan emin olun!
     import { auth, signOut, onAuthStateChanged, db, doc, getDoc } from './firebase-config.js'; 
+
+    // Veri yüklenirken veya hata durumunda arayüzü güncellemek için fonksiyon
+    function updateCard(elementId, value, messageId = null, message = null) {
+        const element = document.getElementById(elementId);
+        if (element) element.innerText = value;
+        if (messageId && message) {
+            const msgElement = document.getElementById(messageId);
+            if (msgElement) msgElement.innerText = message;
+        }
+    }
+    
+    // Yükleme sırasında kartları varsayılan duruma getirme
+    function setLoadingState() {
+        updateCard('userEmail', 'Yükleniyor...');
+        updateCard('siteUrl', 'Yükleniyor...');
+        updateCard('serviceStatus', 'Kontrol Ediliyor...');
+        updateCard('regDate', 'Yükleniyor...');
+        document.getElementById('siteUrlLink').href = '#';
+    }
 
     // Kullanıcının oturum durumunu kontrol et
     onAuthStateChanged(auth, async (user) => {
+        setLoadingState(); // Veriler gelene kadar yükleniyor göster
+        
         if (user) {
-            // Kullanıcı giriş yapmışsa
             document.getElementById('userEmail').innerText = user.email;
             
-            // Firestore'dan kullanıcı verisini çek
-            const docRef = doc(db, "users", user.uid);
-            const docSnap = await getDoc(docRef);
+            try {
+                // Firestore'dan kullanıcı verisini çek
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
 
-            if (docSnap.exists()) {
-                const userData = docSnap.data();
-                // E-postanın '@' öncesi kısmını kullanıcı adı olarak kullanma
-                const username = user.email.split('@')[0]; 
-                
-                document.getElementById('siteUrl').innerText = `bakikara.xyz/${username}`;
-                // Tarihi temiz bir formatta gösterme
-                document.getElementById('regDate').innerText = userData.createdAt.toDate().toLocaleDateString('tr-TR');
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    const username = user.email.split('@')[0]; 
+                    
+                    // 1. Site URL'sini güncelle ve tıklanabilir yap
+                    const sitePath = `bakikara.xyz/${username}`;
+                    updateCard('siteUrl', sitePath);
+                    document.getElementById('siteUrlLink').href = `http://${sitePath}`; // Gerçek bir link oluştur
+
+                    // 2. Kayıt Tarihini göster
+                    const formattedDate = userData.createdAt.toDate().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+                    updateCard('regDate', formattedDate);
+                    
+                    // 3. Hizmet Durumunu dinamik olarak göster (Örnek simülasyon)
+                    // Gerçek uygulamada bu veri (isPublished, status) admin panelinden güncellenmelidir.
+                    if (userData.isPublished === true) {
+                        updateCard('serviceStatus', 'Yayında', 'serviceMessage', 'Siteniz başarılı bir şekilde yayında.');
+                        document.getElementById('serviceStatus').parentElement.classList.remove('card-warning');
+                        document.getElementById('serviceStatus').parentElement.classList.add('card-success');
+
+                    } else if (userData.fileUploaded === true && userData.isPublished !== true) {
+                        updateCard('serviceStatus', 'İncelemede', 'serviceMessage', 'Dosyanız inceleniyor, kısa süre içinde yayında olacak.');
+                        document.getElementById('serviceStatus').parentElement.classList.remove('card-success');
+                        document.getElementById('serviceStatus').parentElement.classList.add('card-warning');
+                    } else {
+                        // Varsayılan: Dosya Bekleniyor
+                        updateCard('serviceStatus', 'Dosya Bekleniyor', 'serviceMessage', 'Yayın için sitenizi (zip) e-posta ile gönderin.');
+                        document.getElementById('serviceStatus').parentElement.classList.remove('card-success');
+                        document.getElementById('serviceStatus').parentElement.classList.add('card-warning');
+                    }
+                    
+                } else {
+                    // Kullanıcı Firestore'da yoksa
+                    updateCard('userEmail', 'Hata: Veri Yok');
+                    console.error("Kullanıcının Firestore verisi bulunamadı.");
+                }
+            } catch (error) {
+                // Veri çekme veya işleme hatası
+                updateCard('userEmail', 'Veri Hatası!');
+                console.error("Firestore verisi çekilirken hata:", error);
             }
 
         } else {
@@ -275,7 +333,7 @@
         }
     });
 
-    // Çıkış Yapma İşlemi
+    // Çıkış Yapma İşlemi (Öncekiyle aynı)
     window.handleLogout = function() {
         signOut(auth).then(() => {
             window.location.href = 'login.html';
@@ -284,6 +342,12 @@
             alert("Çıkış yaparken bir hata oluştu.");
         });
     }
+
+    // Dosya Yükleme Linki İşlevi (Yeni)
+    document.getElementById('fileUploadLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        alert("Dosya Yükleme Paneli henüz aktif değil. Lütfen .zip dosyanızı yönergedeki e-posta adresine gönderin.");
+    });
 </script>
 </body>
 </html>
