@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMM Panel Yönetimi | Firebase Bağlantılı</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <style>
@@ -89,7 +87,6 @@
 </head>
 <body>
 
-    <!-- MODAL (Hata ve Bilgi Mesajları İçin) -->
     <div id="modalContainer" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex items-center justify-center transition-opacity duration-300">
         <div class="bg-gray-800 rounded-xl shadow-2xl p-6 w-11/12 max-w-sm transform transition-all duration-300 scale-100 border border-gray-700">
             <div class="flex items-center space-x-3 mb-4">
@@ -103,19 +100,15 @@
         </div>
     </div>
 
-    <!-- ANA UYGULAMA YAPISI (Giriş yaptıktan sonra görünür) -->
     <div id="appContainer" class="hidden flex">
 
-        <!-- 1. Kenar Çubuğu (Sidebar) -->
         <nav id="sidebar" class="hidden md:block fixed h-full w-[var(--sidebar-width)] bg-[var(--bg-sidebar)] shadow-2xl flex flex-col z-20 border-r border-[var(--border-color)]">
             <div class="p-6 border-b border-[var(--border-color)] flex items-center space-x-3">
                 <i class="fas fa-rocket text-3xl text-[var(--primary-color)]"></i>
                 <h1 class="text-2xl font-extrabold text-white">Gemini Panel</h1>
             </div>
 
-            <!-- Navigasyon Menüsü -->
             <div class="p-4 flex-grow overflow-y-auto">
-                <!-- Navigasyon butonlarında artık handleNavigation global olarak tanımlı -->
                 <a id="nav-dashboard" class="nav-item flex items-center space-x-3 p-3 my-2 font-medium rounded-xl transition duration-200 cursor-pointer active" data-page="dashboard">
                     <i class="fas fa-home w-5"></i><span>Panelim</span>
                 </a>
@@ -131,14 +124,11 @@
                 <a id="nav-profile" class="nav-item flex items-center space-x-3 p-3 my-2 font-medium rounded-xl transition duration-200 cursor-pointer" data-page="profile">
                     <i class="fas fa-user-circle w-5"></i><span>Profilim</span>
                 </a>
-                <!-- YENİ ADMIN PANELİ NAVİGASYONU -->
                 <a id="nav-admin" class="nav-item hidden flex items-center space-x-3 p-3 my-2 font-medium rounded-xl transition duration-200 cursor-pointer" data-page="admin">
                     <i class="fas fa-user-shield w-5 text-red-400"></i><span class="text-red-300">Admin Paneli</span>
                 </a>
-                <!-- YENİ ADMIN PANELİ NAVİGASYONU SONU -->
-            </div>
+                </div>
 
-            <!-- Kullanıcı Bilgisi ve Çıkış -->
             <div class="p-4 border-t border-[var(--border-color)]">
                 <div class="flex items-center space-x-3 p-3 bg-[var(--bg-card)] rounded-xl shadow-inner">
                     <div class="w-10 h-10 bg-[var(--primary-color)] rounded-full flex items-center justify-center text-white text-lg font-bold shadow-md">
@@ -148,7 +138,6 @@
                         <div id="userName" class="text-sm font-semibold text-white truncate"></div>
                         <div id="userBalance" class="text-xs text-gray-400 font-medium">Bakiye: 0.00 TL</div>
                     </div>
-                    <!-- Çıkış Butonu ID ile tanımlandı -->
                     <button id="logoutButton" class="p-2 text-gray-400 hover:text-red-500 transition duration-150 hover:bg-gray-700 rounded-lg" title="Çıkış Yap">
                         <i class="fas fa-sign-out-alt"></i>
                     </button>
@@ -156,9 +145,7 @@
             </div>
         </nav>
 
-        <!-- 2. Ana İçerik Alanı (Main Content) -->
         <main id="mainContent" class="flex-grow p-4 md:p-8 ml-0 md:ml-[var(--sidebar-width)] transition-all duration-300">
-            <!-- Mobil Navigasyon Düğmesi -->
             <div class="sticky top-0 z-10 bg-[var(--bg-body)] -mx-4 md:mx-0 p-4 md:p-0 flex justify-between items-center md:hidden border-b border-[var(--border-color)] mb-4">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-rocket text-2xl text-[var(--primary-color)]"></i>
@@ -169,7 +156,6 @@
                 </button>
             </div>
 
-            <!-- Mobil Menü İçeriği -->
             <div id="mobileMenu" class="hidden fixed inset-0 bg-[var(--bg-sidebar)] z-40 p-6 transform transition-transform duration-300 ease-in-out md:hidden flex flex-col border-r border-[var(--border-color)]">
                 <div class="flex justify-between items-center mb-8">
                     <h2 class="text-2xl font-bold text-white">Menü</h2>
@@ -183,12 +169,10 @@
                     <a class="nav-item flex items-center space-x-3 p-3 font-medium rounded-xl hover:bg-gray-700 cursor-pointer mobile-nav-item" data-page="orders"><i class="fas fa-list-alt w-5"></i><span>Siparişlerim</span></a>
                     <a class="nav-item flex items-center space-x-3 p-3 font-medium rounded-xl hover:bg-gray-700 cursor-pointer mobile-nav-item" data-page="addFunds"><i class="fas fa-wallet w-5"></i><span>Bakiye Yükle</span></a>
                     <a class="nav-item flex items-center space-x-3 p-3 font-medium rounded-xl hover:bg-gray-700 cursor-pointer mobile-nav-item" data-page="profile"><i class="fas fa-user-circle w-5"></i><span>Profilim</span></a>
-                    <!-- YENİ MOBİL ADMIN PANELİ NAVİGASYONU -->
                     <a id="mobile-nav-admin" class="nav-item hidden flex items-center space-x-3 p-3 font-medium rounded-xl hover:bg-red-900/20 cursor-pointer mobile-nav-item" data-page="admin">
                         <i class="fas fa-user-shield w-5 text-red-400"></i><span class="text-red-300">Admin Paneli</span>
                     </a>
-                    <!-- YENİ MOBİL ADMIN PANELİ NAVİGASYONU SONU -->
-                </div>
+                    </div>
                 <div class="mt-auto border-t border-[var(--border-color)] pt-4">
                     <button id="mobileLogoutButton" class="w-full text-left flex items-center space-x-3 p-3 font-medium text-red-500 rounded-xl hover:bg-red-900/20 transition duration-150">
                         <i class="fas fa-sign-out-alt w-5"></i><span>Çıkış Yap</span>
@@ -196,18 +180,14 @@
                 </div>
             </div>
 
-            <!-- Ana İçerik Yükleme Alanı -->
             <div id="pageContent" class="min-h-[calc(100vh-64px)] transition-opacity duration-300">
-                <!-- Sayfalar buraya yüklenecek -->
-            </div>
+                </div>
         </main>
     </div>
 
-    <!-- 3. Kimlik Doğrulama Alanı (Default olarak gösterilir) -->
     <div id="authPageContainer" class="auth-container">
         <div class="w-full max-w-md p-8 m-4 bg-[var(--bg-card)] rounded-xl shadow-2xl border border-[var(--border-color)] transform transition-all duration-300 hover:shadow-blue-500/20">
 
-            <!-- Giriş Formu -->
             <div id="loginFormContainer">
                 <h2 class="text-3xl font-bold text-center text-white mb-6">Giriş Yap</h2>
                 <form id="loginForm" onsubmit="event.preventDefault(); handleAuthSubmit('login');" class="space-y-4">
@@ -224,7 +204,6 @@
                     </button>
                 </form>
                 <div class="mt-6 text-center">
-                    <!-- Bu buton artık id ile JS'e bağlanacak -->
                     <button id="switchToRegister" class="text-sm font-medium text-[var(--primary-color)] hover:text-[var(--primary-light)] transition duration-150">
                         Hesabın yok mu? Kayıt Ol
                     </button>
@@ -232,7 +211,6 @@
                 </div>
             </div>
 
-            <!-- Kayıt Formu (Başlangıçta Gizli) -->
             <div id="registerFormContainer" class="hidden">
                 <h2 class="text-3xl font-bold text-center text-white mb-6">Yeni Hesap Oluştur</h2>
                 <form id="registerForm" onsubmit="event.preventDefault(); handleAuthSubmit('register');" class="space-y-4">
@@ -253,7 +231,6 @@
                     </button>
                 </form>
                 <div class="mt-6 text-center">
-                    <!-- Bu buton artık id ile JS'e bağlanacak -->
                     <button id="switchToLogin" class="text-sm font-medium text-[var(--primary-color)] hover:text-[var(--primary-light)] transition duration-150">
                         Zaten hesabın var mı? Giriş Yap
                     </button>
@@ -925,7 +902,6 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     <div class="lg:col-span-2 bg-[var(--bg-card)] p-6 rounded-xl shadow-lg border border-[var(--border-color)]">
-                        <!-- Form submit'i artık handleNewOrder() fonksiyonunu çağırır -->
                         <form id="newOrderForm" onsubmit="event.preventDefault(); window.handleNewOrder();" class="space-y-4">
                             <div>
                                 <label for="platformSelect" class="block text-sm font-medium text-gray-300 mb-1">Platform Seçin</label>
@@ -1160,14 +1136,14 @@
                     </div>
                 </div>
                 
-                <!-- Admin İçerik Sekmeleri -->
                 <div class="flex border-b border-[var(--border-color)] mb-6">
                     <button id="tabOrders" class="tab-button py-2 px-4 text-sm font-medium border-b-2 border-blue-500 text-blue-400 transition duration-150" data-target="orders">Sipariş Yönetimi</button>
                     <button id="tabUsers" class="tab-button py-2 px-4 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-white transition duration-150" data-target="users">Kullanıcı & Bakiye</button>
+                    <button id="tabServices" class="tab-button py-2 px-4 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-white transition duration-150" data-target="services">Servis Yönetimi</button>
+                    <button id="tabSettings" class="tab-button py-2 px-4 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-white transition duration-150" data-target="settings">Sistem Ayarları</button>
                 </div>
 
                 <div id="adminContentArea">
-                    <!-- Varsayılan olarak sipariş yönetimi yüklenir -->
                     ${renderAdminOrdersManagement()}
                 </div>
             `;
@@ -1277,6 +1253,128 @@
                             ${userTableHtml}
                         </tbody>
                     </table>
+                </div>
+            `;
+        }
+        
+        /**
+         * Admin Servis Yönetimi Sekmesi İçeriği
+         */
+        function renderAdminServicesManagement() {
+            let serviceTableHtml = '';
+
+            categories.forEach(category => {
+                serviceTableHtml += `
+                    <tr class="bg-gray-700/50 border-t border-gray-600">
+                        <td colspan="5" class="px-4 py-3 text-lg font-bold text-white flex items-center space-x-2">
+                            <i class="${category.icon} mr-2"></i> <span>${category.name}</span>
+                        </td>
+                    </tr>
+                `;
+                
+                const currentServices = services[category.id] || [];
+                currentServices.forEach(service => {
+                    const handleUpdate = `
+                        const newPrice = document.getElementById('price-${service.id}').value;
+                        const newMin = document.getElementById('min-${service.id}').value;
+                        const newMax = document.getElementById('max-${service.id}').value;
+                        // NOT: Gerçek bir sistemde bu veriler Firestore'daki 'services' koleksiyonuna kaydedilmelidir.
+                        showModal('Uyarı', 'Bu özellik şu anda sadece sabit kodlanmış servisleri güncelleyebilir. Gerçek güncelleme için Firebase entegrasyonu gereklidir.', 'fas fa-exclamation-triangle text-yellow-500');
+                    `;
+
+                    serviceTableHtml += `
+                        <tr class="hover:bg-gray-700 transition duration-150">
+                            <td class="px-4 py-3 text-sm font-medium text-white">${service.name}</td>
+                            <td class="px-4 py-3 text-sm text-gray-400">${service.desc}</td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <input type="number" id="price-${service.id}" value="${service.price}" 
+                                    min="0.0001" step="0.0001" class="bg-gray-700 text-white text-sm rounded-lg p-2 w-20 border border-gray-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <input type="number" id="min-${service.id}" value="${service.min}" 
+                                    min="1" step="1" class="bg-gray-700 text-white text-sm rounded-lg p-2 w-16 border border-gray-600 focus:ring-blue-500">
+                                /
+                                <input type="number" id="max-${service.id}" value="${service.max}" 
+                                    min="1" step="1" class="bg-gray-700 text-white text-sm rounded-lg p-2 w-16 border border-gray-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <button onclick="${handleUpdate}" 
+                                    class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-1 px-3 rounded-lg transition duration-150">
+                                    Güncelle
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+
+            return `
+                <div class="bg-[var(--bg-card)] p-4 md:p-6 rounded-xl shadow-lg border border-[var(--border-color)] overflow-x-auto">
+                    <h3 class="text-xl font-semibold text-white mb-4">Servis Fiyat/Miktar Yönetimi</h3>
+                    <p class="text-sm text-yellow-400 mb-4">UYARI: Servisler koddadır. Buradaki güncelleme sadece sunum amaçlıdır, kalıcı değildir.</p>
+                    <table class="min-w-full divide-y divide-[var(--border-color)]">
+                        <thead>
+                            <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-400 bg-gray-800">
+                                <th class="px-4 py-3">Servis Adı</th>
+                                <th class="px-4 py-3">Açıklama</th>
+                                <th class="px-4 py-3">Birim Fiyat (Adet)</th>
+                                <th class="px-4 py-3">Min / Max Miktar</th>
+                                <th class="px-4 py-3">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[var(--border-color)]">
+                            ${serviceTableHtml}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        /**
+         * Admin Sistem Ayarları Sekmesi İçeriği
+         */
+        function renderAdminSettingsManagement() {
+            // Örnek ayar değerleri (Gerçek sistemde Firestore'dan çekilmelidir)
+            const minFundAmount = 10.00;
+            const isRegistrationOpen = true;
+
+            const handleSettingsSave = function() {
+                const newMinAmount = document.getElementById('minFundAmount').value;
+                const newRegStatus = document.getElementById('registrationStatus').checked;
+
+                // NOT: Gerçek bir sistemde bu veriler Firestore'daki 'settings' koleksiyonuna kaydedilmelidir.
+                showModal('Uyarı', 'Ayarlar sadece sunum amaçlıdır. Kalıcı kayıt için Firebase entegrasyonu gereklidir.', 'fas fa-exclamation-triangle text-yellow-500');
+            }
+            window.handleSettingsSave = handleSettingsSave; // Global erişim
+
+            return `
+                <div class="bg-[var(--bg-card)] p-6 rounded-xl shadow-lg border border-[var(--border-color)]">
+                    <h3 class="text-xl font-semibold text-white mb-4">Genel Panel Ayarları</h3>
+                    <p class="text-sm text-yellow-400 mb-4">UYARI: Ayarlar koddadır. Değişiklikler kalıcı olarak kaydedilmez.</p>
+                    <form onsubmit="event.preventDefault(); window.handleSettingsSave();" class="space-y-6">
+                        
+                        <div class="border-b border-[var(--border-color)] pb-4">
+                            <label for="minFundAmount" class="block text-sm font-medium text-gray-300 mb-1">Minimum Bakiye Yükleme Miktarı (TL)</label>
+                            <input type="number" id="minFundAmount" value="${minFundAmount.toFixed(2)}" min="1" step="0.01" required
+                                class="w-full max-w-sm px-4 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 transition duration-150">
+                            <p class="text-xs text-gray-500 mt-1">Kullanıcıların tek seferde yükleyebileceği en az miktar.</p>
+                        </div>
+
+                        <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-4">
+                            <div class="flex flex-col">
+                                <label for="registrationStatus" class="text-sm font-medium text-gray-300">Yeni Kullanıcı Kaydı</label>
+                                <p class="text-xs text-gray-500">Kullanıcıların yeni hesap açmasına izin ver.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="registrationStatus" ${isRegistrationOpen ? 'checked' : ''} class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary w-full max-w-sm py-3 text-white font-bold rounded-lg">
+                            Ayarları Kaydet
+                        </button>
+                    </form>
                 </div>
             `;
         }
@@ -1400,6 +1498,10 @@
                                     adminContentArea.innerHTML = renderAdminOrdersManagement();
                                 } else if (target === 'users') {
                                     adminContentArea.innerHTML = renderAdminUsersManagement();
+                                } else if (target === 'services') {
+                                    adminContentArea.innerHTML = renderAdminServicesManagement();
+                                } else if (target === 'settings') {
+                                    adminContentArea.innerHTML = renderAdminSettingsManagement();
                                 }
                             });
                         });
