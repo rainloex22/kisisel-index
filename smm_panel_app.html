@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tam Kapsamlı SMM Panel | Gemini Panel</title>
+    <title>Tam Fonksiyonel SMM Panel | Gemini Panel</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,7 +19,6 @@
             --bg-card: #ffffff;       /* Kart Arka Planı */
             --text-dark: #1f2937;
             --text-muted: #6b7280;
-            --sidebar-width: 280px;
         }
 
         body {
@@ -48,9 +47,43 @@
         /* Mobil görünümde sidebar gizleme */
         #sidebar {
             transition: transform 0.3s ease-in-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-30;
         }
         .sidebar-hidden {
             transform: translateX(-100%);
+        }
+        
+        /* Mobil menü overlay */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .sidebar-visible + .sidebar-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Table responsive scroll */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        /* Fix for hidden content in small screen when not logged in */
+        @media (min-width: 1024px) {
+            #sidebar {
+                position: sticky;
+                width: 280px;
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
@@ -61,6 +94,9 @@
         <i class="fas fa-spinner fa-spin text-4xl text-primary-color mb-4"></i>
         <p class="text-lg font-medium text-text-dark">Panel Yükleniyor...</p>
     </div>
+    
+    <!-- Mobil Overlay -->
+    <div id="sidebar-overlay" class="sidebar-overlay lg:hidden" onclick="toggleSidebar()"></div>
 
     <!-- ANA KAPSAYICI (Giriş/Kayıt VEYA Panel) -->
     <div id="app-container" class="hidden">
@@ -74,7 +110,7 @@
         <div id="main-panel" class="lg:flex hidden min-h-screen">
             
             <!-- Sidebar (Yan Menü) -->
-            <div id="sidebar" class="fixed lg:sticky top-0 left-0 h-screen w-full lg:w-72 bg-white shadow-xl z-30 lg:translate-x-0 sidebar-hidden">
+            <div id="sidebar" class="w-72 bg-white shadow-xl sidebar-hidden lg:block">
                 <div class="p-6 flex flex-col h-full">
                     <h1 class="text-3xl font-extrabold text-primary-color mb-8">Gemini Panel</h1>
                     
@@ -155,9 +191,10 @@
                 balance: 0,
                 orders: [],
                 transactions: [],
+                supportTickets: []
             },
             
-            // Sabit SMM Panel Verileri (Simülasyon için)
+            // Panel Hizmet Kataloğu (Gerçek bir API'den çekilmesi gereken verinin yerine geçer)
             smmData: {
                 platforms: {
                     instagram: "Instagram",
@@ -210,27 +247,29 @@
 
         // --- FIREBASE İŞLEMLERİ ---
 
-        // Firestore yolunu oluşturur
-        const getPrivateDocPath = (docName) => {
+        // Firestore yolunu oluşturur (Özel Kullanıcı Verisi)
+        const getPrivateDocPath = (collectionName) => {
             const userId = appState.user.uid;
             const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            return `/artifacts/${appId}/users/${userId}/${docName}/data`;
+            // /artifacts/{appId}/users/{userId}/{collectionName}/data
+            return `/artifacts/${appId}/users/${userId}/${collectionName}`;
         };
 
         // Firestore'dan kullanıcı verilerini çeker ve anlık dinler (onSnapshot)
         const fetchUserData = () => {
             if (!appState.user) return;
-
+            
             // 1. Kullanıcı Bilgileri ve Bakiyeyi Dinle
-            const userDocRef = doc(db, getPrivateDocPath('user_data'));
+            const userDocRef = doc(db, getPrivateDocPath('user_data'), 'data');
             onSnapshot(userDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     appState.userData.balance = data.balance || 0;
-                    appState.user.displayName = auth.currentUser.displayName || data.displayName || 'Kullanıcı';
+                    appState.user.displayName = auth.currentUser.displayName || data.displayName || (appState.user.email ? appState.user.email.split('@')[0] : 'Kullanıcı');
                 } else {
                     // Yeni kullanıcı, başlangıç bakiyesini ayarla
-                    setDoc(userDocRef, { balance: 0, displayName: auth.currentUser.displayName || 'Kullanıcı' }, { merge: true });
+                    const initialDisplayName = auth.currentUser.displayName || (appState.user.email ? appState.user.email.split('@')[0] : 'Kullanıcı');
+                    setDoc(userDocRef, { balance: 0, displayName: initialDisplayName }, { merge: true });
                     appState.userData.balance = 0;
                 }
                 updateUI(); // Bakiye değiştiğinde UI'ı güncelle
@@ -241,27 +280,36 @@
             // 2. Siparişleri Dinle
             const ordersCollectionRef = collection(db, getPrivateDocPath('orders'));
             onSnapshot(ordersCollectionRef, (snapshot) => {
-                appState.userData.orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
+                appState.userData.orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                 updateUI();
             }, (error) => {
                 console.error("Siparişler dinlenirken hata:", error);
             });
 
-             // 3. İşlemleri Dinle (Bakiye Yüklemeleri)
+            // 3. İşlemleri Dinle (Bakiye Yüklemeleri)
             const transactionsCollectionRef = collection(db, getPrivateDocPath('transactions'));
             onSnapshot(transactionsCollectionRef, (snapshot) => {
-                appState.userData.transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
+                appState.userData.transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                 updateUI();
             }, (error) => {
                 console.error("İşlemler dinlenirken hata:", error);
             });
+            
+            // 4. Destek Taleplerini Dinle
+             const supportCollectionRef = collection(db, getPrivateDocPath('support_tickets'));
+            onSnapshot(supportCollectionRef, (snapshot) => {
+                appState.userData.supportTickets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+                updateUI();
+            }, (error) => {
+                console.error("Destek talepleri dinlenirken hata:", error);
+            });
         };
 
-        // Bakiye ekleme simülasyonu
+        // Gerçek Bakiye Yükleme (Manuel Ekleme)
         const addBalance = async (amount) => {
             if (!appState.user) return showMessageBox("Hata", "Giriş yapmalısınız.");
             
-            const docRef = doc(db, getPrivateDocPath('user_data'));
+            const docRef = doc(db, getPrivateDocPath('user_data'), 'data');
             const transactionRef = collection(db, getPrivateDocPath('transactions'));
 
             try {
@@ -270,17 +318,17 @@
 
                 // İşlem kaydını ekle
                 await addDoc(transactionRef, {
-                    type: 'Bakiye Yükleme',
+                    type: 'Bakiye Yükleme (Manuel)',
                     amount: amount,
                     status: 'Tamamlandı',
                     timestamp: serverTimestamp(),
-                    note: 'Simüle edilmiş bakiye yüklemesi'
+                    note: 'Kullanıcının manuel bakiye eklemesi'
                 });
 
                 showMessageBox("Başarılı", `${amount.toFixed(2)} ₺ bakiyeniz hesabınıza eklendi.`);
             } catch (error) {
                 console.error("Bakiye yükleme hatası:", error);
-                showMessageBox("Hata", "Bakiye yüklenirken bir sorun oluştu. Konsolu kontrol edin.");
+                showMessageBox("Hata", "Bakiye yüklenirken bir sorun oluştu.");
             }
         };
 
@@ -292,7 +340,7 @@
                 return showMessageBox("Hata", "Bakiyeniz yetersiz. Lütfen bakiye yükleyin.");
             }
 
-            const userDocRef = doc(db, getPrivateDocPath('user_data'));
+            const userDocRef = doc(db, getPrivateDocPath('user_data'), 'data');
             const ordersRef = collection(db, getPrivateDocPath('orders'));
             const service = appState.smmData.services[platform][category].find(s => s.id === parseInt(serviceId));
             
@@ -319,12 +367,12 @@
                 showMessageBox("Başarılı", `Siparişiniz (${service.name}) başarıyla oluşturuldu. ${price.toFixed(2)} ₺ bakiyenizden düşüldü.`);
             } catch (error) {
                 console.error("Sipariş oluşturma hatası:", error);
-                // Hata oluşursa bakiyeyi geri yüklemek gerekir, ancak bu simülasyon için atlanmıştır.
-                showMessageBox("Hata", "Sipariş oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
+                // Hata durumunda bakiyeyi geri yüklemek gerekir (gerçek uygulamada transaction kullanılır)
+                showMessageBox("Hata", "Sipariş oluşturulurken bir hata oluştu.");
             }
         };
         
-        // Destek talebi gönderme (Basit Firestore kaydı)
+        // Destek talebi gönderme
         const sendSupportTicket = async (subject, message) => {
              if (!appState.user) return showMessageBox("Hata", "Giriş yapmalısınız.");
              
@@ -339,10 +387,10 @@
                     userEmail: appState.user.email
                 });
 
-                showMessageBox("Başarılı", "Destek talebiniz başarıyla alındı. En kısa sürede yanıtlanacaktır.");
+                showMessageBox("Başarılı", "Destek talebiniz başarıyla alındı. Kayıt altına alındı.");
              } catch(e) {
                 console.error("Destek talebi gönderme hatası:", e);
-                showMessageBox("Hata", "Destek talebiniz gönderilemedi. Konsolu kontrol edin.");
+                showMessageBox("Hata", "Destek talebiniz gönderilemedi.");
              }
         }
 
@@ -369,11 +417,11 @@
         const handleLogin = async (email, password) => {
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                showMessageBox("Başarılı", "Giriş başarılı!");
+                // onAuthStateChanged tetiklenecek
             } catch (error) {
                 console.error("Giriş hatası:", error);
                 let errorMessage = "Giriş başarısız. E-posta veya şifre hatalı.";
-                 if (error.code === 'auth/invalid-credential') {
+                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     errorMessage = "Geçersiz e-posta veya şifre.";
                 }
                 showMessageBox("Hata", errorMessage);
@@ -402,11 +450,14 @@
             }
             // Mobil menüyü kapat
             document.getElementById('sidebar')?.classList.add('sidebar-hidden');
+            document.getElementById('sidebar')?.classList.remove('sidebar-visible');
         };
         
         // Sidebar'ı göster/gizle
         const toggleSidebar = () => {
-            document.getElementById('sidebar')?.classList.toggle('sidebar-hidden');
+            const sidebar = document.getElementById('sidebar');
+            sidebar?.classList.toggle('sidebar-hidden');
+            sidebar?.classList.toggle('sidebar-visible');
         }
 
         // Genel mesaj kutusu gösterimi
@@ -424,24 +475,21 @@
         const updateUI = () => {
             // Yükleniyor ekranını yönet
             const loadingScreen = document.getElementById('loading-screen');
+            const appContainer = document.getElementById('app-container');
+
             if (appState.isAuthReady) {
                 loadingScreen.classList.add('opacity-0');
                 setTimeout(() => loadingScreen.classList.add('hidden'), 500);
+                appContainer.classList.remove('hidden');
             } else {
                 loadingScreen.classList.remove('hidden', 'opacity-0');
+                appContainer.classList.add('hidden');
+                return;
             }
 
-            const appContainer = document.getElementById('app-container');
             const authPage = document.getElementById('auth-page');
             const mainPanel = document.getElementById('main-panel');
             
-            if (!appState.isAuthReady) {
-                appContainer.classList.add('hidden');
-                return;
-            } else {
-                appContainer.classList.remove('hidden');
-            }
-
             // Kimlik doğrulama veya Ana Panel görünümünü seç
             const isAuthPage = appState.currentPage === 'login' || appState.currentPage === 'register';
 
@@ -588,7 +636,7 @@
         const renderDashboard = (container) => {
             const totalOrders = appState.userData.orders.length;
             const completedOrders = appState.userData.orders.filter(o => o.status === 'Tamamlandı').length;
-            const pendingOrders = appState.userData.orders.filter(o => o.status === 'Beklemede').length;
+            const pendingOrders = appState.userData.orders.filter(o => o.status === 'Beklemede' || o.status === 'İşleniyor').length;
             const totalSpent = appState.userData.orders.reduce((sum, order) => sum + (order.price || 0), 0);
 
             container.innerHTML = `
@@ -609,7 +657,7 @@
                     </div>
                     <div class="p-6 bg-white rounded-xl shadow-lg flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-500">Bekleyen</p>
+                            <p class="text-sm font-medium text-gray-500">Bekleyen / İşlenen</p>
                             <p class="text-3xl font-bold text-text-dark">${pendingOrders}</p>
                         </div>
                         <i class="fas fa-clock text-4xl text-yellow-500 opacity-30"></i>
@@ -624,8 +672,10 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-bold text-text-dark mb-4">Son Siparişler</h3>
-                    ${appState.userData.orders.length > 0 ? renderOrderTable(appState.userData.orders.slice(0, 5)) : '<p class="text-gray-500">Henüz bir siparişiniz yok. İlk siparişi oluşturun!</p>'}
+                    <h3 class="text-xl font-bold text-text-dark mb-4">Son 5 Siparişiniz</h3>
+                    <div class="table-wrapper">
+                        ${appState.userData.orders.length > 0 ? renderOrderTable(appState.userData.orders.slice(0, 5)) : '<p class="text-gray-500">Henüz bir siparişiniz yok. İlk siparişi oluşturun!</p>'}
+                    </div>
                 </div>
             `;
         };
@@ -716,23 +766,26 @@
             const calculateCost = () => {
                 const quantity = parseInt(quantityInput.value) || 0;
                 
+                let totalPrice = 0;
+
                 // Miktar kısıtlamaları
                 if (currentService) {
                     quantityInput.min = currentService.min;
                     quantityInput.max = currentService.max;
-                    if (quantity < currentService.min || quantity > currentService.max) {
-                        placeOrderBtn.disabled = true;
-                    } else {
+                    if (quantity >= currentService.min && quantity <= currentService.max) {
                         placeOrderBtn.disabled = false;
+                        const pricePerItem = currentService.pricePerK / 1000;
+                        totalPrice = pricePerItem * quantity;
+                    } else {
+                        placeOrderBtn.disabled = true;
+                        if (quantity > 0) {
+                            showMessageBox("Uyarı", `Seçilen hizmet için miktar ${currentService.min} ile ${currentService.max} arasında olmalıdır.`);
+                        }
                     }
+                } else {
+                    placeOrderBtn.disabled = true;
                 }
                 
-                let totalPrice = 0;
-                if (currentService && quantity > 0) {
-                    const pricePerItem = currentService.pricePerK / 1000;
-                    totalPrice = pricePerItem * quantity;
-                }
-
                 document.getElementById('price-per-k').textContent = currentService ? `${currentService.pricePerK.toFixed(2)} ₺` : '0.00 ₺';
                 document.getElementById('quantity-summary').textContent = quantity.toLocaleString('tr-TR');
                 document.getElementById('total-price').textContent = `${totalPrice.toFixed(2)} ₺`;
@@ -747,6 +800,7 @@
                 serviceInfo.classList.add('hidden');
                 currentService = null;
                 calculateCost();
+                quantityInput.value = '';
 
                 const platformKey = platformSelect.value;
                 if (platformKey && appState.smmData.categories[platformKey]) {
@@ -769,6 +823,7 @@
                 serviceInfo.classList.add('hidden');
                 currentService = null;
                 calculateCost();
+                quantityInput.value = '';
                 
                 const platformKey = platformSelect.value;
                 const categoryKey = categorySelect.value;
@@ -831,7 +886,7 @@
                 const quantity = parseInt(quantityInput.value);
                 const price = calculateCost();
 
-                if (price > 0 && currentService) {
+                if (price > 0 && currentService && quantity >= currentService.min && quantity <= currentService.max) {
                     placeNewOrder(platform, category, serviceId, link, quantity, price);
                     // Formu sıfırla
                     orderForm.reset();
@@ -839,7 +894,7 @@
                 } else if (!currentService) {
                     showMessageBox("Hata", "Lütfen geçerli bir servis seçimi yapın.");
                 } else {
-                    showMessageBox("Hata", "Sipariş miktarı geçerli değil veya fiyat 0.");
+                    showMessageBox("Hata", "Sipariş miktarı veya fiyatı geçerli değil. Lütfen minimum ve maksimum miktarları kontrol edin.");
                 }
             });
             
@@ -849,9 +904,11 @@
 
         const renderOrders = (container) => {
             container.innerHTML = `
-                <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
                     <h3 class="text-xl font-bold text-text-dark mb-4">Tüm Siparişlerim (${appState.userData.orders.length} adet)</h3>
-                    ${appState.userData.orders.length > 0 ? renderOrderTable(appState.userData.orders) : '<p class="text-gray-500">Henüz oluşturulmuş bir siparişiniz bulunmamaktadır.</p>'}
+                    <div class="table-wrapper">
+                        ${appState.userData.orders.length > 0 ? renderOrderTable(appState.userData.orders) : '<p class="text-gray-500">Henüz oluşturulmuş bir siparişiniz bulunmamaktadır.</p>'}
+                    </div>
                 </div>
             `;
         };
@@ -895,18 +952,19 @@
         };
 
         const renderTransactions = (container, action) => {
-            action.innerHTML = ''; // Bakiye ekleme formu bu sayfada olduğu için aksiyon butonuna gerek yok
+            action.innerHTML = ''; // Bakiye ekleme formu bu sayfada
 
             container.innerHTML = `
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Bakiye Ekleme Formu -->
                     <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg h-fit">
-                        <h3 class="text-xl font-bold text-primary-color mb-4">Bakiye Yükle (Simülasyon)</h3>
+                        <h3 class="text-xl font-bold text-primary-color mb-4">Manuel Bakiye Ekleme</h3>
                         <p class="mb-4 text-gray-600">Mevcut Bakiyeniz: <span class="font-bold text-green-600">${appState.userData.balance.toFixed(2)} ₺</span></p>
                         <form id="balance-form" class="space-y-4">
                             <div>
                                 <label for="depositAmount" class="block text-sm font-medium text-gray-700 mb-1">Yüklenecek Tutar (₺)</label>
                                 <input type="number" id="depositAmount" value="50.00" min="5" step="0.01" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-primary-color focus:border-primary-color transition">
+                                <p class="text-xs text-gray-500 mt-1">Bu işlem, başarılı bir ödeme sonrası bakiyenin hesabınıza yansımasını temsil eder.</p>
                             </div>
                             <button type="submit" class="w-full py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition duration-200 shadow-lg shadow-green-300">
                                 <i class="fas fa-plus-circle mr-2"></i> Bakiyeye Ekle
@@ -915,9 +973,11 @@
                     </div>
 
                     <!-- İşlem Geçmişi Tablosu -->
-                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
                         <h3 class="text-xl font-bold text-text-dark mb-4">İşlem Geçmişi (${appState.userData.transactions.length} adet)</h3>
-                        ${appState.userData.transactions.length > 0 ? renderTransactionTable(appState.userData.transactions) : '<p class="text-gray-500">Henüz bakiye işlemi yapılmadı.</p>'}
+                        <div class="table-wrapper">
+                            ${appState.userData.transactions.length > 0 ? renderTransactionTable(appState.userData.transactions) : '<p class="text-gray-500">Henüz bakiye işlemi yapılmadı.</p>'}
+                        </div>
                     </div>
                 </div>
             `;
@@ -926,11 +986,11 @@
             document.getElementById('balance-form')?.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const amount = parseFloat(document.getElementById('depositAmount').value);
-                if (amount > 0) {
+                if (amount >= 5) {
                     addBalance(amount);
                     e.target.reset();
                 } else {
-                    showMessageBox("Hata", "Lütfen geçerli bir tutar girin.");
+                    showMessageBox("Hata", "Lütfen en az 5 ₺ tutarında geçerli bir miktar girin.");
                 }
             });
         };
@@ -964,6 +1024,7 @@
             container.innerHTML = `
                 <div class="bg-white p-6 rounded-xl shadow-lg max-w-xl mx-auto">
                     <h3 class="text-xl font-bold text-text-dark mb-4">Yeni Destek Talebi Oluştur</h3>
+                    <p class="text-sm text-gray-500 mb-6">Talepleriniz Firestore'da kayıt altına alınır ve bir destek sistemi simülasyonu görevi görür.</p>
                     <form id="support-form" class="space-y-4">
                         <div>
                             <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Konu</label>
@@ -977,7 +1038,23 @@
                             <i class="fas fa-paper-plane mr-2"></i> Talebi Gönder
                         </button>
                     </form>
-                    <p class="mt-6 text-sm text-gray-500 text-center">Talepleriniz kayıt altına alınır ve en kısa sürede e-posta adresiniz üzerinden yanıtlanır.</p>
+                    
+                    <div class="mt-8">
+                        <h4 class="text-lg font-bold text-text-dark mb-3">Talepleriniz (${appState.userData.supportTickets.length})</h4>
+                        <div class="space-y-3">
+                        ${appState.userData.supportTickets.length > 0 ? 
+                            appState.userData.supportTickets.map(ticket => `
+                                <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                    <div class="flex justify-between items-center">
+                                        <p class="font-semibold text-text-dark truncate">${ticket.subject}</p>
+                                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${ticket.status === 'Açık' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">${ticket.status}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mt-1">ID: ${ticket.id.substring(0, 6)} - Tarih: ${ticket.timestamp?.toDate ? new Date(ticket.timestamp.toDate()).toLocaleDateString('tr-TR') : 'Yükleniyor'}</p>
+                                </div>
+                            `).join('')
+                            : '<p class="text-gray-500 text-sm">Gönderilmiş bir destek talebiniz bulunmamaktadır.</p>'}
+                        </div>
+                    </div>
                 </div>
             `;
             
@@ -1008,7 +1085,7 @@
                     db = getFirestore(app);
                     auth = getAuth(app);
                     isFirebaseInitialized = true;
-                    setLogLevel('Debug');
+                    setLogLevel('Debug'); // Konsol loglarını aç
 
                     // Kimlik doğrulama durumunu dinle
                     onAuthStateChanged(auth, async (user) => {
@@ -1025,6 +1102,8 @@
                         } else {
                             appState.user = null;
                             appState.currentPage = 'login'; // Giriş sayfasına yönlendir
+                            // Kullanıcı çıkış yaptığında veriyi temizle
+                            appState.userData = { balance: 0, orders: [], transactions: [], supportTickets: [] };
                         }
                         updateUI(); // Her auth durum değişiminde UI'ı güncelle
                     });
@@ -1037,15 +1116,15 @@
                         signInAnonymously(auth);
                     }
                 } else {
-                    // Firebase yapılandırması boşsa, yükleme ekranını kapat ve giriş sayfasını göster
-                    console.error("Firebase yapılandırması boş. Auth simülasyonu yapılacak.");
+                    // Firebase yapılandırması boşsa, yükleme ekranını kapat ve login'e git
+                    console.error("Firebase yapılandırması boş. Panel verilerini kalıcı olarak saklayamayacak.");
                     appState.isAuthReady = true;
                     appState.currentPage = 'login';
                     updateUI();
                 }
             } catch (e) {
                 // Başlatma sırasında kritik hata oluşursa yükleme ekranını kapat
-                console.error("Firebase başlatılırken veya kimlik doğrulanırken KRİTİK hata:", e);
+                console.error("Firebase başlatılırken KRİTİK hata:", e);
                 appState.isAuthReady = true; 
                 appState.currentPage = 'login';
                 updateUI();
