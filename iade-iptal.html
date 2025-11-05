@@ -50,6 +50,9 @@
             background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); border-radius: 0.5rem; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); border: 1px solid rgba(108, 92, 231, 0.3); z-index: 30;
         }
+        .footer-style {
+            background-color: #110915;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -59,6 +62,7 @@
                 <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ S2
             </a>
 
+            <!-- Navigasyon Tuşları -->
             <div class="hidden md:flex space-x-6">
                 <a href="panel.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Panel</a>
                 <a href="yardim.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
@@ -67,22 +71,27 @@
                 <a href="kullanicipaneli.html" class="text-white hover:text-purple-400 transition duration-200 font-medium">Kullanıcı Paneli</a>
             </div>
 
+            <!-- Giriş/Çıkış ve Profil Kartı Bölümü -->
             <div class="flex space-x-3 items-center">
+                <!-- Giriş Yapılmamışsa Gösterilecek Butonlar -->
                 <div id="loggedOutNav" class="flex space-x-3 items-center">
-                    <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple hover:bg-purple transition duration-200">Giriş Yap</a>
+                    <a href="girisyap.html" class="px-5 py-2 rounded-lg font-semibold text-white border border-purple-500 hover:bg-purple-500/20 transition duration-200">Giriş Yap</a>
                     <a href="kaydol.html" class="btn-purple px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a> 
                 </div>
 
+                <!-- Giriş Yapılmışsa Gösterilecek Profil Kartı -->
                 <div id="loggedInNav" class="relative hidden"> 
                     <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
                         <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
                         <div class="hidden sm:flex flex-col items-end">
                             <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
-                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5">Yükleniyor...</span>
+                            <!-- Hesap Türü (Account Role) -->
+                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5 text-purple-200 bg-purple-700/50">Yükleniyor...</span>
                         </div>
                         <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
                     </button>
                     
+                    <!-- Profil Dropdown Menüsü -->
                     <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
                         <a href="kullanicipaneli.html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
                             <i class="fas fa-chart-line w-5 mr-2"></i> Kontrol Paneli
@@ -96,6 +105,7 @@
         </nav>
     </header>
 
+    <!-- Ana İçerik: Gelişmiş İade ve İptal Politikası -->
     <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-16 flex justify-center">
         <div class="content-card max-w-4xl w-full p-8 md:p-12">
             <div class="text-center mb-8">
@@ -111,27 +121,27 @@
                 </p>
                 <ul class="list-disc list-inside space-y-3 pl-4 text-gray-300">
                     <li class="font-semibold text-white">1.1. Yeni Abonelikler için 14 Gün İade Garantisi</li>
-                    <p class="pl-6 text-gray-400">İlk abonelik başlangıcınızdan itibaren 14 gün içinde memnun kalmazsanız, herhangi bir sebep göstermeksizin tam iade talep edebilirsiniz. Bu garanti, **yalnızca ilk satın alım** için geçerlidir.</p>
+                    <p class="pl-6 text-gray-400">İlk abonelik başlangıcınızdan itibaren **14 gün** içinde memnun kalmazsanız, herhangi bir sebep göstermeksizin tam iade talep edebilirsiniz. Bu garanti, **yalnızca ilk satın alım** için geçerlidir ve hizmeti 14 günden fazla kullanmamış olmanız gerekir.</p>
                     
                     <li class="font-semibold text-white">1.2. Kısmi İade (Yıllık Planlar)</li>
-                    <p class="pl-6 text-gray-400">14 günlük iade garantisi süresinin ardından, yıllık plan aboneliğini iptal etmeniz durumunda, kullanılmayan ayların ücreti iade edilmez. Hizmet, ödeme yaptığınız dönemin sonuna kadar aktif kalacaktır.</p>
+                    <p class="pl-6 text-gray-400">14 günlük iade garantisi süresinin ardından, yıllık plan aboneliğini iptal etmeniz durumunda, kullanılmayan ayların ücreti **iade edilmez**. Hizmet, ödeme yaptığınız dönemin sonuna kadar aktif kalacaktır.</p>
 
                     <li class="font-semibold text-white">1.3. İade Geçersizliği</li>
-                    <p class="pl-6 text-gray-400">Hizmet şartlarının veya kullanım politikasının ihlal edilmesi durumunda (örneğin yasa dışı içerik, spam vb.) iade hakkı geçersiz sayılır.</p>
+                    <p class="pl-6 text-gray-400">Hizmet şartlarının veya kullanım politikasının **ihlal edilmesi** durumunda (örneğin yasa dışı içerik, spam vb.) iade hakkı geçersiz sayılır. Ayrıca, iade talebinizden önce hizmetten büyük ölçüde faydalanıldığı tespit edilirse (örneğin 1000'den fazla link tıklaması), iade reddedilebilir.</p>
                 </ul>
             </section>
             
             <section class="mb-10">
                 <h2 class="text-3xl font-bold text-purple-400 mb-4 border-b border-gray-700 pb-2">2. Abonelik İptal Süreci</h2>
                 <p class="text-gray-300 mb-4">
-                    Aboneliğinizi dilediğiniz zaman, herhangi bir ek ücret ödemeden iptal edebilirsiniz.
+                    Aboneliğinizi dilediğiniz zaman, herhangi bir ek ücret ödemeden kolayca iptal edebilirsiniz.
                 </p>
                 <ul class="list-disc list-inside space-y-3 pl-4 text-gray-300">
                     <li class="font-semibold text-white">2.1. İptal Yöntemi</li>
-                    <p class="pl-6 text-gray-400">Abonelik iptali, Kullanıcı Paneli'ndeki "Abonelik ve Ödemeler" sekmesi üzerinden tek tıkla gerçekleştirilebilir.</p>
+                    <p class="pl-6 text-gray-400">Abonelik iptali, **Kullanıcı Paneli**'ndeki "Abonelik ve Ödemeler" sekmesi üzerinden tek tıkla gerçekleştirilebilir. Herhangi bir destek talebi oluşturmanıza gerek yoktur.</p>
                     
-                    <li class="font-semibold text-white">2.2. Hizmetin Devamı</li>
-                    <p class="pl-6 text-gray-400">İptal işlemi sonrasında hesabınız Premium/Kurumsal özelliklerini, ödeme yaptığınız dönemin sonuna kadar kullanmaya devam edecektir. Sonrasında otomatik olarak Ücretsiz (Temel) plana düşürülür.</p>
+                    <li class="font-semibold text-white">2.2. Hizmetin Devamı ve Yenileme</li>
+                    <p class="pl-6 text-gray-400">İptal işlemi sonrasında hesabınız Premium/Kurumsal özelliklerini, ödeme yaptığınız dönemin sonuna kadar kullanmaya devam edecektir. Bu sürenin sonunda otomatik olarak **Ücretsiz (Temel) plana** düşürülür ve bir daha otomatik ödeme çekimi yapılmaz.</p>
 
                     <li class="font-semibold text-white">2.3. Ücretsiz Plan</li>
                     <p class="pl-6 text-gray-400">Ücretsiz (Temel) planı dilediğiniz süre boyunca kullanmaya devam edebilirsiniz; bu planın iptali gerekmez.</p>
@@ -148,6 +158,7 @@
         </div>
     </main>
 
+    <!-- Footer Bölümü -->
     <footer class="footer-style text-gray-300 p-8 mt-auto">
     <div class="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
         
@@ -188,22 +199,68 @@
     </div>
 </footer>
 
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
-    <script type="module" src="./firebase-auth-service.js"></script>
-
+    <!-- Gerekli Firebase Modülleri -->
     <script type="module">
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { app } from "./firebase-auth-service.js"; 
 
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // --- KRİTİK BAŞLATMA VE AUTH MANTIĞI (Tek Dosya Kuralı) ---
+        let db;
+        let auth;
+        let userId = null;
+
+        /**
+         * Firebase uygulaması ve kimlik doğrulama sürecini başlatır.
+         * Harici dosya bağımlılığı kaldırılmıştır.
+         */
+        async function initializeFirebase() {
+            try {
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+                if (!firebaseConfig) {
+                    console.error("Firebase yapılandırması (firebaseConfig) bulunamadı.");
+                    return;
+                }
+
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                // Auth durumu değişimini dinlemeye başla
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                    } else {
+                         // Anonim kullanıcı veya oturum açmamış kullanıcı için rastgele ID
+                         userId = crypto.randomUUID(); 
+                    }
+                    updateHeaderUI(user);
+                });
+
+            } catch (error) {
+                console.error("Firebase başlatma veya kimlik doğrulama hatası:", error);
+            }
+        }
+        
+        // UI elementleri
         const loggedOutNav = document.getElementById('loggedOutNav');
         const loggedInNav = document.getElementById('loggedInNav');
 
-        // --- Auth ve Navbar Mantığı ---
+        // Kullanıcı adının baş harflerini alır
         function getInitials(name) {
             if (!name) return '??';
             const parts = name.split(' ');
@@ -213,9 +270,14 @@
             return name[0].toUpperCase();
         }
 
+        /**
+         * Firebase kullanıcısının oturum durumuna göre header'ı günceller.
+         * @param {import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js").User | null} user 
+         */
         async function updateHeaderUI(user) {
             if (loggedOutNav && loggedInNav) {
-                if (user && !user.isAnonymous) {
+                // Anonim olmayan bir kullanıcı varsa (yani kayıtlı/giriş yapmış)
+                if (user && !user.isAnonymous && db) { // db'nin tanımlı olduğundan emin ol
                     loggedOutNav.classList.add('hidden');
                     loggedInNav.classList.remove('hidden');
 
@@ -223,23 +285,45 @@
                     const navUserRole = document.getElementById('nav_user_role');
                     const navProfileInitials = document.getElementById('nav_profile_initials');
                     
-                    let displayName = user.displayName || user.email.split('@')[0];
+                    let displayName = user.displayName || user.email?.split('@')[0] || "Kullanıcı";
                     let accountType = "STANDART";
                     
                     try {
-                        const docSnap = await getDoc(doc(db, "users", user.uid));
+                        // Kullanıcı rolünü Firestore'dan çekme
+                        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                        const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/user_data/profile`);
+                        const docSnap = await getDoc(userDocRef);
+
                         if (docSnap.exists()) {
-                            accountType = docSnap.data().accountType || "STANDART";
+                            const userData = docSnap.data();
+                            accountType = userData.accountType || "STANDART";
+                            displayName = userData.displayName || displayName;
                         }
+
+                        // Rol etiketinin stilini güncelle
+                        let roleClass = "text-purple-200 bg-purple-700/50";
+                        if (accountType.toUpperCase() === 'PREMIUM') {
+                            roleClass = "text-yellow-200 bg-yellow-600/50";
+                        } else if (accountType.toUpperCase() === 'KURUMSAL') {
+                            roleClass = "text-green-200 bg-green-700/50";
+                        } else if (accountType.toUpperCase() === 'YÖNETİCİ') {
+                            roleClass = "text-red-200 bg-red-700/50";
+                        }
+                        if (navUserRole) {
+                            navUserRole.className = `text-xs font-medium rounded-full px-2 py-0.5 mt-0.5 ${roleClass}`;
+                        }
+
+
                     } catch (e) {
                         console.error("Firestore veri çekme hatası:", e);
                     }
 
                     if (navDisplayName) navDisplayName.textContent = displayName;
-                    if (navUserRole) navUserRole.textContent = accountType;
+                    if (navUserRole) navUserRole.textContent = accountType.toUpperCase();
                     if (navProfileInitials) navProfileInitials.textContent = getInitials(displayName);
 
                 } else {
+                    // Oturum yok veya anonim kullanıcı
                     loggedOutNav.classList.remove('hidden');
                     loggedInNav.classList.add('hidden');
                 }
@@ -249,18 +333,16 @@
         async function handleLogout() {
             try {
                 await signOut(auth);
+                // Çıkış yaptıktan sonra giriş sayfasına yönlendir
                 window.location.href = 'girisyap.html'; 
             } catch (error) {
                 console.error("Çıkış hatası:", error);
             }
         }
 
-        onAuthStateChanged(auth, (user) => {
-            updateHeaderUI(user);
-        });
-
         document.addEventListener('DOMContentLoaded', () => {
-            
+            initializeFirebase(); // Firebase'i başlat
+
             // Logout butonuna olayı bağlama
             document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
 
@@ -271,6 +353,7 @@
                 dropdown.classList.toggle('hidden');
             });
 
+            // Dışarı tıklandığında dropdown'ı kapat
             document.addEventListener('click', (event) => {
                 const menu = document.getElementById('loggedInNav');
                 const isClickInside = menu?.contains(event.target);
@@ -279,8 +362,6 @@
                 }
             });
         });
-
-        window.onload = window.startClient;
     </script>
 </body>
 </html>
