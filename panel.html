@@ -84,47 +84,47 @@
 </head>
 <body class="min-h-screen flex flex-col">
     <header class="header-bg sticky top-0 z-20">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <a href="panel" class="text-3xl font-extrabold text-white flex items-center tracking-wider">
-                <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ <span class="text-gray-400 font-light">S2</span>
-            </a>
+    <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <a href="panel.html" class="text-3xl font-extrabold text-white flex items-center tracking-wider">
+            <i class="fas fa-meteor text-purple-500 mr-2"></i> BAKİ <span class="text-gray-400 font-light">S2</span>
+        </a>
 
-            <div class="hidden md:flex space-x-8">
-    <a href="panel" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Ana Panel</a>
-    <a href="fiyatlandirma" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
-    <a href="kullanicipaneli" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Kullanıcı Paneli</a>          
-    <a href="yardim" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
-</div>
+        <div class="hidden md:flex space-x-8">
+            <a href="panel.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Ana Panel</a>
+            <a href="fiyatlandirma.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
+            <a href="kullanicipaneli.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Kullanıcı Paneli</a>
+            <a href="yardim.html" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
+        </div>
 
-            <div class="flex space-x-3 items-center">
+        <div class="flex space-x-3 items-center">
+            
+            <div id="loggedOutNav" class="flex space-x-3 items-center">
+                <a href="girisyap.html" class="nav-link px-5 py-2 rounded-lg font-semibold text-white border border-purple-500 hover:bg-purple-600/30 transition duration-200">Giriş Yap</a>
+                <a href="kaydol.html" class="main-cta-button px-5 py-2 rounded-lg font-semibold text-white">Kaydol</a> 
+            </div>
 
-                <div id="loggedOutNav" class="flex space-x-4 items-center">
-                    <a href="girisyap" class="px-6 py-2 rounded-lg font-semibold text-white border border-purple-500 hover:bg-purple-600 transition duration-200">Giriş Yap</a>
-                    <a href="kaydol" class="btn-purple px-6 py-2 rounded-lg font-semibold text-white">Kaydol</a> 
-                </div>
-
-                <div id="loggedInNav" class="relative hidden"> 
-                    <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-800 transition duration-200 focus:outline-none">
-                        <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
-                        <div class="hidden sm:flex flex-col items-end">
-                            <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
-                            <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5" style="background-color: rgba(108, 92, 231, 0.3);">Yükleniyor...</span>
-                        </div>
-                        <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
-                    </button>
-                     
-                    <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
-                        <a href="kullanicipaneli" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
-                            <i class="fas fa-chart-line w-5 mr-2 text-purple-400"></i> Kontrol Paneli
-                        </a>
-                        <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
-                            <i class="fas fa-sign-out-alt w-5 mr-2"></i> Çıkış Yap
-                        </button>
+            <div id="loggedInNav" class="relative hidden"> 
+                <button id="profileMenuButton" class="flex items-center space-x-3 p-2 rounded-full hover:bg-gray-700 transition duration-200 focus:outline-none">
+                    <span id="nav_profile_initials" class="profile-avatar-nav flex-shrink-0">...</span> 
+                    <div class="hidden sm:flex flex-col items-end">
+                        <span id="nav_display_name" class="text-sm font-semibold text-white">Yükleniyor...</span>
+                        <span id="nav_user_role" class="text-xs font-medium rounded-full px-2 py-0.5 mt-0.5" style="background-color: rgba(108, 92, 231, 0.3);">Yükleniyor...</span>
                     </div>
+                    <i class="fas fa-chevron-down text-gray-400 text-xs hidden sm:block"></i>
+                </button>
+                
+                <div id="profileDropdown" class="card-dropdown absolute right-0 mt-3 w-48 p-2 hidden">
+                    <a href="kullanicipaneli.html" class="flex items-center p-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition duration-200">
+                        <i class="fas fa-chart-line w-5 mr-2 text-purple-400"></i> Kontrol Paneli
+                    </a>
+                    <button id="logoutButtonNav" class="w-full text-left flex items-center p-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 mt-2">
+                        <i class="fas fa-sign-out-alt w-5 mr-2"></i> Çıkış Yap
+                    </button>
                 </div>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
 
     <main class="flex-grow container mx-auto px-4 py-20">
         
