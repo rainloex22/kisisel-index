@@ -75,11 +75,11 @@
             </a>
 
             <div class="hidden md:flex space-x-8">
-    <a href="panel" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Ana Panel</a>
-    <a href="fiyatlandirma" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
-    <a href="kullanicipaneli" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Kullanıcı Paneli</a>            
-    <a href="yardim" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
-</div>
+                <a href="panel" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Ana Panel</a>
+                <a href="fiyatlandirma" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Fiyatlandırma</a>
+                <a href="kullanicipaneli" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Kullanıcı Paneli</a>             
+                <a href="yardim" class="nav-link text-white hover:text-purple-400 transition duration-200 font-medium">Yardım</a>
+            </div>
 
             <div id="authButtonsContainer" class="flex space-x-3 items-center">
                 
@@ -108,7 +108,7 @@
                     </div>
                 </div>
             </div>
-            </nav>
+        </nav>
     </header>
     <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-10 flex">
         
@@ -163,9 +163,12 @@
                         <i class="fas fa-plus mr-2"></i> Yeni Bağlantı
                     </button>
                 </div>
-                <div class="dashboard-card p-6 rounded-xl">
-                    <p class="text-gray-500">Bağlantılarınız bu alanda listelenecektir.</p>
+                <div id="linksListContainer" class="space-y-4">
+                    <div id="loadingLinks" class="dashboard-card p-6 rounded-xl text-center text-gray-400">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Bağlantılar yükleniyor...
                     </div>
+                    <!-- Bağlantılar buraya JavaScript ile eklenecek -->
+                </div>
             </div>
 
             <div id="profileContent" class="content-tab hidden">
@@ -214,20 +217,25 @@
     </main>
     
     <div id="linkModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
-        <div class="dashboard-card p-8 rounded-xl w-full max-w-md">
+        <div class="dashboard-card p-8 rounded-xl w-full max-w-md transform transition-transform duration-300 scale-95">
             <h2 class="text-2xl font-bold mb-4">Yeni Bağlantı Oluştur</h2>
             <form id="linkForm" class="space-y-4">
                 <div>
-                    <label for="link_name" class="block text-sm font-medium text-gray-300 mb-1">Bağlantı Adı</label>
-                    <input type="text" id="link_name" name="link_name" required class="form-input w-full p-3 rounded-lg">
+                    <label for="link_name" class="block text-sm font-medium text-gray-300 mb-1">Bağlantı Adı (Opsiyonel)</label>
+                    <input type="text" id="link_name" name="link_name" class="form-input w-full p-3 rounded-lg" placeholder="Örn: Kişisel Web Sitem">
                 </div>
                 <div>
                     <label for="link_url" class="block text-sm font-medium text-gray-300 mb-1">Hedef URL</label>
-                    <input type="url" id="link_url" name="link_url" required class="form-input w-full p-3 rounded-lg">
+                    <input type="url" id="link_url" name="link_url" required class="form-input w-full p-3 rounded-lg" placeholder="https://ornek.com/uzun-adres" autocomplete="off">
                 </div>
+                <div>
+                    <label for="short_code" class="block text-sm font-medium text-gray-300 mb-1">Özel Kod (Opsiyonel)</label>
+                    <input type="text" id="short_code" name="short_code" class="form-input w-full p-3 rounded-lg" placeholder="Kısa kodunuz (örn: sitem)">
+                </div>
+                <p id="linkStatus" class="text-sm text-center pt-2 text-yellow-400"></p>
                 <div class="flex justify-end space-x-3 mt-4">
                     <button type="button" onclick="closeLinkModal()" class="py-2 px-4 rounded-lg text-gray-400 hover:bg-gray-700">İptal</button>
-                    <button type="submit" class="btn-primary py-2 px-4 rounded-lg font-bold text-white">Kaydet</button>
+                    <button type="submit" id="linkSubmitBtn" class="btn-primary py-2 px-4 rounded-lg font-bold text-white">Kaydet</button>
                 </div>
             </form>
         </div>
@@ -237,18 +245,14 @@
         © 2025 BAKİ S2 Yönetim Hizmetleri.
     </footer>
 
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
-    <script type="module" src="./firebase-auth-service.js"></script>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, addDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- KULLANICININ SAĞLADIĞI YAPILANDIRMA ---
-        const firebaseConfig = {
+        // Firebase ve Canvas Ortam Değişkenleri (Önce Canvas'ı, sonra kullanıcı yapılandırmasını kullan)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyBfc0F8o5aVmwTw-gyLRZVI2OMUljFi6Ao",
             authDomain: "baki-s2-yonetim.firebaseapp.com",
             projectId: "baki-s2-yonetim",
@@ -257,17 +261,18 @@
             appId: "1:692508919425:web:fac963c81c11b7be70af80",
             measurementId: "G-Q52XG8GLB2"
         };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app); // Firestore başlatıldı
+        const db = getFirestore(app);
 
         // --- Yardımcı Fonksiyonlar ---
         function getInitials(name) {
             if (!name) return '..';
-            const parts = name.split(' ');
+            const parts = name.trim().split(/\s+/);
             if (parts.length > 1) {
-                return (parts[0][0] + parts[1][0]).toUpperCase();
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
             }
             return name[0].toUpperCase();
         }
@@ -281,8 +286,14 @@
             }
         }
 
+        // Kullanıcının özel link koleksiyonunun yolu
+        const getLinksCollectionRef = (userId) => {
+             // Özel koleksiyon yolu: /artifacts/{appId}/users/{userId}/links
+            return collection(db, `artifacts/${appId}/users/${userId}/links`);
+        };
+
         // --- Navbar Güncelleme ---
-        function updateHeaderUI(user) {
+        async function updateHeaderUI(user) {
             const loggedInNav = document.getElementById('loggedInNav');
             const loggedOutNav = document.getElementById('loggedOutNav');
             
@@ -293,49 +304,39 @@
                 const initialsEl = document.getElementById('nav_profile_initials');
                 const displayNameEl = document.getElementById('nav_display_name');
                 const roleEl = document.getElementById('nav_user_role');
+                const welcomeUser = document.getElementById('welcome_user_name');
+                const profileEmailEl = document.getElementById('profile_email');
+                const displayNameInputEl = document.getElementById('display_name');
+                const accountTypeEl = document.getElementById('account_type');
                 
-                // Varsayılan değerler
                 let displayName = user.email ? user.email.split('@')[0] : 'Kullanıcı';
-                let userRole = 'Üye'; // Varsayılan: Üye
+                let userRole = 'Üye'; 
                 
-                // Kullanıcı verisini Firestore'dan çek (Arayüzde gösterilecek isim ve rol için)
-                const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then(docSnap => {
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(userDocRef);
+
                     if (docSnap.exists()) {
                         const userData = docSnap.data();
                         displayName = userData.displayName || displayName;
                         userRole = userData.role || userRole;
-                        if (initialsEl) initialsEl.textContent = getInitials(displayName);
-                        if (displayNameEl) displayNameEl.textContent = displayName;
-                        if (roleEl) {
-                            roleEl.textContent = userRole;
-                            roleEl.className = getRoleBadge(userRole);
-                        }
-                        // Paneldeki karşılama mesajını güncelle
-                        const welcomeUser = document.getElementById('welcome_user_name');
-                        if (welcomeUser) welcomeUser.textContent = displayName;
-
-                        const profileEmailEl = document.getElementById('profile_email');
-                        const displayNameInputEl = document.getElementById('display_name');
-                        if (profileEmailEl) profileEmailEl.value = user.email;
-                        if (displayNameInputEl) displayNameInputEl.value = userData.displayName || '';
-
-                    } else {
-                         // Firestore'da kaydı yoksa varsayılan bilgileri kullan
-                         if (initialsEl) initialsEl.textContent = getInitials(displayName);
-                         if (displayNameEl) displayNameEl.textContent = displayName;
-                         if (roleEl) {
-                            roleEl.textContent = userRole;
-                            roleEl.className = getRoleBadge(userRole);
-                         }
-                         const profileEmailEl = document.getElementById('profile_email');
-                         if (profileEmailEl) profileEmailEl.value = user.email;
                     }
-                }).catch(e => {
-                    console.error("Kullanıcı verisi çekilemedi:", e);
-                });
+                } catch(e) {
+                     console.error("Kullanıcı verisi çekilemedi:", e);
+                }
 
-                
+                // UI Güncelleme
+                if (initialsEl) initialsEl.textContent = getInitials(displayName);
+                if (displayNameEl) displayNameEl.textContent = displayName;
+                if (roleEl) {
+                    roleEl.textContent = userRole;
+                    roleEl.className = getRoleBadge(userRole);
+                }
+                if (welcomeUser) welcomeUser.textContent = displayName;
+                if (profileEmailEl) profileEmailEl.value = user.email || 'N/A';
+                if (displayNameInputEl) displayNameInputEl.value = displayName;
+                if (accountTypeEl) accountTypeEl.textContent = userRole;
+
             } else {
                 // Logged Out State
                 loggedInNav.classList.add('hidden');
@@ -351,75 +352,162 @@
             });
         }
 
-        // --- Güvenlik Kontrolü ve Dinleyiciler ---
+        // Link Listesi render fonksiyonu
+        function renderLink(link, linkId) {
+            const urlDomain = new URL(link.targetUrl).hostname;
+            const shortUrl = `${window.location.origin}/${link.shortCode}`;
+            
+            return `
+                <div class="dashboard-card p-4 rounded-xl flex items-center justify-between shadow-xl transition hover:shadow-purple-500/30">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-lg font-semibold truncate text-accent-purple">${link.name || urlDomain}</p>
+                        <a href="${shortUrl}" target="_blank" class="text-sm text-gray-400 hover:text-purple-400 truncate block">${shortUrl}</a>
+                        <p class="text-xs text-gray-500 truncate mt-1">Hedef: ${link.targetUrl}</p>
+                    </div>
+                    <div class="flex items-center space-x-4 ml-4">
+                        <div class="text-center">
+                            <i class="fas fa-eye text-purple-400"></i>
+                            <p class="text-lg font-bold">${link.views || 0}</p>
+                            <p class="text-xs text-gray-500">Görüntüleme</p>
+                        </div>
+                        <button onclick="copyToClipboard('${shortUrl}')" class="text-gray-400 hover:text-green-400 p-2 rounded-full transition duration-200" title="Kopyala">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <!-- Düzenleme ve Silme butonları burada eklenebilir -->
+                    </div>
+                </div>
+            `;
+        }
+
+        function copyToClipboard(text) {
+             const tempInput = document.createElement('input');
+             tempInput.value = text;
+             document.body.appendChild(tempInput);
+             tempInput.select();
+             document.execCommand('copy');
+             document.body.removeChild(tempInput);
+             // Basit bir bildirim mekanizması kullanın
+             const statusEl = document.getElementById('profileStatus');
+             if(statusEl) {
+                 statusEl.textContent = 'Bağlantı panoya kopyalandı!';
+                 statusEl.classList.remove('text-red-400');
+                 statusEl.classList.add('text-green-400');
+                 setTimeout(() => statusEl.textContent = '', 3000);
+             }
+        }
+        window.copyToClipboard = copyToClipboard; // HTML'den erişim için
+
+        // --- Link Yönetimi İşlemleri ---
+        const loadUserLinks = (userId) => {
+            const linksContainer = document.getElementById('linksListContainer');
+            const linksCollectionRef = getLinksCollectionRef(userId);
+
+            const q = query(linksCollectionRef);
+
+            return onSnapshot(q, (querySnapshot) => {
+                let htmlContent = '';
+                let totalViews = 0;
+                let activeLinksCount = 0;
+                
+                if (querySnapshot.empty) {
+                    htmlContent = `
+                        <div class="dashboard-card p-6 rounded-xl text-center text-gray-400 border-dashed border-2 border-gray-700">
+                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                            <p class="text-lg font-semibold">Henüz bir bağlantınız yok.</p>
+                            <p class="text-sm mt-1">Başlamak için "Yeni Bağlantı Oluştur" butonuna tıklayın.</p>
+                        </div>
+                    `;
+                } else {
+                    querySnapshot.forEach(doc => {
+                        const linkData = doc.data();
+                        htmlContent += renderLink(linkData, doc.id);
+                        totalViews += (linkData.views || 0);
+                        activeLinksCount++;
+                    });
+                }
+                
+                linksContainer.innerHTML = htmlContent;
+
+                // Dashboard metriklerini güncelle
+                document.getElementById('total_views').textContent = totalViews.toLocaleString('tr-TR');
+                document.getElementById('active_links_count').textContent = activeLinksCount.toLocaleString('tr-TR');
+                
+            }, (error) => {
+                 console.error("Linkleri dinlerken hata oluştu: ", error);
+                 linksContainer.innerHTML = `<div class="p-4 bg-red-800/30 rounded-lg text-red-300">Bağlantılar yüklenemedi. Yetkilendirme hatası olabilir.</div>`;
+            });
+        };
+
+        const handleLinkSubmission = async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const linkForm = e.target;
+            const linkName = linkForm.link_name.value.trim();
+            const linkUrl = linkForm.link_url.value.trim();
+            const shortCode = linkForm.short_code.value.trim() || Math.random().toString(36).substring(2, 8); // Kısa kod yoksa rastgele oluştur
+            const submitBtn = document.getElementById('linkSubmitBtn');
+            const statusEl = document.getElementById('linkStatus');
+
+            submitBtn.disabled = true;
+            statusEl.textContent = 'Bağlantı oluşturuluyor...';
+            statusEl.classList.remove('text-red-400', 'text-green-400');
+            statusEl.classList.add('text-yellow-400');
+            
+            try {
+                // Linkler, kullanıcının özel koleksiyonuna eklenir.
+                const linksCollectionRef = getLinksCollectionRef(user.uid);
+                
+                // Firestore'da shortCode'a göre otomatik ID kullanmayacağız, kısa kodu doküman ID'si yapabiliriz.
+                // Ancak bu, link çakışmalarını kontrol etmeyi zorlaştırır. Standart addDoc kullanalım ve shortCode'u alan olarak saklayalım.
+                // Ancak çakışma kontrolü için shortCode'un global bir 'public_links' koleksiyonunda benzersiz olması gerekir.
+                // Basitlik için sadece kullanıcının koleksiyonuna ekleyip kısa kodu rastgele bırakalım veya alan olarak alalım (Gelişmiş kontrol için 'public' koleksiyonuna da yazmak gerekir).
+                
+                // Doküman ID'sini kullanmak yerine, kolaylık için shortCode'u doküman ID'si yapıyoruz.
+                // NOT: Gerçek bir kısaltıcıda, bu kodun *global olarak* benzersiz olması gerekir.
+                const newLinkRef = doc(linksCollectionRef, shortCode);
+
+                await setDoc(newLinkRef, {
+                    shortCode: shortCode,
+                    targetUrl: linkUrl,
+                    name: linkName || new URL(linkUrl).hostname,
+                    userId: user.uid,
+                    views: 0,
+                    createdAt: serverTimestamp(),
+                });
+
+                statusEl.textContent = '✅ Bağlantı başarıyla oluşturuldu!';
+                statusEl.classList.remove('text-yellow-400');
+                statusEl.classList.add('text-green-400');
+                linkForm.reset();
+                setTimeout(() => {
+                    closeLinkModal();
+                    statusEl.textContent = '';
+                }, 1500);
+
+            } catch (error) {
+                console.error("Link oluşturulurken hata:", error);
+                statusEl.textContent = `Hata: Link oluşturulamadı. (Hata Kodu: ${error.code || 'Bilinmiyor'})`;
+                statusEl.classList.remove('text-yellow-400', 'text-green-400');
+                statusEl.classList.add('text-red-400');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        };
+
+        // --- Navigasyon ve Olay Dinleyicileri ---
         const navItems = document.querySelectorAll('.sidebar-nav-item');
         const contentTabs = document.querySelectorAll('.content-tab');
         const quickCreateLinkBtn = document.getElementById('quickCreateLinkBtn');
         const openNewLinkModalBtn = document.getElementById('openNewLinkModalBtn');
+        const profileForm = document.getElementById('profileForm');
         const profileStatusEl = document.getElementById('profileStatus');
         const linkModal = document.getElementById('linkModal');
+        const linkForm = document.getElementById('linkForm');
 
+        let unsubscribeLinks = null; // onSnapshot iptal fonksiyonu
 
-        onAuthStateChanged(auth, (user) => {
-            updateHeaderUI(user);
-
-            // KRİTİK: Kullanıcı Paneli Koruması
-            if (!user || user.isAnonymous) {
-                // Kullanıcı Giriş yapmamışsa veya anonimse yönlendir
-                window.location.href = 'girisyap.html'; 
-            }
-        });
-
-        // Dropdown ve Logout olayları
-        document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
-        document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('profileDropdown')?.classList.toggle('hidden');
-        });
-        document.addEventListener('click', (event) => {
-            const menu = document.getElementById('loggedInNav');
-            const isClickInside = menu?.contains(event.target);
-            if (!isClickInside) {
-                document.getElementById('profileDropdown')?.classList.add('hidden');
-            }
-        });
-
-        // --- Form İşlemleri ---
-        const profileForm = document.getElementById('profileForm');
-        profileForm?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const displayName = document.getElementById('display_name').value.trim();
-            const avatarUrl = document.getElementById('avatar_url').value.trim();
-
-            profileStatusEl.textContent = 'Kaydediliyor...';
-            
-            try {
-                const userDocRef = doc(db, "users", user.uid);
-                await setDoc(userDocRef, {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: displayName,
-                    avatarUrl: avatarUrl,
-                    role: 'Üye', // Rolü sadece ilk girişte Üye olarak ayarla
-                    updatedAt: new Date()
-                }, { merge: true }); // Merge ile sadece gönderilen alanlar güncellenir
-
-                profileStatusEl.textContent = '✅ Profil başarıyla güncellendi!';
-                updateHeaderUI(user); // Navbar'ı hemen güncelle
-                setTimeout(() => profileStatusEl.textContent = '', 3000);
-
-            } catch (error) {
-                console.error("Profil kaydedilirken hata:", error);
-                profileStatusEl.textContent = `Hata: ${error.message}`;
-            }
-        });
-
-
-        // --- Navigasyon ve Olay Dinleyicileri ---
-        
         const switchTab = (targetContentId) => {
             contentTabs.forEach(tab => tab.classList.add('hidden'));
             document.getElementById(`${targetContentId}Content`).classList.remove('hidden');
@@ -433,27 +521,130 @@
             });
         };
         
+        // --- AUTH Mantığı ---
+        async function setupAuthAndData() {
+            // İlk olarak Canvas token ile oturum açmayı dene
+            if (initialAuthToken) {
+                try {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Canvas token ile oturum açıldı.");
+                } catch (error) {
+                    console.error("Canvas token ile oturum açma başarısız, anonim olarak deneniyor:", error);
+                    await signInAnonymously(auth); // Hata durumunda anonim oturum
+                }
+            } else {
+                 await signInAnonymously(auth); // Token yoksa anonim oturum
+            }
+        }
+
+        setupAuthAndData().then(() => {
+             onAuthStateChanged(auth, (user) => {
+                updateHeaderUI(user);
+
+                // KRİTİK: Kullanıcı Paneli Koruması
+                if (!user || user.isAnonymous) {
+                    // Kullanıcı Giriş yapmamışsa veya anonimse yönlendir
+                    // NOT: signInAnonymously çağrıldığı için bu kısma gelmeyecek,
+                    // ancak gerçek bir uygulamada kullanıcı anonimse yetkili sayfaya giremez.
+                    // Burada sadece email/şifre ile girenleri yetkili kabul ediyoruz.
+                    if (!user.email) {
+                        window.location.href = 'girisyap.html'; 
+                        return;
+                    }
+                }
+
+                // Oturum açan yetkili kullanıcı için link dinlemeyi başlat
+                if (user && user.email) {
+                    // Önceki dinleyiciyi iptal et
+                    if (unsubscribeLinks) {
+                        unsubscribeLinks();
+                    }
+                    unsubscribeLinks = loadUserLinks(user.uid);
+                }
+            });
+        });
+
+        // Event Listeners
+        document.getElementById('logoutButtonNav')?.addEventListener('click', handleLogout);
+        document.getElementById('profileMenuButton')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('profileDropdown')?.classList.toggle('hidden');
+        });
+        document.addEventListener('click', (event) => {
+            const menu = document.getElementById('loggedInNav');
+            const isClickInside = menu?.contains(event.target);
+            if (!isClickInside) {
+                document.getElementById('profileDropdown')?.classList.add('hidden');
+            }
+        });
+
+        // Panel menüleri
         navItems.forEach(item => {
             item.addEventListener('click', () => switchTab(item.getAttribute('data-content')));
         });
-
+        
         // Modal Aç/Kapat
-        window.openLinkModal = function(linkData) {
+        window.openLinkModal = function() {
+            linkForm.reset();
+            document.getElementById('linkStatus').textContent = '';
             linkModal.classList.remove('hidden', 'opacity-0');
             linkModal.classList.add('opacity-100');
+            linkModal.querySelector('.dashboard-card').classList.remove('scale-95');
         }
         window.closeLinkModal = function() {
             linkModal.classList.remove('opacity-100');
+            linkModal.querySelector('.dashboard-card').classList.add('scale-95');
             linkModal.classList.add('opacity-0');
             setTimeout(() => linkModal.classList.add('hidden'), 300);
         }
 
         quickCreateLinkBtn.addEventListener('click', () => {
-             openLinkModal(null);
-             switchTab('links');
+              openLinkModal();
+              switchTab('links');
         });
-        
-        openNewLinkModalBtn.addEventListener('click', () => openLinkModal(null));
+        openNewLinkModalBtn.addEventListener('click', () => openLinkModal());
+        linkModal.addEventListener('click', (e) => {
+             if (e.target === linkModal) closeLinkModal();
+        });
+
+
+        // Profil Formu İşlemleri
+        profileForm?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const displayName = document.getElementById('display_name').value.trim();
+            const avatarUrl = document.getElementById('avatar_url').value.trim();
+
+            profileStatusEl.textContent = 'Kaydediliyor...';
+            profileStatusEl.classList.remove('text-red-400', 'text-green-400');
+            profileStatusEl.classList.add('text-yellow-400');
+            
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                await setDoc(userDocRef, {
+                    displayName: displayName,
+                    avatarUrl: avatarUrl,
+                    updatedAt: serverTimestamp()
+                }, { merge: true }); 
+
+                profileStatusEl.textContent = '✅ Profil başarıyla güncellendi!';
+                profileStatusEl.classList.remove('text-yellow-400');
+                profileStatusEl.classList.add('text-green-400');
+                updateHeaderUI(user); 
+                setTimeout(() => profileStatusEl.textContent = '', 3000);
+
+            } catch (error) {
+                console.error("Profil kaydedilirken hata:", error);
+                profileStatusEl.textContent = `Hata: ${error.message}`;
+                profileStatusEl.classList.remove('text-yellow-400', 'text-green-400');
+                profileStatusEl.classList.add('text-red-400');
+            }
+        });
+
+        // Link Oluşturma Formu İşlemleri
+        linkForm?.addEventListener('submit', handleLinkSubmission);
 
     </script>
 </body>
