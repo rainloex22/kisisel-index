@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş / Kayıt | bakikara.xyz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .auth-container { background-color: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; }
+        .tabs { display: flex; margin-bottom: 25px; }
+        .tab-button { flex-grow: 1; padding: 15px 0; cursor: pointer; border: none; background: none; font-size: 1.1em; font-weight: 600; border-bottom: 3px solid transparent; color: #aaa; transition: all 0.3s; }
+        .tab-button.active { color: #007bff; border-bottom: 3px solid #007bff; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9em; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1em; }
+        .auth-btn { width: 100%; padding: 15px; border: none; border-radius: 6px; background-color: #28a745; color: white; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: background-color 0.3s; margin-top: 10px; }
+        .auth-btn:hover { background-color: #218838; }
+        #authMessage { margin-top: 15px; padding: 10px; border-radius: 4px; text-align: center; display: none; }
+        .error { background-color: #ffdddd; color: #d8000c; }
+        .success { background-color: #d4edda; color: #155724; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="tabs">
+        <button class="tab-button active" onclick="showTab('login')">Giriş Yap</button>
+        <button class="tab-button" onclick="showTab('register')">Kayıt Ol</button>
+    </div>
+
+    <div id="login" class="tab-content">
+        <div class="form-group">
+            <label for="loginEmail">E-posta</label>
+            <input type="email" id="loginEmail" placeholder="ornek@mail.com">
+        </div>
+        <div class="form-group">
+            <label for="loginPassword">Şifre</label>
+            <input type="password" id="loginPassword" placeholder="En az 6 karakter">
+        </div>
+        <button class="auth-btn" onclick="handleLogin()">Giriş Yap</button>
+    </div>
+
+    <div id="register" class="tab-content hidden">
+        <div class="form-group">
+            <label for="registerEmail">E-posta</label>
+            <input type="email" id="registerEmail" placeholder="ornek@mail.com">
+        </div>
+        <div class="form-group">
+            <label for="registerPassword">Şifre</label>
+            <input type="password" id="registerPassword" placeholder="En az 6 karakter">
+        </div>
+        <button class="auth-btn" onclick="handleRegister()">Kayıt Ol</button>
+    </div>
+
+    <div id="authMessage" class="error"></div>
+</div>
+
+<script type="module">
+    // Firebase yapılandırmasını ve fonksiyonlarını içe aktar
+    import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, doc, setDoc } from './firebase-config.js'; 
+
+    // Tab geçiş işlevi
+    window.showTab = function(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById(tabId).classList.remove('hidden');
+        document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.tab-button[onclick*='${tabId}']`).classList.add('active');
+        document.getElementById('authMessage').style.display = 'none';
+    }
+
+    // Mesaj gösterme işlevi
+    function displayMessage(message, isError) {
+        const msgEl = document.getElementById('authMessage');
+        msgEl.innerText = message;
+        msgEl.classList.remove('error', 'success');
+        msgEl.classList.add(isError ? 'error' : 'success');
+        msgEl.style.display = 'block';
+    }
+
+    // Kayıt İşlemi
+    window.handleRegister = async function() {
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+
+        if (password.length < 6) {
+            return displayMessage("Şifre en az 6 karakter olmalıdır.", true);
+        }
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Kullanıcı verilerini Firestore'a kaydet (İlk Veri)
+            await setDoc(doc(db, "users", user.uid), {
+                email: user.email,
+                createdAt: new Date(),
+                // Diğer başlangıç verileri buraya eklenebilir
+            });
+
+            displayMessage("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...", false);
+            setTimeout(() => {
+                window.location.href = 'dashboard.html'; // Başarılıysa paneli yönlendir
+            }, 1500);
+
+        } catch (error) {
+            displayMessage("Kayıt hatası: " + error.message, true);
+        }
+    }
+
+    // Giriş İşlemi
+    window.handleLogin = async function() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            displayMessage("Giriş başarılı! Yönlendiriliyorsunuz...", false);
+            setTimeout(() => {
+                window.location.href = 'dashboard.html'; // Başarılıysa paneli yönlendir
+            }, 1000);
+        } catch (error) {
+            displayMessage("Giriş hatası: " + error.message, true);
+        }
+    }
+</script>
+</body>
+</html>
