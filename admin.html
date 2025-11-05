@@ -11,14 +11,17 @@
         /* TEMA RENKLERİ */
         :root {
             --primary-color: #5d3f6a;       /* Kapalı Mor Vurgu */
-            --bg-dark: #1e1e2d;             
-            --bg-card: #27293d;             
-            --text-light: #e0e0e0;          
-            --text-secondary: #a9a9b6;      
-            --border-dark: #3b3b51;         
-            --danger-color: #e74c3c;        
-            --success-color: #28a745;       
-            --info-color: #007bff;          
+            --bg-dark: #1e1e2d;             /* Koyu Arka Plan */
+            --bg-card: #27293d;             /* Koyu Kart Arka Planı */
+            --text-light: #e0e0e0;          /* Açık Metin */
+            --text-secondary: #a9a9b6;      /* İkincil Metin */
+            --border-dark: #3b3b51;         /* Koyu Sınır */
+            --danger-color: #e74c3c;        /* Kırmızı (Sil/Çıkış) */
+            --success-color: #28a745;       /* Yeşil (Yayında) */
+            --warning-color: #ffc107;       /* Sarı (Onay Bekliyor) */
+            --info-color: #007bff;          /* Mavi (Dosya Bekleniyor) */
+            --suspend-color: #f39c12;       /* Turuncu (Askıda) */
+            --passive-color: #7f8c8d;       /* Gri (Pasif) */
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
@@ -32,7 +35,7 @@
             min-height: 100vh;
         }
         .container {
-            max-width: 1400px;
+            max-width: 1600px; /* Genişletildi */
             margin: 0 auto;
             padding: 40px 20px;
         }
@@ -42,6 +45,35 @@
             border-bottom: 2px solid var(--border-dark);
             padding-bottom: 10px;
             margin-bottom: 30px;
+        }
+        
+        /* ARAMA VE ÖZET ALANI */
+        .controls-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background-color: var(--bg-card);
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            border-left: 5px solid var(--primary-color);
+        }
+        .summary-card strong {
+            font-size: 1.5em;
+            color: var(--primary-color);
+        }
+        
+        #searchFilter {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid var(--border-dark);
+            border-radius: 4px;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
         }
 
         /* MÜŞTERİ TABLOSU */
@@ -83,10 +115,15 @@
             font-size: 0.8em;
             font-weight: 600;
             text-transform: uppercase;
+            min-width: 100px; /* Okunurluk için minimum genişlik */
+            text-align: center;
         }
         .status-pending { background-color: var(--warning-color); color: #333; }
         .status-active { background-color: var(--success-color); color: white; }
         .status-file { background-color: var(--info-color); color: white; }
+        .status-suspended { background-color: var(--suspend-color); color: white; }
+        .status-passive { background-color: var(--passive-color); color: white; }
+
 
         /* BUTONLAR */
         .action-btn {
@@ -96,11 +133,19 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.85em;
+            font-size: 0.8em;
+            margin-right: 5px;
+            margin-bottom: 5px;
             transition: opacity 0.3s;
         }
         .action-btn:hover {
             opacity: 0.8;
+        }
+        .action-btn.delete-btn {
+            background-color: var(--danger-color);
+        }
+        .action-btn.open-site-btn {
+            background-color: var(--success-color);
         }
         .logout-btn {
             background-color: var(--danger-color);
@@ -129,13 +174,22 @@
     <button class="logout-btn" onclick="handleLogout()">Çıkış Yap</button>
     <h1><i class="fas fa-user-shield"></i> Yönetici Paneli - Müşteriler</h1>
 
+    <div class="controls-area">
+        <div class="summary-card">
+            Toplam Müşteri: <strong id="totalCustomers">0</strong>
+        </div>
+        <div>
+            <input type="text" id="searchFilter" placeholder="E-posta veya kullanıcı adı ile ara..." onkeyup="filterCustomers()">
+        </div>
+    </div>
+    
     <div id="loading">Müşteri verileri yükleniyor...</div>
     <div id="error-message" style="display:none;"></div>
     
     <table class="admin-table" id="customerTable" style="display:none;">
         <thead>
             <tr>
-                <th>E-posta / Kullanıcı Adı</th>
+                <th>E-posta / Site Adı</th>
                 <th>Kayıt Tarihi</th>
                 <th>Site Adresi (Öneri)</th>
                 <th>Durum</th>
@@ -158,72 +212,134 @@
         collection, 
         getDocs, 
         doc, 
-        updateDoc 
+        updateDoc,
+        deleteDoc 
     } from './firebase-config.js'; 
 
-    // 🔴 1. ADIM: YÖNETİCİ E-POSTASINI BURAYA YAZIN!
+    // 🔴 YÖNETİCİ E-POSTASINI BURAYA YAZIN!
     const ADMIN_EMAIL = "mehmeteminacan13@gmail.com"; 
     
     const loading = document.getElementById('loading');
     const table = document.getElementById('customerTable');
     const tableBody = document.getElementById('customerTableBody');
     const errorMessage = document.getElementById('error-message');
+    const totalCustomersSpan = document.getElementById('totalCustomers');
+    let allCustomers = []; // Filtreleme için tüm müşterileri tutan dizi
 
-    // Durum Etiketlerini Oluşturma Yardımcı Fonksiyonu
+    /**
+     * Müşteri Durumları:
+     * ACTIVE: Yayında
+     * PENDING: Admin Onayı Bekliyor (Dosya yüklenmiş olabilir)
+     * FILE_WAITING: Dosya Bekleniyor
+     * SUSPENDED: Askıya Alındı
+     * PASSIVE: Pasif
+     */
     function getStatusBadge(status) {
         let className = 'status-file';
         let text = 'Dosya Bekleniyor';
-        if (status === 'ACTIVE') {
-            className = 'status-active';
-            text = 'YAYINDA';
-        } else if (status === 'PENDING_APPROVAL') {
-            className = 'status-pending';
-            text = 'Onay Bekliyor';
+        
+        switch (status) {
+            case 'ACTIVE':
+                className = 'status-active';
+                text = 'YAYINDA';
+                break;
+            case 'PENDING':
+                className = 'status-pending';
+                text = 'Onay Bekliyor';
+                break;
+            case 'SUSPENDED':
+                className = 'status-suspended';
+                text = 'ASKIYA ALINDI';
+                break;
+            case 'PASSIVE':
+                className = 'status-passive';
+                text = 'PASİF';
+                break;
+            case 'FILE_WAITING':
+            default:
+                className = 'status-file';
+                text = 'Dosya Bekleniyor';
+                break;
         }
-        return `<span class="status-badge ${className}">${text}</span>`;
+        return `<span class="status-badge ${className}" data-status="${status}">${text}</span>`;
     }
 
-    // 2. Müşteri Verilerini Çekme ve Ekrana Basma
+    // Tablonun içini dolduran ana render fonksiyonu
+    function renderTable(customers) {
+        tableBody.innerHTML = '';
+        totalCustomersSpan.innerText = customers.length; // Toplam müşteri sayısını güncelle
+
+        if (customers.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--warning-color);">Filtreye uyan müşteri bulunamadı.</td></tr>`;
+            return;
+        }
+
+        customers.forEach(user => {
+            const userEmail = user.email || 'Bilinmiyor';
+            const username = userEmail.split('@')[0];
+            const siteUrl = `bakikara.xyz/${username}`;
+            const regDate = user.createdAt ? user.createdAt.toDate().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Bilinmiyor';
+            const status = user.serviceStatus || 'FILE_WAITING'; 
+
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>
+                    <strong>${userEmail}</strong><br>
+                    <span style="color:var(--text-secondary);">${user.site_adi || 'Site Adı Yok'}</span>
+                </td>
+                <td>${regDate}</td>
+                <td><a href="http://${siteUrl}" target="_blank" style="color:var(--info-color);">${siteUrl}</a></td>
+                <td>${getStatusBadge(status)}</td>
+                <td>
+                    <button class="action-btn open-site-btn" onclick="openCustomerSite('${siteUrl}')"><i class="fas fa-external-link-alt"></i> Siteyi Aç</button>
+                    <button class="action-btn" onclick="updateCustomerStatus('${user.userId}', 'ACTIVE')"><i class="fas fa-check"></i> Yayına Al</button>
+                    <button class="action-btn" onclick="updateCustomerStatus('${user.userId}', 'PENDING')" style="background-color: var(--warning-color);"><i class="fas fa-clock"></i> Onay Bekle</button>
+                    <button class="action-btn" onclick="updateCustomerStatus('${user.userId}', 'SUSPENDED')" style="background-color: var(--suspend-color);"><i class="fas fa-pause"></i> Askıya Al</button>
+                    <button class="action-btn delete-btn" onclick="deleteCustomer('${user.userId}')"><i class="fas fa-trash-alt"></i> Sil</button>
+                </td>
+            `;
+        });
+    }
+
+    // Arama ve Filtreleme Fonksiyonu
+    window.filterCustomers = function() {
+        const searchText = document.getElementById('searchFilter').value.toLowerCase();
+        
+        const filtered = allCustomers.filter(user => {
+            const userEmail = (user.email || '').toLowerCase();
+            const username = userEmail.split('@')[0].toLowerCase();
+            const status = (user.serviceStatus || 'FILE_WAITING').toLowerCase();
+            
+            // E-posta, kullanıcı adı veya durum ile arama
+            return userEmail.includes(searchText) || username.includes(searchText) || status.includes(searchText);
+        });
+
+        renderTable(filtered);
+    }
+
+    // Müşteri Verilerini Çekme ve Ekrana Basma
     async function fetchCustomers() {
         loading.style.display = 'block';
         table.style.display = 'none';
         errorMessage.style.display = 'none';
-        tableBody.innerHTML = '';
-
+        
         try {
             const usersRef = collection(db, "users");
             const snapshot = await getDocs(usersRef);
             
             if (snapshot.empty) {
                 loading.innerText = 'Henüz kayıtlı müşteri bulunmamaktadır.';
+                totalCustomersSpan.innerText = '0';
                 return;
             }
 
-            snapshot.forEach(doc => {
-                const user = doc.data();
-                const userId = doc.id;
-                const userEmail = user.email || 'Bilinmiyor';
-                const username = userEmail.split('@')[0];
-                const siteUrl = `bakikara.xyz/${username}`;
-                // createdAt alanı, Firebase Timestamp nesnesidir.
-                const regDate = user.createdAt ? user.createdAt.toDate().toLocaleDateString('tr-TR') : 'Bilinmiyor';
-                const status = user.serviceStatus || 'FILE_WAITING'; // Varsayılan durum
+            allCustomers = snapshot.docs.map(doc => ({
+                userId: doc.id,
+                ...doc.data()
+            }));
 
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>
-                        <strong>${userEmail}</strong><br>
-                        <span style="color:var(--text-secondary);">${user.site_adi || '-'}</span>
-                    </td>
-                    <td>${regDate}</td>
-                    <td><a href="#" style="color:var(--info-color);">${siteUrl}</a></td>
-                    <td>${getStatusBadge(status)}</td>
-                    <td>
-                        <button class="action-btn" onclick="updateCustomerStatus('${userId}', 'ACTIVE')">Yayına Al</button>
-                        <button class="action-btn" onclick="updateCustomerStatus('${userId}', 'FILE_WAITING')" style="background-color: var(--warning-color);">Dosya Bekle</button>
-                    </td>
-                `;
-            });
+            // Tabloyu başlangıçta tüm verilerle doldur
+            renderTable(allCustomers);
 
             loading.style.display = 'none';
             table.style.display = 'table';
@@ -236,7 +352,7 @@
         }
     }
 
-    // 3. Müşteri Durumunu Güncelleme (Basit Mesajlaşma/Durum Özelliği)
+    // Müşteri Durumunu Güncelleme
     window.updateCustomerStatus = async function(userId, newStatus) {
         if (!confirm(`Kullanıcı ID: ${userId} durumunu ${newStatus} olarak güncellemek istediğinizden emin misiniz?`)) {
             return;
@@ -255,7 +371,33 @@
         }
     }
 
-    // 4. Yetkilendirme Kontrolü
+    // Müşteriyi Silme
+    window.deleteCustomer = async function(userId) {
+        if (!confirm(`DİKKAT! Kullanıcı ID: ${userId} kalıcı olarak silinecektir. Emin misiniz?`)) {
+            return;
+        }
+
+        try {
+            // Firestore'dan sil
+            await deleteDoc(doc(db, "users", userId));
+            
+            // (İSTEĞE BAĞLI: Authentication'dan da silmek için admin SDK gerekir, bu client-side JS ile mümkün değildir)
+            
+            alert(`Kullanıcı başarıyla silindi.`);
+            fetchCustomers(); // Tabloyu yeniden yükle
+        } catch (error) {
+            console.error("Kullanıcı silinirken hata oluştu:", error);
+            alert("Kullanıcı silinirken hata oluştu: " + error.message);
+        }
+    }
+    
+    // Müşterinin Sitesini Açma
+    window.openCustomerSite = function(siteUrl) {
+        window.open(`http://${siteUrl}`, '_blank');
+    }
+
+
+    // Yetkilendirme Kontrolü
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === ADMIN_EMAIL) {
             // Yöneticinin email adresi eşleşiyorsa
