@@ -1,371 +1,257 @@
 <!DOCTYPE html>
+
 <html lang="tr">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Giriş / Kayıt | bakikara.xyz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* THEME AND VARIABLES */
-        :root {
-            --primary-color: #5d3f6a;       /* Deep Purple Accent */
-            --bg-dark: #12121e;             /* Very Dark Background */
-            --bg-card: #1e1e2d;             /* Dark Card Background */
-            --text-light: #e0e0e0;          /* Light Text */
-            --text-secondary: #a9a9b6;      /* Secondary Text */
-            --border-dark: #2a2a3f;         /* Dark Border */
-            --success-color: #28a745;       /* Green (Success) */
-            --danger-color: #e74c3c;        /* Red (Error) */
-            --shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-        }
 
-        /* GENERAL STYLES AND ANIMATIONS */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: var(--text-light);
-            transition: background-color 0.5s;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
 
-        /* ANIMATED CARD CONTAINER */
-        .auth-container {
-            background-color: var(--bg-card);
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid var(--border-dark);
-            opacity: 0;
-            transform: scale(0.9);
-            animation: card-in 0.6s ease-out forwards;
-        }
+        .auth-container { background-color: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; }
 
-        @keyframes card-in {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
+        .tabs { display: flex; margin-bottom: 25px; }
 
-        /* TAB STYLE */
-        .tabs {
-            display: flex;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border-dark);
-        }
-        .tab-button {
-            flex-grow: 1;
-            padding: 15px 0;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 1.1em;
-            font-weight: 600;
-            border-bottom: 3px solid transparent;
-            color: var(--text-secondary);
-            transition: all 0.3s;
-            outline: none;
-        }
-        .tab-button:hover:not(.active) {
-             color: var(--text-light);
-        }
-        .tab-button.active { 
-            color: var(--primary-color); 
-            border-bottom: 3px solid var(--primary-color);
-        }
-        .tab-button.active i {
-            color: var(--primary-color);
-        }
+        .tab-button { flex-grow: 1; padding: 15px 0; cursor: pointer; border: none; background: none; font-size: 1.1em; font-weight: 600; border-bottom: 3px solid transparent; color: #aaa; transition: all 0.3s; }
 
-        /* FORM STYLE */
-        .form-group { 
-            margin-bottom: 20px; 
-            position: relative;
-        }
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: 500; 
-            font-size: 0.9em; 
-            color: var(--text-secondary);
-            transition: color 0.3s;
-        }
-        input { 
-            width: 100%; 
-            padding: 12px 15px; 
-            border: 1px solid var(--border-dark); 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 1em;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            transition: border-color 0.3s, box-shadow 0.3s;
-            outline: none;
-        }
-        input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 10px rgba(93, 63, 106, 0.4);
-        }
-        
-        /* BUTTON STYLE */
-        .auth-btn { 
-            width: 100%; 
-            padding: 15px; 
-            border: none; 
-            border-radius: 8px; 
-            background-color: var(--primary-color); 
-            color: white; 
-            font-size: 1.1em; 
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; 
-            margin-top: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        .auth-btn:hover { 
-            background-color: #4a3355; 
-            transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-        }
-        .auth-btn:active {
-            transform: translateY(0);
-        }
+        .tab-button.active { color: #007bff; border-bottom: 3px solid #007bff; }
 
-        /* MESSAGE STYLE */
-        #authMessage { 
-            margin-top: 20px; 
-            padding: 15px; 
-            border-radius: 8px; 
-            text-align: center; 
-            font-size: 0.95em;
-            font-weight: 600;
-            display: none; 
-            animation: message-fade 0.4s ease-out;
-        }
-        .error { 
-            background-color: #3b2020; 
-            color: var(--danger-color); 
-            border: 1px solid var(--danger-color);
-        }
-        .success { 
-            background-color: #213c23; 
-            color: var(--success-color); 
-            border: 1px solid var(--success-color);
-        }
+        .form-group { margin-bottom: 15px; }
+
+        label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9em; }
+
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1em; }
+
+        .auth-btn { width: 100%; padding: 15px; border: none; border-radius: 6px; background-color: #28a745; color: white; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: background-color 0.3s; margin-top: 10px; }
+
+        .auth-btn:hover { background-color: #218838; }
+
+        #authMessage { margin-top: 15px; padding: 10px; border-radius: 4px; text-align: center; display: none; }
+
+        .error { background-color: #ffdddd; color: #d8000c; }
+
+        .success { background-color: #d4edda; color: #155724; }
+
         .hidden { display: none; }
 
-        @keyframes message-fade {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
     </style>
+
 </head>
+
 <body>
 
+
+
 <div class="auth-container">
+
     <div class="tabs">
-        <!-- Added IDs for event listeners, removed inline onclick -->
-        <button class="tab-button active" id="tab-login"><i class="fas fa-sign-in-alt"></i> Giriş Yap</button>
-        <button class="tab-button" id="tab-register"><i class="fas fa-user-plus"></i> Kayıt Ol</button>
+
+        <button class="tab-button active" onclick="showTab('login')">Giriş Yap</button>
+
+        <button class="tab-button" onclick="showTab('register')">Kayıt Ol</button>
+
     </div>
+
+
 
     <div id="login" class="tab-content">
+
         <div class="form-group">
+
             <label for="loginEmail">E-posta</label>
+
             <input type="email" id="loginEmail" placeholder="ornek@mail.com">
+
         </div>
+
         <div class="form-group">
+
             <label for="loginPassword">Şifre</label>
+
             <input type="password" id="loginPassword" placeholder="En az 6 karakter">
+
         </div>
-        <!-- Added ID for event listener, removed inline onclick -->
-        <button class="auth-btn" id="btnLogin"><i class="fas fa-lock"></i> Giriş Yap</button>
+
+        <button class="auth-btn" onclick="handleLogin()">Giriş Yap</button>
+
     </div>
+
+
 
     <div id="register" class="tab-content hidden">
+
         <div class="form-group">
+
             <label for="registerEmail">E-posta</label>
+
             <input type="email" id="registerEmail" placeholder="ornek@mail.com">
+
         </div>
+
         <div class="form-group">
+
             <label for="registerPassword">Şifre</label>
+
             <input type="password" id="registerPassword" placeholder="En az 6 karakter">
+
         </div>
-        <!-- Added ID for event listener, removed inline onclick -->
-        <button class="auth-btn" id="btnRegister"><i class="fas fa-paper-plane"></i> Kayıt Ol</button>
+
+        <button class="auth-btn" onclick="handleRegister()">Kayıt Ol</button>
+
     </div>
 
+
+
     <div id="authMessage" class="error"></div>
+
 </div>
 
+
+
 <script type="module">
-    // Import Firebase dependencies
-    import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    
-    // Set Firestore log level (helpful for debugging)
-    setLogLevel('Debug');
 
-    // Global Firebase Variables
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+    // Firebase yapılandırmasını ve fonksiyonlarını içe aktar
 
-    // Initialize Firebase services
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, doc, setDoc } from './firebase-config.js'; 
 
-    // Set persistence to local storage
-    setPersistence(auth, browserLocalPersistence);
 
-    /**
-     * Toggles between the login and register tabs.
-     * @param {string} tabId - The ID of the tab to show ('login' or 'register').
-     */
-    function showTab(tabId) {
+
+    // Tab geçiş işlevi
+
+    window.showTab = function(tabId) {
+
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+
         document.getElementById(tabId).classList.remove('hidden');
+
         document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
-        
-        // Use ID selectors for robustness
-        document.getElementById(`tab-${tabId}`).classList.add('active');
+
+        document.querySelector(`.tab-button[onclick*='${tabId}']`).classList.add('active');
+
         document.getElementById('authMessage').style.display = 'none';
+
     }
 
-    /**
-     * Displays a message to the user in the designated message box.
-     * @param {string} message - The message text.
-     * @param {boolean} isError - True if the message is an error, false for success.
-     */
+
+
+    // Mesaj gösterme işlevi
+
     function displayMessage(message, isError) {
+
         const msgEl = document.getElementById('authMessage');
+
         msgEl.innerText = message;
+
         msgEl.classList.remove('error', 'success');
+
         msgEl.classList.add(isError ? 'error' : 'success');
+
         msgEl.style.display = 'block';
+
     }
 
-    /**
-     * Saves initial user profile data to Firestore.
-     * @param {object} user - The Firebase User object.
-     */
-    async function saveInitialUserData(user) {
-        // Path: /artifacts/{appId}/users/{userId}/profile/data
-        const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
-        const initialUserData = {
-            email: user.email,
-            createdAt: new Date(),
-            lastLogin: new Date(),
-            siteCount: 0, 
-            package: 'none'
-        };
-        try {
-            await setDoc(userDocRef, initialUserData, { merge: true });
-            console.log("Initial user profile created/updated successfully.");
-        } catch (error) {
-            console.error("Error creating/updating user profile:", error);
-        }
-    }
 
-    /**
-     * Handles the user registration process using Firebase Email/Password.
-     */
-    async function handleRegister() {
+
+    // Kayıt İşlemi
+
+    window.handleRegister = async function() {
+
         const email = document.getElementById('registerEmail').value;
+
         const password = document.getElementById('registerPassword').value;
 
-        if (!email || password.length < 6) {
-            return displayMessage("Lütfen geçerli bir e-posta girin ve şifrenin en az 6 karakter olduğundan emin olun.", true);
+
+
+        if (password.length < 6) {
+
+            return displayMessage("Şifre en az 6 karakter olmalıdır.", true);
+
         }
 
+
+
         try {
+
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
             const user = userCredential.user;
 
-            // Save initial user data to Firestore
-            await saveInitialUserData(user);
 
-            displayMessage("Kayıt başarılı! Müşteri paneline yönlendiriliyorsunuz...", false);
-            // Redirect to dashboard on success
+
+            // Kullanıcı verilerini Firestore'a kaydet (İlk Veri)
+
+            await setDoc(doc(db, "users", user.uid), {
+
+                email: user.email,
+
+                createdAt: new Date(),
+
+                // Diğer başlangıç verileri buraya eklenebilir
+
+            });
+
+
+
+            displayMessage("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...", false);
+
             setTimeout(() => {
-                window.location.href = 'dashboard.html'; 
+
+                window.location.href = 'dashboard.html'; // Başarılıysa paneli yönlendir
+
             }, 1500);
 
+
+
         } catch (error) {
-            let errorMessage = "Kayıt hatası. Lütfen tekrar deneyin.";
-            if (error.code === 'auth/email-already-in-use') {
-                errorMessage = "Bu e-posta adresi zaten kullanılıyor. Giriş yapmayı deneyin.";
-            } else if (error.code === 'auth/weak-password') {
-                errorMessage = "Şifre çok zayıf. En az 6 karakter kullanın.";
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage = "Geçersiz e-posta formatı.";
-            }
-            displayMessage(errorMessage, true);
-            console.error("Registration Error:", error);
+
+            displayMessage("Kayıt hatası: " + error.message, true);
+
         }
+
     }
 
-    /**
-     * Handles the user login process using Firebase Email/Password.
-     */
-    async function handleLogin() {
+
+
+    // Giriş İşlemi
+
+    window.handleLogin = async function() {
+
         const email = document.getElementById('loginEmail').value;
+
         const password = document.getElementById('loginPassword').value;
 
-        if (!email || !password) {
-            return displayMessage("Lütfen e-posta ve şifrenizi girin.", true);
-        }
+
 
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
 
-            // Update last login time in Firestore
-            // Path: /artifacts/{appId}/users/{userId}/profile/data
-            const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
-            await setDoc(userDocRef, { lastLogin: new Date() }, { merge: true });
-            
+            await signInWithEmailAndPassword(auth, email, password);
+
             displayMessage("Giriş başarılı! Yönlendiriliyorsunuz...", false);
-            // Redirect to dashboard on success
+
             setTimeout(() => {
-                window.location.href = 'dashboard.html'; 
+
+                window.location.href = 'dashboard.html'; // Başarılıysa paneli yönlendir
+
             }, 1000);
+
         } catch (error) {
-            let errorMessage = "Giriş başarısız. E-posta veya şifreniz yanlış olabilir.";
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                errorMessage = "Geçersiz e-posta veya şifre.";
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage = "Geçersiz e-posta formatı.";
-            }
-            displayMessage(errorMessage, true);
-            console.error("Login Error:", error);
+
+            displayMessage("Giriş hatası: " + error.message, true);
+
         }
+
     }
 
-    // CRITICAL: Attach event listeners after the DOM is fully loaded.
-    // This solves the issue where inline onclick attributes fail due to script type="module" scoping.
-    document.addEventListener('DOMContentLoaded', () => {
-        // Tab Listeners
-        document.getElementById('tab-login').addEventListener('click', () => showTab('login'));
-        document.getElementById('tab-register').addEventListener('click', () => showTab('register'));
-
-        // Form Button Listeners
-        document.getElementById('btnLogin').addEventListener('click', handleLogin);
-        document.getElementById('btnRegister').addEventListener('click', handleRegister);
-    });
-
-    // CRITICAL FIX: Manually call showTab('login') to ensure correct initial state
-    // in case the script loading caused initial DOM issues.
-    showTab('login');
 </script>
+
 </body>
+
 </html>
