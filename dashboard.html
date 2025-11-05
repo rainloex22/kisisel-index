@@ -1,3 +1,655 @@
+<!DOCTYPE html>
+
+<html lang="tr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Müşteri Paneli | bakikara.xyz</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    
+
+    <style>
+
+        /* TEMA RENKLERİ */
+
+        :root {
+
+            --primary-color: #5d3f6a; /* Kapalı Mor Vurgu */
+
+            --bg-dark: #1e1e2d;       /* Koyu Arka Plan */
+
+            --bg-card: #27293d;       /* Koyu Kart Arka Planı */
+
+            --text-light: #e0e0e0;    /* Açık Metin */
+
+            --text-secondary: #a9a9b6; /* İkincil Metin */
+
+            --border-dark: #3b3b51;   /* Koyu Sınır */
+
+            --danger-color: #e74c3c; /* Kırmızı (Çıkış Butonu) */
+
+            --success-color: #28a745; /* Yeşil (Başarılı) */
+
+            --warning-color: #ffc107; /* Sarı (Uyarı) */
+
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+        }
+
+
+
+        /* GENEL STİL */
+
+        body { 
+
+            font-family: 'Roboto', sans-serif; 
+
+            background-color: var(--bg-dark); 
+
+            color: var(--text-light);
+
+            margin: 0; 
+
+            padding: 0; 
+
+            display: flex; 
+
+            min-height: 100vh;
+
+        }
+
+
+
+        /* KENAR ÇUBUĞU */
+
+        .sidebar {
+
+            width: 250px;
+
+            background-color: var(--bg-card);
+
+            padding: 20px 0;
+
+            box-shadow: var(--shadow);
+
+            display: flex;
+
+            flex-direction: column;
+
+            border-right: 1px solid var(--border-dark);
+
+            flex-shrink: 0; /* Mobil uyumluluk için */
+
+        }
+
+        .logo {
+
+            font-family: 'Poppins', sans-serif;
+
+            font-size: 1.8em;
+
+            font-weight: 700;
+
+            margin: 0 0 40px 30px;
+
+            color: var(--primary-color);
+
+        }
+
+        .nav-link {
+
+            width: 100%;
+
+            padding: 15px 30px;
+
+            text-decoration: none;
+
+            color: var(--text-secondary);
+
+            display: flex;
+
+            align-items: center;
+
+            transition: background-color 0.3s, color 0.3s;
+
+        }
+
+        .nav-link i {
+
+            margin-right: 15px;
+
+            font-size: 1.1em;
+
+        }
+
+        .nav-link:hover, .nav-link.active {
+
+            background-color: var(--bg-dark);
+
+            color: var(--text-light);
+
+            border-left: 4px solid var(--primary-color);
+
+        }
+
+        .logout-btn {
+
+            margin-top: auto; 
+
+            padding: 15px 30px;
+
+            width: 100%;
+
+            border: none;
+
+            background-color: var(--danger-color);
+
+            color: white;
+
+            cursor: pointer;
+
+            font-weight: 600;
+
+            transition: background-color 0.3s;
+
+        }
+
+        .logout-btn:hover {
+
+            background-color: #c0392b;
+
+        }
+
+
+
+        /* ANA İÇERİK */
+
+        .main-content {
+
+            flex-grow: 1;
+
+            padding: 40px;
+
+            overflow-y: auto;
+
+        }
+
+        .top-bar {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 30px;
+
+        }
+
+        .welcome-msg {
+
+            font-size: 1.5em;
+
+            font-family: 'Poppins', sans-serif;
+
+        }
+
+        .welcome-msg strong {
+
+            color: var(--primary-color);
+
+            font-weight: 700;
+
+        }
+
+        
+
+        /* BİLGİ KARTLARI */
+
+        .status-cards {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+            gap: 25px;
+
+            margin-bottom: 40px;
+
+        }
+
+        .info-card {
+
+            background: var(--bg-card);
+
+            padding: 25px;
+
+            border-radius: 8px;
+
+            box-shadow: var(--shadow);
+
+            border-top: 5px solid;
+
+            transition: transform 0.3s;
+
+        }
+
+        .info-card:hover {
+
+            transform: translateY(-5px);
+
+        }
+
+        .info-card h3 {
+
+            margin-top: 0;
+
+            font-family: 'Poppins', sans-serif;
+
+            font-weight: 600;
+
+            font-size: 1.1em;
+
+            color: var(--text-secondary);
+
+        }
+
+        .card-value {
+
+            font-size: 2em;
+
+            font-weight: 700;
+
+            margin-top: 5px;
+
+        }
+
+
+
+        /* Kart Renkleri */
+
+        .card-primary { border-top-color: var(--primary-color); }
+
+        .card-success { border-top-color: var(--success-color); }
+
+        .card-warning { border-top-color: var(--warning-color); }
+
+        
+
+        .card-primary .card-value { color: var(--primary-color); }
+
+        .card-success .card-value { color: var(--success-color); }
+
+        .card-warning .card-value { color: var(--warning-color); }
+
+
+
+
+
+        /* YÖNERGE KUTUSU */
+
+        .instruction-box { 
+
+            border: 1px solid var(--border-dark);
+
+            background-color: var(--bg-card); 
+
+            padding: 25px; 
+
+            border-radius: 8px;
+
+            margin-top: 20px; 
+
+        }
+
+        .instruction-box h3 { 
+
+            color: var(--warning-color); 
+
+            margin-top: 0;
+
+        }
+
+        .instruction-box a { 
+
+            color: var(--primary-color); 
+
+            font-weight: 600; 
+
+            text-decoration: none; 
+
+        }
+
+        .email-address {
+
+            font-size: 1.2em;
+
+            color: var(--danger-color);
+
+            font-weight: 700;
+
+            margin: 15px 0;
+
+            display: block;
+
+        }
+
+
+
+        /* Yeni Eklenen Stiller */
+
+        .hidden {
+
+            display: none !important;
+
+        }
+
+        .action-btn {
+
+            padding: 10px 20px;
+
+            border-radius: 5px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: background-color 0.3s;
+
+        }
+
+        .primary-btn {
+
+            background-color: var(--primary-color);
+
+            color: var(--text-light);
+
+            border: none;
+
+        }
+
+        .primary-btn:hover {
+
+            background-color: #4b3455; /* Slightly darker primary */
+
+        }
+
+        .content-card {
+
+            background: var(--bg-card);
+
+            padding: 25px;
+
+            border-radius: 8px;
+
+            box-shadow: var(--shadow);
+
+            margin-top: 20px;
+
+        }
+
+        
+
+        /* MOBİL UYUMLULUK */
+
+        @media (max-width: 768px) {
+
+            body { flex-direction: column; }
+
+            .sidebar {
+
+                width: 100%;
+
+                padding: 10px 0;
+
+                flex-direction: row;
+
+                justify-content: space-around;
+
+                border-right: none;
+
+                border-bottom: 1px solid var(--border-dark);
+
+            }
+
+            .sidebar .logo { display: none; }
+
+            .sidebar .logout-btn { display: none; }
+
+            .sidebar .nav-link { 
+
+                padding: 10px 15px; 
+
+                flex-direction: column; 
+
+                text-align: center;
+
+                border-left: none !important;
+
+            }
+
+            .sidebar .nav-link i { margin: 0 0 5px 0; }
+
+            .main-content { padding: 20px; }
+
+            .status-cards { grid-template-columns: 1fr; }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+<div class="sidebar">
+
+    <div class="logo">Baki Hosting</div>
+
+    
+
+    <a href="#panelim" id="dashboardLink" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Panelim</a>
+
+    <a href="#dosya-yonetimi" id="fileUploadLink" class="nav-link"><i class="fas fa-file-upload"></i> Dosya Yön.</a>
+
+    <a href="#destek" id="supportLink" class="nav-link"><i class="fas fa-question-circle"></i> Destek</a>
+
+    <a href="#ayarlar" id="settingsLink" class="nav-link"><i class="fas fa-cog"></i> Ayarlar</a>
+
+
+
+    <button class="logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
+
+</div>
+
+
+
+<div class="main-content">
+
+    
+
+    <div class="top-bar">
+
+        <div class="welcome-msg">Merhaba, <strong id="userEmail">Yükleniyor...</strong></div>
+
+    </div>
+
+    
+
+    <!-- 1. PANELİM (Dashboard) İÇERİĞİ -->
+
+    <div id="dashboardContent" class="content-section">
+
+        <div class="status-cards">
+
+            
+
+            <div class="info-card card-primary">
+
+                <h3>Site Adresiniz</h3>
+
+                <a id="siteUrlLink" target="_blank" style="text-decoration: none;">
+
+                    <div class="card-value" id="siteUrl">Yükleniyor...</div>
+
+                </a>
+
+                <p style="font-size: 0.9em; margin: 0; color: var(--text-secondary);">Alt klasörde yayınlanacak. (Tıklanabilir)</p>
+
+            </div>
+
+
+
+            <div class="info-card card-success">
+
+                <h3>Hizmet Durumu</h3>
+
+                <div class="card-value" id="serviceStatus">Yükleniyor...</div>
+
+                <p style="font-size: 0.9em; margin: 0; color: var(--text-secondary);" id="serviceMessage">...</p>
+
+            </div>
+
+
+
+            <div class="info-card card-warning">
+
+                <h3>Kayıt Tarihi</h3>
+
+                <div class="card-value" id="regDate">Yükleniyor...</div>
+
+                <p style="font-size: 0.9em; margin: 0; color: var(--text-secondary);">Hosting'e başlama tarihiniz.</p>
+
+            </div>
+
+        </div>
+
+        
+
+        <h2><i class="fas fa-paper-plane"></i> Dosya Gönderim Yönergesi</h2>
+
+        <div class="instruction-box">
+
+            <h3>Sitenizin Yayınlanması İçin Son Adım</h3>
+
+            <p>Web sitenizi (HTML, CSS, JS) tek bir **.zip** dosyası halinde sıkıştırdıktan sonra, lütfen bu dosyayı aşağıdaki e-posta adresine gönderin.</p>
+
+            
+
+            <p style="font-weight: bold; margin-top: 15px; color: var(--text-light);">Gönderim Adresi:</p>
+
+            
+
+            <strong class="email-address">admin@bakikara.xyz</strong>
+
+            <button onclick="handleCopy('admin@bakikara.xyz')" class="action-btn primary-btn" style="margin-top: 10px;">E-postayı Kopyala</button>
+
+            
+
+            <p style="font-size: 0.9em; color: var(--text-secondary); margin-top: 20px;">Dosyanız bize ulaştığında, maks. 24 saat içinde siteniz yayına alınır ve size onay e-postası gönderilir.</p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- 2. DOSYA YÖNETİMİ İÇERİĞİ -->
+
+    <div id="fileUploadContent" class="content-section hidden">
+
+        <h2><i class="fas fa-file-upload"></i> Dosya Yöneticisi <span style="color: var(--warning-color); font-size: 0.8em;">(Geliştiriliyor)</span></h2>
+
+        <div class="content-card">
+
+            <h3 style="color: var(--primary-color);">Yükleme Paneli Yakında</h3>
+
+            <p>Dosya Yönetimi paneli, sitenizi otomatik olarak yüklemeniz ve güncellemeniz için çok yakında aktif olacaktır.</p>
+
+            <p>Şu an için sitenizin ZIP dosyasını e-posta yoluyla göndermeye devam edebilirsiniz.</p>
+
+            <p style="margin-top: 15px;">**Alternatif E-posta Adresi:** <strong style="color: var(--danger-color);">admin@bakikara.xyz</strong></p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- 3. DESTEK İÇERİĞİ -->
+
+    <div id="supportContent" class="content-section hidden">
+
+        <h2><i class="fas fa-question-circle"></i> Destek Merkezi</h2>
+
+        <div class="content-card">
+
+            <h3 style="color: var(--success-color);">Bize Ulaşın</h3>
+
+            <p>Her türlü teknik veya faturalandırma sorununuz için destek ekibimizle iletişime geçebilirsiniz.</p>
+
+            <p style="margin-top: 15px;">**E-posta:** <a href="mailto:admin@bakikara.xyz" style="color: var(--warning-color); font-weight: bold;">admin@bakikara.xyz</a></p>
+
+            <button onclick="handleCopy('admin@bakikara.xyz')" class="action-btn primary-btn" style="margin-top: 15px;">E-posta Gönder</button>
+
+            <hr style="border-color: var(--border-dark); margin: 25px 0;">
+
+            <h3 style="color: var(--primary-color);">SSS (Sıkça Sorulan Sorular)</h3>
+
+            <p>Sıkça sorulan sorular bölümü yakında bu sayfada yayına alınacaktır.</p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- 4. AYARLAR İÇERİĞİ -->
+
+    <div id="settingsContent" class="content-section hidden">
+
+        <h2><i class="fas fa-cog"></i> Hesap Ayarları</h2>
+
+        <div class="content-card">
+
+            <h3 style="color: var(--primary-color);">Genel Hesap Bilgileri</h3>
+
+            <p>E-posta Adresiniz: <strong id="settingsEmail">Yükleniyor...</strong></p>
+
+            <p>Kayıt Tarihi: <strong id="settingsRegDate">Yükleniyor...</strong></p>
+
+            <hr style="border-color: var(--border-dark); margin: 25px 0;">
+
+            <h3 style="color: var(--warning-color);">Şifre Değiştirme</h3>
+
+            <p>Şifre değiştirme veya diğer hassas işlemler için güvenlik sebebiyle destek ile iletişime geçmeniz gerekmektedir.</p>
+
+            <button onclick="switchContent('support')" class="action-btn primary-btn" style="background-color: var(--warning-color); margin-top: 15px;">
+
+                <i class="fas fa-headset"></i> Destek İle İletişime Geç
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+</div>
+
+
+
 <script type="module">
     // Zorunlu Firebase CDN importları (Değişmedi)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -116,11 +768,9 @@
         });
     }
 
-    // Navigasyon linklerine tıklama olaylarını bağlama (Sekme değiştirme)
+    // HATA DÜZELTME: Tüm Navigasyon linklerine tıklama olaylarını bağlama
     document.getElementById('dashboardLink').addEventListener('click', (e) => { e.preventDefault(); switchContent('dashboard'); });
     document.getElementById('fileUploadLink').addEventListener('click', (e) => { e.preventDefault(); switchContent('fileUpload'); });
-    
-    // HATA DÜZELTME: Destek ve Ayarlar linklerinin olay dinleyicileri eklendi
     document.getElementById('supportLink').addEventListener('click', (e) => { e.preventDefault(); switchContent('support'); });
     document.getElementById('settingsLink').addEventListener('click', (e) => { e.preventDefault(); switchContent('settings'); });
 
