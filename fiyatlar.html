@@ -85,6 +85,10 @@
 
     <!-- JavaScript Başlangıcı: UI İşlevleri, Alert ve Tab Yönetimi -->
     <script>
+        // Platform Sekme Kimlikleri ve Mevcut İndeksi
+        const tabIds = ['instagram', 'tiktok', 'youtube'];
+        let currentTabIndex = 0;
+
         // Global alert box görünürlüğünü yönetme
         function showAlert(message) {
             const alertBox = document.getElementById('alert-box');
@@ -140,6 +144,23 @@
                 targetButton.classList.add('active', 'primary-color');
                 targetButton.classList.remove('bg-gray-700', 'hover:bg-gray-600');
             }
+            
+            // Mevcut indeksi güncelle
+            currentTabIndex = tabIds.indexOf(tabId);
+        }
+        
+        // Navigasyon Fonksiyonu
+        function navigateTabs(direction) {
+            let newIndex = currentTabIndex + direction;
+            
+            // Döngüsel Navigasyon (Wrap-around)
+            if (newIndex >= tabIds.length) {
+                newIndex = 0; // Başa dön
+            } else if (newIndex < 0) {
+                newIndex = tabIds.length - 1; // Sona dön
+            }
+
+            switchTab(tabIds[newIndex]);
         }
 
 
@@ -163,6 +184,15 @@
                 button.addEventListener('click', function() {
                     switchTab(this.getAttribute('data-tab'));
                 });
+            });
+            
+            // Navigasyon butonları event listener
+            document.getElementById('nav-prev').addEventListener('click', () => {
+                navigateTabs(-1); // Önceki sekmeye git
+            });
+
+            document.getElementById('nav-next').addEventListener('click', () => {
+                navigateTabs(1); // Sonraki sekmeye git
             });
 
             // Başlangıçta ilk tab'ı aktif et
@@ -224,20 +254,34 @@
     <!-- Fiyatlar / Paketler Bölümü (Platform Tab'lı) -->
     <section id="fiyatlar" class="py-16 sm:py-24 bg-gray-900 section-fade-in" style="animation-delay: 0.3s;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center text-indigo-400 mb-12">Hangi Platform İçin Paket Arıyorsunuz?</h2>
+            <h2 class="text-3xl font-bold text-center text-indigo-400 mb-6">Hangi Platform İçin Paket Arıyorsunuz?</h2>
             
-            <!-- Platform Tab Butonları -->
-            <div class="flex flex-wrap justify-center mb-10 space-x-2 sm:space-x-4">
-                <button data-tab="instagram" class="tab-button bg-gray-700 hover:bg-gray-600 text-gray-100 font-semibold py-2 px-6 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0">
-                    <span class="text-xl mr-2">📸</span> Instagram
+            <!-- Platform Tab Butonları ve Navigasyon Tuşları -->
+            <div class="flex flex-wrap justify-center items-center mb-10">
+                <!-- Navigasyon Sol Ok -->
+                <button id="nav-prev" class="nav-arrow primary-color hover:primary-hover text-white p-3 rounded-full transition-element button-press mx-2 shadow-lg" title="Önceki Platform">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <button data-tab="tiktok" class="tab-button bg-gray-700 hover:bg-gray-600 text-gray-100 font-semibold py-2 px-6 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0">
-                    <span class="text-xl mr-2">🎶</span> TikTok
-                </button>
-                <button data-tab="youtube" class="tab-button bg-gray-700 hover:bg-gray-600 text-gray-100 font-semibold py-2 px-6 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0">
-                    <span class="text-xl mr-2">▶️</span> YouTube
+
+                <!-- Platform Tab Butonları -->
+                <div id="tab-buttons-container" class="flex flex-wrap justify-center space-x-2 sm:space-x-4">
+                    <button data-tab="instagram" class="tab-button bg-gray-700 hover:bg-gray-600 text-gray-100 font-semibold py-2 px-6 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0">
+                        <span class="text-xl mr-2">📸</span> Instagram
+                    </button>
+                    <button data-tab="tiktok" class="tab-button bg-gray-700 hover:bg-gray-600 text-gray-100 font-semibold py-2 px-6 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0">
+                        <span class="text-xl mr-2">🎶</span> TikTok
+                    </button>
+                    <button data-tab="youtube" class="tab-button bg-gray-700 hover:bg-gray-600 text-gray-100 font-semibold py-2 px-6 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0">
+                        <span class="text-xl mr-2">▶️</span> YouTube
+                    </button>
+                </div>
+
+                <!-- Navigasyon Sağ Ok -->
+                <button id="nav-next" class="nav-arrow primary-color hover:primary-hover text-white p-3 rounded-full transition-element button-press mx-2 shadow-lg" title="Sonraki Platform">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
+
 
             <!-- 1. Instagram Fiyat Listesi (Tab Content) -->
             <div id="instagram" class="tab-content grid grid-cols-1 lg:grid-cols-3 gap-8 hidden">
@@ -489,13 +533,12 @@
                             <label for="email" class="block text-gray-300 font-medium mb-2">E-posta Adresiniz</label>
                             <input type="email" id="email" name="email" required class="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-lg focus:border-indigo-500 transition-element">
                         </div>
-                        <div class="mb-6">
+                        <div class="mb-4">
                             <label for="message" class="block text-gray-300 font-medium mb-2">Mesajınız</label>
                             <textarea id="message" name="message" rows="4" required class="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-lg focus:border-indigo-500 transition-element"></textarea>
                         </div>
-                        <!-- Gönder butonuna basma efekti ve gölge animasyonu eklendi -->
-                        <button type="submit" class="w-full secondary-color hover:secondary-hover text-white font-bold py-3 rounded-lg shadow-md transition-element transform hover:scale-[1.01] hover:shadow-amber-500/40 button-press">
-                            Mesajı Gönder
+                        <button type="submit" class="w-full primary-color hover:primary-hover text-white font-bold py-3 rounded-lg transition-element transform hover:scale-[1.01] button-press shadow-md">
+                            Gönder
                         </button>
                     </form>
                 </div>
@@ -503,16 +546,11 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8 border-t border-gray-700">
+    <!-- Footer (Alt Bilgi) -->
+    <footer class="bg-gray-900 border-t border-gray-700 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p class="text-sm">
-                &copy; 2025 SOSYAL HUB. Tüm Hakları Saklıdır. | 
-                <a href="#" class="text-indigo-400 hover:text-indigo-200 transition-element button-press">Gizlilik Politikası</a> |
-                <a href="#" class="text-indigo-400 hover:text-indigo-200 transition-element button-press">Kullanım Şartları</a>
-            </p>
+            <p class="text-gray-400 text-sm">&copy; 2025 SOSYAL HUB. Tüm Hakları Saklıdır.</p>
         </div>
     </footer>
-
 </body>
 </html>
