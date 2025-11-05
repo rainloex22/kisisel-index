@@ -18,7 +18,16 @@
             flex-direction: column;
             overflow-x: hidden;
         }
-        .header-bg { background-color: rgba(26, 14, 33, 0.9); backdrop-filter: blur(5px); }
+        /* Navbar ve Footer için arka plan rengi */
+        .header-bg { 
+            background-color: rgba(26, 14, 33, 0.9); 
+            backdrop-filter: blur(5px); 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .footer-bg { 
+            background-color: #110915; 
+            border-top: 1px solid rgba(108, 92, 231, 0.1);
+        }
         .content-card { 
             background-color: #2a1b3a; 
             border: 1px solid rgba(108, 92, 231, 0.3);
@@ -26,27 +35,71 @@
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); 
         }
         .text-purple { color: var(--purple); }
-        /* Diğer sayfalardaki Navbar ve Footer stilleri buraya dahil edilmelidir */
+        .bg-purple-dark { background-color: var(--purple); }
+
+        /* Navbar link stilleri */
+        .nav-link:hover { color: #8b80f8; }
+        .nav-link.active { color: var(--purple); font-weight: 600; }
+        
+        /* Buton stilleri */
+        .btn-primary {
+            background-color: var(--purple);
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #8b80f8;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
+
+    <!-- Header (Dinamik Navigasyon ve Kullanıcı Arayüzü) -->
+    <header class="header-bg sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- Logo / Marka -->
+            <a href="#" class="text-2xl font-extrabold text-white tracking-widest">
+                <span class="text-purple">BAKİ</span> S2
+            </a>
+
+            <!-- Navigasyon Menüsü -->
+            <nav class="hidden md:flex space-x-6 lg:space-x-8 items-center" id="desktop-nav-links">
+                <a href="#" class="nav-link text-gray-300 font-medium transition duration-200">Anasayfa</a>
+                <a href="#" class="nav-link text-gray-300 font-medium transition duration-200">Özellikler</a>
+                <a href="#" class="nav-link text-gray-300 font-medium transition duration-200 active">Kullanım Şartları</a>
+                <a href="#" class="nav-link text-gray-300 font-medium transition duration-200">Gizlilik</a>
+            </nav>
+
+            <!-- Dinamik Giriş/Profil Kartı -->
+            <div id="auth-ui-container" class="flex items-center space-x-3">
+                <!-- Burası JS ile doldurulacak -->
+                <div class="text-gray-400">Yükleniyor...</div>
+            </div>
+
+            <!-- Mobile Menü Butonu (Şimdilik Gizli) -->
+            <button class="md:hidden text-gray-300 text-xl" aria-label="Menü Aç">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Ana İçerik -->
     <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-16 flex justify-center">
         <div class="content-card max-w-4xl w-full p-8 md:p-12">
             <div class="text-center mb-8">
-                <i class="fas fa-file-contract text-6xl text-purple-500 mb-4"></i>
+                <i class="fas fa-file-contract text-6xl text-purple mb-4"></i>
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-2">Kullanım Şartları</h1>
                 <p class="text-gray-400 text-lg">Hizmetlerimizi kullanmadan önce bu koşulları okuyunuz.</p>
             </div>
 
             <section class="mb-10">
-                <h2 class="text-3xl font-bold text-purple-400 mb-4 border-b border-gray-700 pb-2">1. Şartların Kabulü</h2>
+                <h2 class="text-3xl font-bold text-purple mb-4 border-b border-gray-700 pb-2">1. Şartların Kabulü</h2>
                 <p class="text-gray-300">
                     BAKİ S2'yi kullanarak, bu Kullanım Şartları'na ve tüm geçerli yasalara uymayı kabul etmiş olursunuz. Bu şartları kabul etmiyorsanız, hizmeti kullanmamanız gerekmektedir.
                 </p>
             </section>
             
             <section class="mb-10">
-                <h2 class="text-3xl font-bold text-purple-400 mb-4 border-b border-gray-700 pb-2">2. Yasaklı Kullanımlar</h2>
+                <h2 class="text-3xl font-bold text-purple mb-4 border-b border-gray-700 pb-2">2. Yasaklı Kullanımlar</h2>
                 <p class="text-gray-300 mb-4">
                     Kullanıcılar, aşağıdaki faaliyetler için kısaltılmış bağlantı oluşturamaz, yayınlayamaz veya yönlendiremez:
                 </p>
@@ -62,7 +115,7 @@
             </section>
 
             <section class="mb-10">
-                <h2 class="text-3xl font-bold text-purple-400 mb-4 border-b border-gray-700 pb-2">3. Hesap Sorumluluğu</h2>
+                <h2 class="text-3xl font-bold text-purple mb-4 border-b border-gray-700 pb-2">3. Hesap Sorumluluğu</h2>
                 <p class="text-gray-300">
                     Hesabınızın güvenliğini sağlamak sizin sorumluluğunuzdadır. Şifrenizi gizli tutmalı ve hesabınız altında gerçekleşen tüm faaliyetlerden sorumlu olmalısınız.
                 </p>
@@ -74,5 +127,125 @@
         </div>
     </main>
 
-    </body>
+    <!-- Footer -->
+    <footer class="footer-bg py-8 mt-auto">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8 text-gray-400 mb-4">
+                <a href="#" class="hover:text-purple transition duration-200">Gizlilik Politikası</a>
+                <a href="#" class="hover:text-purple transition duration-200 active">Kullanım Şartları</a>
+                <a href="#" class="hover:text-purple transition duration-200">İletişim</a>
+            </div>
+            <p class="text-gray-500 text-sm mt-4">
+                &copy; 2025 BAKİ S2. Tüm hakları saklıdır.
+            </p>
+             <div class="flex justify-center mt-4 space-x-6">
+                <a href="#" class="text-gray-400 hover:text-purple transition"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-gray-400 hover:text-purple transition"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-gray-400 hover:text-purple transition"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase ve Dinamik UI Script'i -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Yapılandırması ve Yetkilendirme
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Uygulama ve Servisleri Başlat
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        setLogLevel('Debug'); // Firestore loglarını aç
+
+        // Kullanıcı Profil Bilgilerini Simüle Etme
+        // Gerçek uygulamada bu veri Firestore'dan veya bir backend'den çekilmelidir.
+        const mockUserProfile = (uid) => {
+            // Basit bir kural: 'a' ile başlayanlar Premium olsun
+            const isPremium = uid && uid.toLowerCase().includes('a');
+            return {
+                ppUrl: isPremium 
+                    ? `https://placehold.co/40x40/6c5ce7/ffffff?text=PR`
+                    : `https://placehold.co/40x40/4a4a4a/ffffff?text=BA`,
+                userName: isPremium ? 'Premium Kullanıcı' : 'Temel Kullanıcı',
+                accountType: isPremium ? 'Premium' : 'Temel'
+            };
+        };
+
+        const authUiContainer = document.getElementById('auth-ui-container');
+
+        // UI'yı Oturum Durumuna Göre Güncelleyen Fonksiyon
+        const updateAuthUI = (user) => {
+            authUiContainer.innerHTML = ''; // İçeriği temizle
+
+            if (user) {
+                // Giriş Yapılmışsa: Profil Kartını Göster
+                const profile = mockUserProfile(user.uid);
+
+                const profileCard = `
+                    <div class="flex items-center space-x-3 bg-gray-800 p-2 rounded-full pr-4 cursor-pointer hover:bg-gray-700 transition duration-200" title="Hesap Türü: ${profile.accountType}">
+                        <img src="${profile.ppUrl}" alt="PP" class="w-10 h-10 rounded-full object-cover border-2 border-purple">
+                        <div class="flex flex-col text-sm leading-tight">
+                            <span class="text-white font-semibold">${profile.userName}</span>
+                            <span class="text-xs ${profile.accountType === 'Premium' ? 'text-yellow-400' : 'text-gray-400'}">${profile.accountType} Hesap</span>
+                        </div>
+                        <button id="logout-btn" class="text-gray-400 hover:text-red-400 ml-2" title="Çıkış Yap">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                `;
+                authUiContainer.innerHTML = profileCard;
+
+                // Çıkış Butonu İşleyicisi
+                document.getElementById('logout-btn').addEventListener('click', async () => {
+                    try {
+                        await signOut(auth);
+                        // Başarılı çıkış sonrası UI onAuthStateChanged tarafından güncellenecek
+                        console.log('Kullanıcı başarıyla çıkış yaptı.');
+                    } catch (error) {
+                        console.error('Çıkış yapılırken hata oluştu:', error);
+                    }
+                });
+
+            } else {
+                // Giriş Yapılmamışsa: Giriş Yap / Kayıt Ol Butonlarını Göster
+                const authButtons = `
+                    <a href="#" class="px-4 py-2 text-sm font-semibold text-gray-300 border-2 border-transparent hover:text-purple transition duration-200">
+                        Giriş Yap
+                    </a>
+                    <a href="#" class="btn-primary px-4 py-2 text-sm font-semibold text-white rounded-full transition duration-200 shadow-lg shadow-purple-500/50">
+                        Kayıt Ol
+                    </a>
+                `;
+                authUiContainer.innerHTML = authButtons;
+            }
+        };
+
+        // Oturum Durumu Dinleyicisi
+        onAuthStateChanged(auth, (user) => {
+            updateAuthUI(user);
+        });
+
+        // Başlangıçta Oturum Açma Girişimi
+        const initializeAuth = async () => {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error('Oturum açılırken hata oluştu:', error);
+                // Hata durumunda bile UI'ın yüklenmesi için anonim giriş başarısız olsa dahi UI güncellenir.
+                updateAuthUI(null);
+            }
+        };
+
+        initializeAuth();
+    </script>
+</body>
 </html>
