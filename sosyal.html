@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sosyal Medya Servisleri | Takipçi, Beğeni, İzlenme Satın Al</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Inter Font'u tüm sayfada kullan */
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Renk Teması: Indigo (Lacivert) */
+        .primary-color { background-color: #4f46e5; } /* Indigo-600 */
+        .primary-hover { background-color: #4338ca; } /* Indigo-700 */
+        
+        /* Sekonder Renk (Vurgu/CTA): Amber (Turuncu) */
+        .secondary-color { background-color: #f59e0b; } /* Amber-500 (CTA) */
+        .secondary-hover { background-color: #d97706; } /* Amber-600 */
+        
+        /* Ekranın ortasında yer alan uyarı kutusu stilleri */
+        #alert-box {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+        }
+
+        /* Tüm elemanlarda akıcı geçişler için özel CSS (HIZLANDIRILDI) */
+        .transition-element {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Inputlara özel focus/odaklanma animasyonu */
+        input:focus, textarea:focus {
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5); /* Indigo-600 shadow */
+        }
+        
+        /* Buton Basma Animasyonu (Active State) - Her butona uygulanmalı */
+        .button-press:active {
+            transform: scale(0.98) !important;
+            opacity: 0.9;
+        }
+
+        /* Bölüm Giriş Animasyonu Keyframes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate3d(0, 40px, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+        
+        /* Sürekli Nabız (Pulse) Animasyonu Keyframes (CTA için) */
+        @keyframes pulseShadow {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } /* Amber-500 shadow */
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        .section-fade-in {
+            animation: fadeInUp 0.8s ease-out both;
+        }
+        
+        .cta-pulse {
+            animation: pulseShadow 2s infinite;
+        }
+    </style>
+</head>
+<!-- DARK MODE UYGULAMASI: bg-gray-900 ve varsayılan text-gray-100 -->
+<body class="bg-gray-900 text-gray-100">
+
+    <!-- JavaScript Başlangıcı: UI İşlevleri ve Alert Yönetimi -->
+    <script>
+        // Global alert box görünürlüğünü yönetme
+        function showAlert(message) {
+            const alertBox = document.getElementById('alert-box');
+            const alertMessage = document.getElementById('alert-message');
+            alertMessage.textContent = message;
+            
+            // Animasyon başlangıcı: class'ı kaldır ve ekle
+            alertBox.classList.remove('hidden', 'opacity-0', 'scale-75');
+            alertBox.classList.add('opacity-100', 'scale-100');
+            
+            // 3 saniye sonra uyarıyı otomatik olarak gizle
+            setTimeout(() => {
+                alertBox.classList.remove('opacity-100', 'scale-100');
+                alertBox.classList.add('opacity-0', 'scale-75'); // Gizlenme animasyonu
+                setTimeout(() => {
+                     alertBox.classList.add('hidden');
+                }, 300); // CSS geçişi bitene kadar bekle
+            }, 3000);
+        }
+
+        // Form gönderimini yakala ve alert göster (Simülasyon)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Alert kutusunun başlangıç animasyon sınıflarını ayarla
+            const alertBox = document.getElementById('alert-box');
+            alertBox.classList.add('opacity-0', 'scale-75');
+
+            const contactForm = document.getElementById('contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // Sayfanın yeniden yüklenmesini engelle
+                    // Form gönderme simülasyonu
+                    showAlert('Mesajınız başarıyla gönderildi! Kısa sürede dönüş yapılacaktır.');
+                    this.reset(); // Formu temizle
+                });
+            }
+
+            // CTA butonlarına tıklama event'i ekleme
+            const buyButtons = document.querySelectorAll('.buy-button');
+            buyButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const serviceName = this.getAttribute('data-service');
+                    showAlert(`${serviceName} hizmeti için paketlere yönlendiriliyorsunuz...`);
+                    // Gerçek uygulamada buraya ilgili paket sayfasına yönlendirme kodu gelir.
+                });
+            });
+        });
+    </script>
+    
+    <!-- Merkezi Uyarı Kutusu (Alert Box) - Gelişmiş Animasyonlu -->
+    <div id="alert-box" class="hidden bg-green-600 text-white p-4 rounded-lg shadow-2xl transition-element duration-300 ease-out">
+        <p id="alert-message" class="font-semibold"></p>
+    </div>
+
+    <!-- Navigasyon (Header) -->
+    <header class="bg-gray-800 shadow-lg sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="#" class="flex items-center space-x-2 transition-element hover:opacity-70 button-press">
+                    <svg class="h-8 w-8 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <span class="text-xl font-bold text-gray-100">SOSYAL HUB</span>
+                </a>
+                
+                <!-- Menü (Büyük Ekranlar) -->
+                <nav class="hidden md:flex space-x-8">
+                    <!-- Navigasyon linklerine hover/active eklendi -->
+                    <a href="#hizmetler" class="text-gray-300 hover:text-indigo-400 font-medium transition-element button-press">Hizmetler</a>
+                    <a href="#hizmetler" class="text-gray-300 hover:text-indigo-400 font-medium transition-element button-press">Fiyatlar</a> 
+                    <a href="#nedenbiz" class="text-gray-300 hover:text-indigo-400 font-medium transition-element button-press">Avantajlarımız</a>
+                    <a href="#yorumlar" class="text-gray-300 hover:text-indigo-400 font-medium transition-element button-press">Yorumlar</a>
+                    <!-- İletişim butonuna sürekli pulse ve press eklendi -->
+                    <a href="#iletisim" class="text-white primary-color px-4 py-2 rounded-lg font-semibold hover:primary-hover transition-element shadow-md transform hover:scale-105 button-press">İletişim</a>
+                </nav>
+                
+                <!-- Mobil Menü Butonu (Sadece Gerekliyse) -->
+                <div class="md:hidden">
+                    <button type="button" class="text-gray-300 hover:text-indigo-400 focus:outline-none transition-element button-press">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Alanı (Banner) - Hafif Degradeli Arkaplan -->
+    <section id="hero" class="bg-gradient-to-br from-gray-800 to-gray-900 py-16 sm:py-24 border-b border-indigo-700 section-fade-in" style="animation-delay: 0.1s;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-6xl font-extrabold text-white leading-tight mb-4">
+                Sosyal Medya Gücünüzü <span class="text-indigo-400">Hemen Artırın!</span>
+            </h1>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+                Instagram Takipçi, YouTube İzlenme, TikTok Beğeni ve daha fazlası. Hesabınızı profesyonelce büyütün.
+            </p>
+            <!-- CTA butonu: sürekli nabız animasyonu ve basma efekti -->
+            <a href="#hizmetler" class="secondary-color hover:secondary-hover text-white font-bold py-3 px-8 rounded-xl text-lg shadow-xl transition-element transform hover:scale-105 hover:shadow-amber-500/40 cta-pulse button-press">
+                Hizmetleri Keşfet
+            </a>
+        </div>
+    </section>
+
+    <!-- Hizmetler / Ürün Kartları Bölümü -->
+    <section id="hizmetler" class="py-16 sm:py-24 bg-gray-900 section-fade-in" style="animation-delay: 0.3s;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-indigo-400 mb-12">Tüm Platformlar İçin Güvenilir Servisler</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <!-- Servis Kartları: Gelişmiş Hover Animasyonu -->
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-2xl transition-element border border-gray-700 border-t-4 border-indigo-500 flex flex-col items-center text-center transform hover:scale-[1.03] hover:shadow-indigo-500/50" style="animation-delay: 0.4s;">
+                    <span class="text-5xl mb-4 transition-element hover:rotate-3" role="img" aria-label="Takipçi">👥</span>
+                    <h3 class="text-xl font-bold text-white mb-3">Gerçek Takipçi</h3>
+                    <p class="text-gray-400 mb-4 flex-grow">Instagram, TikTok ve Twitter için düşüş garantili, kaliteli takipçi hizmetleri.</p>
+                    <a href="#" data-service="Takipçi" class="buy-button w-full primary-color hover:primary-hover text-white font-semibold py-2 rounded-lg transition-element transform hover:scale-[1.03] button-press">İncele</a>
+                </div>
+
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-2xl transition-element border border-gray-700 border-t-4 border-amber-500 flex flex-col items-center text-center transform hover:scale-[1.03] hover:shadow-amber-500/50" style="animation-delay: 0.5s;">
+                    <span class="text-5xl mb-4 transition-element hover:scale-110" role="img" aria-label="Beğeni">💖</span>
+                    <h3 class="text-xl font-bold text-white mb-3">Hızlı Beğeni</h3>
+                    <p class="text-gray-400 mb-4 flex-grow">Gönderilerinizin etkileşimini artırın. Anında yüklenen organik beğeniler.</p>
+                    <a href="#" data-service="Beğeni" class="buy-button w-full primary-color hover:primary-hover text-white font-semibold py-2 rounded-lg transition-element transform hover:scale-[1.03] button-press">İncele</a>
+                </div>
+                
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-2xl transition-element border border-gray-700 border-t-4 border-blue-500 flex flex-col items-center text-center transform hover:scale-[1.03] hover:shadow-blue-500/50" style="animation-delay: 0.6s;">
+                    <span class="text-5xl mb-4 transition-element hover:rotate-6" role="img" aria-label="İzlenme">👁️</span>
+                    <h3 class="text-xl font-bold text-white mb-3">Yüksek Kaliteli İzlenme</h3>
+                    <p class="text-gray-400 mb-4 flex-grow">YouTube ve TikTok videolarınız için keşfete çıkaran izlenme paketleri.</p>
+                    <a href="#" data-service="İzlenme" class="buy-button w-full primary-color hover:primary-hover text-white font-semibold py-2 rounded-lg transition-element transform hover:scale-[1.03] button-press">İncele</a>
+                </div>
+                
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-2xl transition-element border border-gray-700 border-t-4 border-purple-500 flex flex-col items-center text-center transform hover:scale-[1.03] hover:shadow-purple-500/50" style="animation-delay: 0.7s;">
+                    <span class="text-5xl mb-4 transition-element hover:scale-110" role="img" aria-label="Yorum">💬</span>
+                    <h3 class="text-xl font-bold text-white mb-3">Özel Yorum & Üye</h3>
+                    <p class="text-gray-400 mb-4 flex-grow">İçeriğinizle alakalı, gerçek kullanıcı yorumları ve Telegram grup üyeleri.</p>
+                    <a href="#" data-service="Yorum & Üye" class="buy-button w-full primary-color hover:primary-hover text-white font-semibold py-2 rounded-lg transition-element transform hover:scale-[1.03] button-press">İncele</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Neden Biz? Avantajlar Bölümü -->
+    <section id="nedenbiz" class="primary-color py-16 sm:py-24 text-white section-fade-in" style="animation-delay: 0.8s;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">Neden SOSYAL HUB?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <!-- Avantaj Kartları: Hafif Yukarı Kalkma Animasyonu -->
+                <div class="p-6 rounded-lg bg-indigo-800 bg-opacity-70 shadow-lg border border-indigo-700 transition-element transform hover:-translate-y-2 hover:bg-indigo-700" style="animation-delay: 0.9s;">
+                    <span class="text-4xl mb-4 block transition-element hover:scale-125">🔒</span>
+                    <h4 class="text-xl font-semibold mb-2">Güvenli ve Şifresiz İşlem</h4>
+                    <p class="text-indigo-200">Hesabınızın şifresi asla istenmez. %100 gizlilik garantisi.</p>
+                </div>
+                <!-- Avantaj 2 -->
+                <div class="p-6 rounded-lg bg-indigo-800 bg-opacity-70 shadow-lg border border-indigo-700 transition-element transform hover:-translate-y-2 hover:bg-indigo-700" style="animation-delay: 1.0s;">
+                    <span class="text-4xl mb-4 block transition-element hover:scale-125">⚡</span>
+                    <h4 class="text-xl font-semibold mb-2">Anında ve Hızlı Başlangıç</h4>
+                    <p class="text-indigo-200">Siparişleriniz ortalama 5 dakika içinde işleme alınır ve yüklenmeye başlar.</p>
+                </div>
+                <!-- Avantaj 3 -->
+                <div class="p-6 rounded-lg bg-indigo-800 bg-opacity-70 shadow-lg border border-indigo-700 transition-element transform hover:-translate-y-2 hover:bg-indigo-700" style="animation-delay: 1.1s;">
+                    <span class="text-4xl mb-4 block transition-element hover:scale-125">📞</span>
+                    <h4 class="text-xl font-semibold mb-2">7/24 Canlı Destek</h4>
+                    <p class="text-indigo-200">Herhangi bir sorunda uzman ekibimiz bir tık uzağınızda.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Müşteri Yorumları Bölümü -->
+    <section id="yorumlar" class="py-16 sm:py-24 bg-gray-900 section-fade-in" style="animation-delay: 1.2s;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-indigo-400 mb-12">Müşterilerimizden Gelen Yorumlar</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- Yorum Kartları: Şık Hover Efekti -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-xl border border-gray-700 border-l-4 border-amber-500 transition-element hover:shadow-amber-500/50 hover:border-l-8" style="animation-delay: 1.3s;">
+                    <div class="flex items-center mb-4">
+                        <span class="text-2xl mr-2">⭐⭐⭐⭐⭐</span>
+                        <p class="font-bold text-white">Ayşe Demir</p>
+                    </div>
+                    <p class="text-gray-400 italic">"Instagram takipçi paketi aldım. Hızları inanılmaz! Düşüş olmadı, hizmet kalitesi beklediğimden yüksekti. Kesinlikle tavsiye ederim."</p>
+                </div>
+
+                <div class="bg-gray-800 p-6 rounded-xl shadow-xl border border-gray-700 border-l-4 border-amber-500 transition-element hover:shadow-amber-500/50 hover:border-l-8" style="animation-delay: 1.4s;">
+                    <div class="flex items-center mb-4">
+                        <span class="text-2xl mr-2">⭐⭐⭐⭐⭐</span>
+                        <p class="font-bold text-white">Can Yılmaz</p>
+                    </div>
+                    <p class="text-gray-400 italic">"YouTube izlenmelerim hemen gelmeye başladı, videolarım daha fazla kişiye ulaştı. Satış öncesi ve sonrası destek çok ilgiliydi."</p>
+                </div>
+                
+                <div class="bg-gray-800 p-6 rounded-xl shadow-xl border border-gray-700 border-l-4 border-amber-500 transition-element hover:shadow-amber-500/50 hover:border-l-8" style="animation-delay: 1.5s;">
+                    <div class="flex items-center mb-4">
+                        <span class="text-2xl mr-2">⭐⭐⭐⭐</span>
+                        <p class="font-bold text-white">Burak Özen</p>
+                    </div>
+                    <p class="text-gray-400 italic">"Fiyatlar piyasaya göre çok uygun. TikTok beğeni paketi ile etkileşimim arttı. Bir sonraki siparişimde yine sizi tercih edeceğim."</p>
+                </div>
+            </div>
+            
+            <!-- CTA Yorum Altı: Sürekli nabız ve basma efekti -->
+            <div class="text-center mt-12" style="animation-delay: 1.6s;">
+                <a href="#hizmetler" class="secondary-color hover:secondary-hover text-white font-bold py-3 px-8 rounded-xl text-lg shadow-xl transition-element transform hover:scale-105 hover:shadow-amber-500/40 cta-pulse button-press">
+                    Hemen Bir Paket Seçin
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- İletişim Bölümü ve Form -->
+    <section id="iletisim" class="py-16 sm:py-24 bg-gray-800 section-fade-in" style="animation-delay: 1.7s;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:flex lg:space-x-12">
+                
+                <!-- İletişim Bilgileri -->
+                <div class="lg:w-1/2 mb-10 lg:mb-0">
+                    <h2 class="text-3xl font-bold text-indigo-400 mb-6">Bize Ulaşın</h2>
+                    <p class="text-gray-300 mb-8">Sorularınız, işbirliği teklifleriniz veya özel paket talepleriniz için bize yazabilirsiniz. 7/24 yanınızdayız.</p>
+                    
+                    <div class="space-y-4">
+                        <!-- İletişim ikonlarına hover efekti eklendi -->
+                        <div class="flex items-center space-x-3 transition-element hover:translate-x-1 button-press">
+                            <span class="text-indigo-400 text-2xl" role="img" aria-label="E-posta">✉️</span>
+                            <p class="text-lg font-medium text-white">Email: destek@sosyalhub.com</p>
+                        </div>
+                        <div class="flex items-center space-x-3 transition-element hover:translate-x-1 button-press">
+                            <span class="text-indigo-400 text-2xl" role="img" aria-label="Telefon">📞</span>
+                            <p class="text-lg font-medium text-white">WhatsApp Destek: +90 (5XX) 123 45 67</p>
+                        </div>
+                        <div class="flex items-center space-x-3 transition-element hover:translate-x-1 button-press">
+                            <span class="text-indigo-400 text-2xl" role="img" aria-label="Adres">📍</span>
+                            <p class="text-lg font-medium text-white">Adres: Dijital Plaza, İstanbul, Türkiye</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- İletişim Formu -->
+                <div class="lg:w-1/2 bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h3 class="text-2xl font-bold text-white mb-6">Hızlı Mesaj Gönderin</h3>
+                    <form id="contact-form">
+                        <div class="mb-4">
+                            <label for="name" class="block text-gray-300 font-medium mb-2">Adınız Soyadınız</label>
+                            <input type="text" id="name" name="name" required class="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-lg focus:border-indigo-500 transition-element">
+                        </div>
+                        <div class="mb-4">
+                            <label for="email" class="block text-gray-300 font-medium mb-2">E-posta Adresiniz</label>
+                            <input type="email" id="email" name="email" required class="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-lg focus:border-indigo-500 transition-element">
+                        </div>
+                        <div class="mb-6">
+                            <label for="message" class="block text-gray-300 font-medium mb-2">Mesajınız</label>
+                            <textarea id="message" name="message" rows="4" required class="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-lg focus:border-indigo-500 transition-element"></textarea>
+                        </div>
+                        <!-- Gönder butonuna basma efekti ve gölge animasyonu eklendi -->
+                        <button type="submit" class="w-full secondary-color hover:secondary-hover text-white font-bold py-3 rounded-lg shadow-md transition-element transform hover:scale-[1.01] hover:shadow-amber-500/40 button-press">
+                            Mesajı Gönder
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 border-t border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm">
+                &copy; 2025 SOSYAL HUB. Tüm Hakları Saklıdır. | 
+                <a href="#" class="text-indigo-400 hover:text-indigo-200 transition-element button-press">Gizlilik Politikası</a> |
+                <a href="#" class="text-indigo-400 hover:text-indigo-200 transition-element button-press">Kullanım Şartları</a>
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
