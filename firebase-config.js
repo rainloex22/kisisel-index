@@ -6,9 +6,16 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 import { getFirestore, doc, setDoc, getDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
 
 
-// Firebase Config Objesi buraya geliyor (apiKey, authDomain, vs.)
+// firebase-config.js dosyanızın içindeki bu kısmı kontrol edin!
+
 const firebaseConfig = {
-    // ... Sizin projenizin bilgileri burada olmalı ...
+  apiKey: "AIzaSyATqhJsWJGv3AxdvLmCKS-T9UlDycwhXys", // EN KRİTİK ALAN!
+  authDomain: "baki-s2-hosting.firebaseapp.com",
+  projectId: "baki-s2-hosting",
+  storageBucket: "baki-s2-hosting.firebasestorage.app",
+  messagingSenderId: "1096636788468",
+  appId: "1:1096636788468:web:ef3365f47930ab98a738a1",
+  // measurementId alanı olmasa da olur
 };
 
 
