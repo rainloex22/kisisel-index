@@ -315,6 +315,40 @@
             });
         });
 
+        // Sayfa yüklendiğinde aktif linki belirleyen fonksiyon
+function setActiveNavLink() {
+    // URL'den dosya adını alıyoruz (örneğin: "index.html")
+    const currentPath = window.location.pathname.split('/').pop(); 
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(link => {
+        const linkPath = link.getAttribute('href');
+
+        // Önceki vurguyu temizle
+        link.classList.remove('nav-active');
+
+        // Linkin yolu, mevcut sayfanın yoluyla eşleşiyor mu?
+        if (linkPath === currentPath) {
+            link.classList.add('nav-active');
+        } 
+        
+        // KRİTİK NOT: Eğer ana sayfanız "panel.html" değil de sadece "/" ise 
+        // ve URL boş geliyorsa, "panel.html" linkini vurgula.
+        if (currentPath === '' && linkPath === 'panel.html') {
+            link.classList.add('nav-active');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // ... var olan diğer başlangıç kodları (örneğin: switchTab('dashboard');) ...
+    
+    // 💡 Yeni eklenen fonksiyon çağrısı
+    setActiveNavLink(); 
+
+    // ... onAuthStateChanged ve diğer kodlarınız ...
+});
+
         // Sayfa yüklendiğinde Firebase başlatma ve dinleme işlemini başlat
         window.onload = window.startClient;
 
