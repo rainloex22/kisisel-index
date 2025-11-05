@@ -1,45 +1,267 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profesyonel Web Barındırma | bakikara.xyz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* GENEL SIFIRLAMA VE FONT */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; /* Çok açık gri */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* HEADER & BANNER STİLİ */
+        .header-banner {
+            background: linear-gradient(135deg, #007bff, #0056b3); /* Mavi gradient */
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .header-banner h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        .header-banner p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .header-banner strong {
+            color: #ffc107; /* Sarı vurgu */
+        }
+
+        /* ANA İÇERİK STİLİ */
+        .main-content {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* 1. HİZMET KARTLARI (Neden Bizi Seçmelisiniz) */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-card h3 {
+            color: #007bff;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+        .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #28a745; /* Yeşil ikon */
+        }
+
+        /* 2. FİYATLANDIRMA/PAKETLER (Bu sizin tek paketiniz) */
+        .pricing-section h2 {
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .pricing-table {
+            max-width: 400px;
+            margin: 0 auto 50px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 2px solid #28a745; /* Vurgulu sınır */
+        }
+        .package-header {
+            background-color: #28a745;
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+        }
+        .package-header h3 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        .price {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .price small {
+            font-size: 0.5em;
+            font-weight: 400;
+        }
+        .package-features {
+            list-style: none;
+            padding: 20px 30px;
+            margin: 0;
+        }
+        .package-features li {
+            padding: 12px 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .package-features li:last-child {
+            border-bottom: none;
+        }
+        .check-icon {
+            color: #28a745;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        /* 3. BAŞVURU FORMU STİLİ */
+        .form-section {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-section h2 {
+            font-family: 'Poppins', sans-serif;
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="email"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* MOBİL UYUMLULUK */
+        @media (max-width: 768px) {
+            .header-banner h1 {
+                font-size: 2em;
+            }
+            .header-banner {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-banner">
+    <h1>Statik Web Barındırma Çözümü</h1>
+    <p>Projelerinizi hızla yayınlayın. Başlangıç seviyesi, <strong>%100 ÜCRETSİZ</strong> barındırma.</p>
+</div>
+
 <div class="main-content">
-    <div class="card-container">
-        
-        <div class="info-panel">
-            <h2>Hizmet Detayları</h2>
-            <ul>
-                <li><strong>Adres Formatı:</strong> <code>bakikara.xyz/site-adı</code></li>
-                <li><strong>Özel Alan Adı:</strong> İsteğe bağlı, ek depo gerektirir.</li>
-                <li><strong>Barındırma Tipi:</strong> Statik (HTML, CSS, JavaScript)</li>
-                <li><strong>Başvuru Süreci:</strong> Form → E-posta İletişimi → Dosya Gönderimi → Yayın.</li>
-            </ul>
-            <div style="margin-top: 30px;">
-                <h3 style="color: #555;">Dosya Yükleme Notu</h3>
-                <p style="font-size: 0.9em;">Dosyalarınızı (zip olarak) **bu formu gönderdikten sonra** sizinle paylaşacağımız e-posta adresine göndermeniz gerekecektir.</p>
-            </div>
+    
+    <h2 style="text-align: center; font-family: 'Poppins', sans-serif; margin-bottom: 40px;">Neden Bizimle Başlamalısınız?</h2>
+    <div class="features">
+        <div class="feature-card">
+            <span class="icon">⚡</span>
+            <h3>Yüksek Hız</h3>
+            <p>Siteniz, optimize edilmiş GitHub altyapısında hızlı ve kesintisiz çalışır.</p>
         </div>
-        
-        <div class="form-panel">
-            <h2>Başvuru Formunu Doldurun</h2>
-            
-            <form id="hostingBasvuruFormu" action="https://formspree.io/f/manlrnqz" method="POST"> 
-                
-                <label for="kullaniciAdi">İstenen Site Adı (URL Kısmı):</label>
-                <input type="text" id="kullaniciAdi" name="site_adi" placeholder="Örn: deneme-sitesi" required>
-
-                <label for="adSoyad">Adınız ve Soyadınız:</label>
-                <input type="text" id="adSoyad" name="ad_soyad" required>
-
-                <label for="eposta">E-posta Adresiniz:</label>
-                <input type="email" id="eposta" name="email" required>
-                
-                <label for="ozelDomain">Özel Alan Adı İsteği (isteğe bağlı):</label>
-                <input type="text" id="ozelDomain" name="ozel_alan_adi" placeholder="Örn: siteminadi.com">
-
-                <label for="aciklama">Proje Amacı ve Ek Açıklamalar:</label>
-                <textarea id="aciklama" name="message" rows="4" placeholder="Projenizin amacını kısaca belirtiniz."></textarea>
-                
-                <input type="hidden" name="_subject" value="Yeni Hosting Başvurusu: bakikara.xyz">
-
-                <button type="submit">Başvuruyu Tamamla ve Gönder</button>
-            </form>
-
+        <div class="feature-card">
+            <span class="icon">✅</span>
+            <h3>Sıfır Maliyet</h3>
+            <p>Başlangıç siteleri ve kişisel projeler için hiçbir ücret ödemezsiniz.</p>
+        </div>
+        <div class="feature-card">
+            <span class="icon">🔗</span>
+            <h3>Kolay Erişim</h3>
+            <p>Siteniz otomatik olarak <code>bakikara.xyz/site-adi</code> adresinde yayınlanır.</p>
         </div>
     </div>
+
+    <div class="pricing-section">
+        <h2>Barındırma Paketimiz</h2>
+        <div class="pricing-table">
+            <div class="package-header">
+                <h3>Statik Başlangıç Paketi</h3>
+                <div class="price">ÜCRETSİZ <small>/ Süresiz</small></div>
+            </div>
+            <ul class="package-features">
+                <li>Statik Hosting <span class="check-icon">✓</span></li>
+                <li>Adres Formatı: bakikara.xyz/site-adi <span class="check-icon">✓</span></li>
+                <li>SSL Sertifikası (HTTPS) <span class="check-icon">✓</span></li>
+                <li>Dosya Yükleme Yönergesi <span class="check-icon">✓</span></li>
+                <li>Özel Alan Adı Desteği <span class="check-icon">✓</span></li>
+                <li>Veritabanı Desteği <span style="color: #dc3545;">X</span></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="form-section">
+        <h2>Hizmetten Faydalanmak İçin Başvurun</h2>
+        
+        <form id="hostingBasvuruFormu" action="https://formspree.io/f/manlrnqz" method="POST"> 
+            
+            <label for="kullaniciAdi">İstenen Site Adı (URL Kısmı):</label>
+            <input type="text" id="kullaniciAdi" name="site_adi" placeholder="Örn: sitemin-adi (URL: bakikara.xyz/sitemin-adi)" required>
+
+            <label for="adSoyad">Adınız ve Soyadınız:</label>
+            <input type="text" id="adSoyad" name="ad_soyad" required>
+
+            <label for="eposta">E-posta Adresiniz:</label>
+            <input type="email" id="eposta" name="email" required>
+            
+            <label for="ozelDomain">Özel Alan Adı İsteği (isteğe bağlı):</label>
+            <input type="text" id="ozelDomain" name="ozel_alan_adi" placeholder="Örn: www.kullanici-sitem.com (varsa belirtin)">
+
+            <label for="aciklama">Proje Amacı ve Ek Açıklamalar:</label>
+            <textarea id="aciklama" name="message" rows="4" placeholder="Projenizin amacını ve statik olduğunu kısaca belirtiniz."></textarea>
+            
+            <input type="hidden" name="_subject" value="Yeni Hosting Başvurusu: bakikara.xyz">
+
+            <button type="submit" class="submit-btn">Başvuruyu Gönder ve Başla</button>
+        </form>
+
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9em; color: #555;">Başvurunuz onaylandıktan sonra dosyalarınızı göndermeniz için size e-posta ile ulaşılacaktır.</p>
+    </div>
 </div>
+
+</body>
+</html>
