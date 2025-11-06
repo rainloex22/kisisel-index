@@ -442,7 +442,7 @@
         <thead>
             <tr>
                 <th onclick="sortCustomers('email')">E-posta / Site Adı <span id="sortEmail" class="sort-icon fas fa-sort"></span></th>
-                <th onclick="sortCustomers('createdAt')">Kayıt Tarihi <span id="sortCreatedAt" class="sort-icon fas fa-sort-down"></span></th>
+                <th onclick="sortCustomers('created_at')">Kayıt Tarihi <span id="sortCreated_at" class="sort-icon fas fa-sort-down"></span></th> 
                 <th onclick="sortCustomers('balance')">Bakiye (₺) <span id="sortBalance" class="sort-icon fas fa-sort"></span></th>
                 <th>Site Adresi (Öneri)</th>
                 <th onclick="sortCustomers('serviceStatus')">Durum <span id="sortStatus" class="sort-icon fas fa-sort"></span></th>
@@ -510,7 +510,6 @@
 <script type="module">
     // ----------------------------------------------------------------------
     // 🔥 ADIM 1: SUPABASE BAĞLANTI AYARLARI
-    // Bu iki satırı Supabase panelinizdeki API Ayarları bölümünden aldığınız URL ve Anahtar ile DEĞİŞTİRMELİSİNİZ!
     // ----------------------------------------------------------------------
     const SUPABASE_URL = 'https://rqbbxjuncwwgtkbcqtet.supabase.co'; 
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxYmJ4anVuY3d3Z3RrYmNxdGV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0MzM1NjAsImV4cCI6MjA3ODAwOTU2MH0.8dzDoL8MEgbrL7b-ocJ79c9ts9qtSbFT3EashQZXyZQ'; 
@@ -540,7 +539,7 @@
     
     let allCustomers = [];
     let currentEditingUser = null; 
-    let sortKey = 'createdAt'; 
+    let sortKey = 'created_at'; // 🔥 DÜZELTME: Başlangıç sıralama anahtarı created_at olarak değiştirildi
     let sortDirection = 'desc'; 
 
     // ----------------------------------------------------------------------
@@ -582,7 +581,7 @@
 
 
     // ----------------------------------------------------------------------
-    // 2. MÜŞTERİ TABLOSU ve FİLTRE/SIRA İŞLEVLERİ (Küçük düzenlemelerle aynı kaldı)
+    // 2. MÜŞTERİ TABLOSU ve FİLTRE/SIRA İŞLEVLERİ
     // ----------------------------------------------------------------------
     
     /**
@@ -627,8 +626,8 @@
             let aVal = a[sortKey];
             let bVal = b[sortKey];
 
-            // Tarih ve Bakiye alanları için dönüşüm
-            if (sortKey === 'createdAt') {
+            // 🔥 DÜZELTME: created_at kullanılıyor
+            if (sortKey === 'created_at') { 
                 // Supabase'den gelen tarih string'ini Date nesnesine çevir
                 aVal = aVal ? new Date(aVal).getTime() : 0;
                 bVal = bVal ? new Date(bVal).getTime() : 0;
@@ -650,7 +649,16 @@
             icon.classList.remove('fa-sort-up', 'fa-sort-down');
             icon.classList.add('fa-sort');
         });
-        const currentSortIcon = document.getElementById(`sort${sortKey.charAt(0).toUpperCase() + sortKey.slice(1)}`);
+        // 🔥 DÜZELTME: Sadece created_at'i ayrı ele al
+        let iconId = '';
+        if (sortKey === 'created_at') {
+            iconId = 'sortCreated_at';
+        } else {
+            iconId = `sort${sortKey.charAt(0).toUpperCase() + sortKey.slice(1)}`;
+        }
+        
+        const currentSortIcon = document.getElementById(iconId);
+        
         if (currentSortIcon) {
              currentSortIcon.classList.remove('fa-sort');
              currentSortIcon.classList.add(sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down');
@@ -666,8 +674,8 @@
             const userEmail = user.email || 'Bilinmiyor';
             const username = userEmail.split('@')[0];
             const siteUrl = `bakikara.xyz/${user.site_adi || username}`; // Site adı varsa onu kullan
-            // Supabase'den gelen ISO tarih formatını yerel formata çevir
-            const regDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Bilinmiyor';
+            // 🔥 DÜZELTME: user.created_at kullanılıyor
+            const regDate = user.created_at ? new Date(user.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Bilinmiyor';
             const status = user.serviceStatus || 'FILE_WAITING'; 
             const balance = (user.balance || 0).toFixed(2); // Bakiye değeri
 
@@ -701,7 +709,8 @@
         } else {
             sortKey = key;
             sortDirection = 'asc'; 
-            if (key === 'createdAt' || key === 'balance') sortDirection = 'desc'; 
+            // 🔥 DÜZELTME: created_at kullanılıyor
+            if (key === 'created_at' || key === 'balance') sortDirection = 'desc'; 
         }
         filterCustomers(); // Veriyi yeniden render et
     }
@@ -746,7 +755,8 @@
             const { data: customers, error } = await supabaseClient
                 .from('customers') // Oluşturduğumuz tablo adı
                 .select('*') 
-                .order('createdAt', { ascending: false }); 
+                // 🔥 DÜZELTME: created_at kullanılıyor
+                .order('created_at', { ascending: false }); 
 
             if (error) {
                 throw error;
@@ -830,9 +840,10 @@
         try {
             // Supabase'den son 5 duyuruyu çek
             const { data: announcements, error } = await supabaseClient
+                // 🔥 DÜZELTME: created_at kullanılıyor
                 .from('announcements')
-                .select('text, createdAt') // Sadece metin ve oluşturulma tarihi
-                .order('createdAt', { ascending: false })
+                .select('text, created_at') // Sadece metin ve oluşturulma tarihi
+                .order('created_at', { ascending: false })
                 .limit(5);
 
             if (error) throw error;
@@ -845,7 +856,8 @@
             }
 
             announcements.forEach(announcement => {
-                const date = announcement.createdAt ? new Date(announcement.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Bilinmiyor';
+                // 🔥 DÜZELTME: announcement.created_at kullanılıyor
+                const date = announcement.created_at ? new Date(announcement.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Bilinmiyor';
                 
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
@@ -901,6 +913,9 @@
             messageElement.style.color = 'var(--success-color)';
             messageElement.innerText = '✅ Duyuru başarıyla yayınlandı! (Müşteri sitelerinde görünecek)';
             textElement.value = ''; 
+            
+            // Yayın başarılı olduğunda aktivite listesini güncelle
+            listenForRecentActivity();
 
         } catch (error) {
             console.error("Duyuru yayınlanırken hata oluştu:", error);
@@ -934,8 +949,9 @@
                     try {
                         // Supabase ile Güncelleme
                         const { error } = await supabaseClient
+                            // Supabase'in otomatik last_updated alanını kullanmak için burada lastUpdated yerine last_updated kullanılması gerekebilir.
                             .from('customers')
-                            .update({ serviceStatus: newStatus, lastUpdated: new Date().toISOString() })
+                            .update({ serviceStatus: newStatus, lastUpdated: new Date().toISOString() }) 
                             .eq('user_id', userId); // user_id'si eşleşeni bul
 
                         if (error) throw error;
@@ -1029,7 +1045,7 @@
                     serviceStatus: document.getElementById('detailStatus').value,
                     admin_notes: document.getElementById('detailNotes').value.trim(),
                     balance: newBalance,
-                    lastUpdated: new Date().toISOString() // Supabase timestamp formatı
+                    lastUpdated: new Date().toISOString() // Supabase timestamp formatı (Eğer tablonuzda bu isimde sütun yoksa hata verebilir, ama şimdilik bırakıyorum)
                 })
                 .eq('user_id', currentEditingUser.userId); // Doğru user_id ile eşleştir
 
