@@ -6,7 +6,6 @@ service cloud.firestore {
     match /users/{userId} {
       
       // 🔥 ÇÖZÜM: Oturum açmış herkesin (admin dahil) tüm kullanıcıları okumasına izin ver.
-      // Bu kural, admin panelindeki tüm listeleme/sorgulama isteklerini (400 hatası) çözecektir.
       allow read: if request.auth != null; 
 
       // Kendi belgesini güncelleme/silme iznini koru.
@@ -16,8 +15,13 @@ service cloud.firestore {
       allow create: if request.auth != null;
     }
     
-    // ... (Diğer kurallar)
+    // 2. DUYURULAR
+    match /announcements/{document} {
+        allow read: if true;
+        allow create: if request.auth != null;
+    }
 
+    // 3. DİĞER HER ŞEY
     match /{document=**} {
         allow read, write: if false;
     }
