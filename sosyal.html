@@ -68,11 +68,16 @@
         const TARGET_URL = "fiyatlar.html"; 
 
         // Global alert box görünürlüğünü yönetme (auth.js'de de kullanılıyor)
-        function showAlert(message) {
+        function showAlert(message, type = 'green') {
             const alertBox = document.getElementById('alert-box');
             const alertMessage = document.getElementById('alert-message');
             alertMessage.textContent = message;
             
+            // Renk ayarı
+            alertBox.className = `fixed top-20 left-1/2 transform -translate-x-1/2 p-4 rounded-xl shadow-2xl z-50 transition-element duration-300 ease-out font-semibold ${
+                type === 'red' ? 'bg-red-600' : 'bg-green-600'
+            }`;
+
             alertBox.classList.remove('hidden', 'opacity-0');
             alertBox.classList.add('opacity-100');
             
@@ -96,7 +101,8 @@
 
         // DOMContentLoaded ve Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('alert-box').classList.add('opacity-0');
+            const alertBox = document.getElementById('alert-box');
+            if (alertBox) alertBox.classList.add('opacity-0', 'hidden');
 
             // Form Gönderimi Simülasyonu
             const contactForm = document.getElementById('contact-form');
@@ -132,24 +138,23 @@
                 });
             });
 
-            // Giriş Yap / Kayıt Ol Butonu Listener'ı
-            // Not: Bu artık modal açmak yerine formu scroll ile gösterir.
+            // ⭐ KRİTİK DÜZELTME: Giriş Yap / Kayıt Ol Butonu Listener'ı
             const loginButton = document.getElementById('login-button');
             if (loginButton) {
                 loginButton.addEventListener('click', (event) => {
-                    event.preventDefault();
+                    event.preventDefault(); // Sayfa yenilenmesini engelle
                     const targetSection = document.getElementById('sosyal-yorumlar'); 
                     if (targetSection) {
                         // Formun olduğu bölüme yumuşak kaydırma
                         targetSection.scrollIntoView({ behavior: 'smooth' }); 
-                        showAlert('Lütfen Giriş Yapın veya Kayıt Olun.');
+                        showAlert('Lütfen Giriş Yapın veya Kayıt Olun.', 'green');
                     }
                 });
             }
         });
     </script>
     
-    <div id="alert-box" class="hidden accent-color text-white p-4 rounded-xl shadow-2xl transition-element duration-300 ease-out">
+    <div id="alert-box" class="hidden text-white">
         <p id="alert-message" class="font-semibold"></p>
     </div>
 
@@ -279,7 +284,7 @@
             <h2 class="text-4xl font-extrabold text-center text-green-400 mb-12">Ziyaretçi Yorumları</h2>
             
             <div id="auth-form-area" class="primary-light p-8 rounded-3xl shadow-2xl border border-slate-700 max-w-lg mx-auto mb-12">
-                <h3 class="text-2xl font-bold text-white mb-6 text-center" id="auth-title">Giriş Yap veya Kayıt Ol</h3>
+                <h3 class="text-2xl font-bold text-white mb-6 text-center" id="auth-title">Giriş Yap</h3>
                 <form id="auth-form">
                     <div class="mb-4">
                         <label for="auth-email" class="block text-gray-400 font-medium mb-2">E-posta</label>
