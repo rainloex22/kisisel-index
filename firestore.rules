@@ -1,29 +1,16 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // 1. MÜŞTERİ HESAPLARI (users koleksiyonu)
-    match /users/{userId} {
-      
-      // 🔥 ÇÖZÜM: Oturum açmış herkesin (admin dahil) tüm kullanıcıları okumasına izin ver.
-      allow read: if request.auth != null; 
-
-      // Kendi belgesini güncelleme/silme iznini koru.
-      allow update, delete: if request.auth != null && request.auth.uid == userId;
-      
-      // Giriş yapmış herkes hesap oluşturabilir.
-      allow create: if request.auth != null;
-    }
     
-    // 2. DUYURULAR
-    match /announcements/{document} {
-        allow read: if true;
-        allow create: if request.auth != null;
+    // Kendi e-postanızla değiştirin!
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == "mehmeteminacan13@gmail.com";
     }
 
-    // 3. DİĞER HER ŞEY
-    match /{document=**} {
-        allow read, write: if false;
+    match /users/{userId} {
+      allow read: if isAdmin();
+      // Yöneticilerin yazmasına izin ver
+      allow create, update, delete: if isAdmin(); 
     }
   }
 }
