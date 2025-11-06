@@ -1,29 +1,33 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
     // 1. MÜŞTERİ HESAPLARI (users koleksiyonu)
     match /users/{userId} {
-      // Müşterinin sadece kendi belgesini okumasına, güncellemesine ve silmesine izin ver.
-      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+      
+      // 🔥 TEST İÇİN DÜZELTİLDİ: Oturum açmış herkesin (admin dahil) TÜM belgeleri okumasına izin ver.
+      // Bu kural, admin.html'deki koleksiyon sorgulama (list) sorununu çözer.
+      allow read: if request.auth != null;
+
+      // Güncelleme ve Silme: Sadece kendi belgesini güncelleme/silme iznini koru.
+      allow update, delete: if request.auth != null && request.auth.uid == userId;
+      
+      // Oluşturma: Giriş yapmış herkes oluşturabilir.
       allow create: if request.auth != null;
     }
     
-    // 🔥 2. KRİTİK ADMIN PANEL İZNİ 🔥
-    // Oturum açmış herkesin (admin.html'ye giren) TÜM users koleksiyonunu okumasına izin ver.
-    match /users/{document=**} {
-      allow read: if request.auth != null; 
-    }
-    
-    // 3. DUYURULAR (announcements koleksiyonu)
+    // (Daha önceki /users/{document=**} bloğu, /users/{userId} ile çakıştığı için kaldırıldı.)
+
+    // 2. DUYURULAR (announcements koleksiyonu)
     match /announcements/{document} {
         // Tüm müşterilerin (giriş yapmayanlar dahil) okumasına izin ver.
-        allow read: if true; 
+        allow read: if true;
+        
         // Sadece giriş yapanın (Yönetici) duyuru oluşturmasına izin ver.
-        allow create: if request.auth != null; 
+        allow create: if request.auth != null;
     }
-    
-    // 4. DİĞER HER ŞEY
+
+    // 3. DİĞER HER ŞEY
     match /{document=**} {
         // Yukarıda tanımlanmayan diğer tüm koleksiyonlara erişimi kısıtla.
         allow read, write: if false;
