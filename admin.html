@@ -435,6 +435,89 @@
             <p id="announcementMessage" style="margin-top: 10px; color: var(--text-light);"></p>
         </div>
     </div>
+
+  <div class="card activity-area" style="margin-bottom: 30px;">
+        <h2><i class="fas fa-user-plus"></i> Yeni Müşteri Ekle</h2>
+        <div class="card-body">
+            <div class="modal-input-group">
+                <label for="newCustomerEmail">E-posta Adresi:</label>
+                <input type="email" id="newCustomerEmail" placeholder="ornek@mail.com">
+            </div>
+            <div class="modal-input-group">
+                <label for="newCustomerBalance">Başlangıç Bakiyesi (₺):</label>
+                <input type="number" id="newCustomerBalance" value="0.00" step="0.01">
+            </div>
+            <div class="modal-input-group">
+                <label for="newCustomerStatus">Durum:</label>
+                <select id="newCustomerStatus">
+                    <option value="PENDING">BEKLEMEDE</option>
+                    <option value="ACTIVE">AKTİF</option>
+                    <option value="SUSPENDED">ASKIYA ALINDI</option>
+                </select>
+            </div>
+            <button class="action-btn" onclick="addNewCustomer()" style="background-color: var(--success-color); margin-top: 15px; width: 100%;">Müşteriyi Ekle</button>
+        </div>
+    </div>
+    ```
+
+## 🛠️ ADIM 2: MANUEL EKLEME FONKSİYONUNU EKLEME (JavaScript)
+
+Bu fonksiyon, formdan gelen veriyi Supabase'e gönderecektir.
+
+Lütfen `admin.html` dosyanızdaki `<script type="module">` etiketleri arasına, **`// 4. DUYURU YÖNETİMİ (SUPABASE INSERT)`** başlığının hemen altına (yaklaşık 525. satır civarı) aşağıdaki Javascript kodunu yapıştırın:
+
+```javascript
+    // ----------------------------------------------------------------------
+    // 5. MANUEL MÜŞTERİ EKLEME İŞLEMİ (Yeni)
+    // ----------------------------------------------------------------------
+
+    /**
+     * Admin tarafından manuel olarak yeni müşteri ekleyen fonksiyon
+     */
+    window.addNewCustomer = async function() {
+        const email = document.getElementById('newCustomerEmail').value;
+        const initialBalance = parseFloat(document.getElementById('newCustomerBalance').value) || 0;
+        const status = document.getElementById('newCustomerStatus').value;
+
+        if (!email || !email.includes('@') || !email.includes('.')) {
+            showModal("Hata", "Lütfen geçerli bir e-posta adresi girin.", 'alert');
+            return;
+        }
+
+        try {
+            // Supabase'e doğrudan insert işlemi
+            const { error } = await supabaseClient
+                .from('customers')
+                .insert([
+                    { 
+                        email: email, 
+                        balance: initialBalance, 
+                        serviceStatus: status,
+                        user_id: null, // Manuel eklenenlerin Auth hesabı yok
+                        createdAt: new Date().toISOString() // Kayıt tarihi ekle
+                    }
+                ]);
+
+            if (error) throw error;
+
+            // Başarılı olursa formu temizle ve mesaj göster
+            document.getElementById('newCustomerEmail').value = '';
+            document.getElementById('newCustomerBalance').value = '0.00';
+            document.getElementById('newCustomerStatus').value = 'PENDING';
+            
+            // Gerçek zamanlı dinleme sayesinde tablo otomatik güncellenecektir.
+            showModal("Başarılı", `${email} adlı müşteri başarıyla eklendi.`, 'success');
+
+        } catch (error) {
+            console.error("Müşteri ekleme hatası:", error);
+            let errorMessage = `Müşteri eklenirken hata oluştu: ${error.message}`;
+            if (error.code === '23505') { 
+                 errorMessage = "Bu e-posta adresi zaten kayıtlı.";
+            }
+            showModal("Hata", errorMessage, 'alert');
+        }
+    }  
+    
     <div id="loading">Müşteri verileri yükleniyor...</div>
     <div id="error-message" style="display:none;"></div>
     
