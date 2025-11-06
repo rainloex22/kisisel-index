@@ -3,107 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fiyat Listesi | Sosyal Medya Hizmet Paketleri</title>
+    <title>⚡ Fiyat Listesi | Sosyal Medya Hizmet Paketleri</title>
+    <meta name="description" content="Instagram, TikTok ve YouTube için en güncel ve avantajlı fiyat paketlerini inceleyin.">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         /* Inter Font'u tüm sayfada kullan */
         body { font-family: 'Inter', sans-serif; }
         
-        /* Renk Teması: Indigo (Lacivert) */
-        .primary-color { background-color: #4f46e5; } /* Indigo-600 */
-        .primary-hover { background-color: #4338ca; } /* Indigo-700 */
-        
-        /* Sekonder Renk (Vurgu/CTA): Amber (Turuncu) - En Popüler Paket Vurgusu */
-        .secondary-color { background-color: #f59e0b; } /* Amber-500 (CTA) */
-        .secondary-hover { background-color: #d97706; } /* Amber-600 */
-        
-        /* Ekranın ortasında yer alan uyarı kutusu stilleri */
+        /* Temaya Uyumlu Renkler */
+        .primary-dark { background-color: #0f172a; } /* Slate-900 */
+        .primary-light { background-color: #1e293b; } /* Slate-800 */
+        .accent-color { background-color: #22c55e; } /* Green-500 (Vurgu) */
+        .accent-hover { background-color: #16a34a; } /* Green-600 */
+        .cta-special-color { background-color: #f97316; } /* Orange-600 (En Popüler Vurgu) */
+        .cta-special-hover { background-color: #ea580c; } /* Orange-700 */
+
+        /* Akıcı Geçişler ve Buton Basma Efekti */
+        .transition-element { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .button-press:active { transform: scale(0.97) !important; opacity: 0.9; }
+
+        /* Alert Box Stili (Header altına) */
         #alert-box {
             position: fixed;
-            top: 20%;
+            top: 6rem; /* Header altında */
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             z-index: 50;
         }
 
-        /* Tüm elemanlarda akıcı geçişler için özel CSS */
-        .transition-element {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        /* Inputlara özel focus/odaklanma animasyonu */
-        input:focus, textarea:focus {
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5); /* Indigo-600 shadow */
-        }
-        
-        /* Buton Basma Animasyonu (Active State) - Her butona uygulanmalı */
-        .button-press:active {
-            transform: scale(0.98) !important;
-            opacity: 0.9;
-        }
-
-        /* Bölüm Giriş Animasyonu Keyframes */
+        /* Animasyon: Section Fade In (Ana sayfaya uyumlu) */
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translate3d(0, 40px, 0);
-            }
-            to {
-                opacity: 1;
-                transform: translate3d(0, 0, 0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        /* Sürekli Nabız (Pulse) Animasyonu Keyframes (CTA için) */
-        @keyframes pulseShadow {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); } /* Amber-500 shadow */
-            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-        }
+        .section-animate { animation: fadeInUp 0.8s ease-out both; }
 
-        .section-fade-in {
-            animation: fadeInUp 0.8s ease-out both;
+        /* Animasyon: CTA Nabız Efekti (Ana sayfaya uyumlu) */
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
         }
+        .cta-pulse-glow { animation: pulseGlow 2.5s infinite; }
         
-        .cta-pulse {
-            animation: pulseShadow 2s infinite;
-        }
-
-        /* Platform tab butonlarına özel animasyon */
+        /* Platform tab butonlarına özel animasyon (Ana sayfadaki Green vurguya uyarlandı) */
         .tab-button.active {
-            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
-            background-color: #4f46e5; /* primary-color */
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
+            background-color: #22c55e; /* accent-color */
             color: #fff;
         }
+        
     </style>
 </head>
-<body class="bg-gray-900 text-gray-100">
+<body class="primary-dark text-gray-100 antialiased">
 
     <script>
         // Platform Sekme Kimlikleri ve Mevcut İndeksi
         const tabIds = ['instagram', 'tiktok', 'youtube'];
         let currentTabIndex = 0;
         
-        // Yönlendirilecek Shopier adresi
-        const SHOPIER_URL = "https://www.shopier.com/bakikaraxyz"; // Yeni hedef adres
-
+        // Yönlendirilecek Ödeme adresi (varsayılan olarak)
+        const SHOPIER_URL = "https://www.shopier.com/sosyalpro"; // Örnek hedef adres
+        
         // Global alert box görünürlüğünü yönetme
         function showAlert(message) {
             const alertBox = document.getElementById('alert-box');
             const alertMessage = document.getElementById('alert-message');
             alertMessage.textContent = message;
             
-            // Animasyon başlangıcı: class'ı kaldır ve ekle
-            alertBox.classList.remove('hidden', 'opacity-0', 'scale-75');
-            alertBox.classList.add('opacity-100', 'scale-100');
+            // Animasyon başlangıcı
+            alertBox.classList.remove('hidden', 'opacity-0');
+            alertBox.classList.add('opacity-100');
             
             // 3 saniye sonra uyarıyı otomatik olarak gizle
             setTimeout(() => {
-                alertBox.classList.remove('opacity-100', 'scale-100');
-                alertBox.classList.add('opacity-0', 'scale-75'); // Gizlenme animasyonu
+                alertBox.classList.remove('opacity-100');
+                alertBox.classList.add('opacity-0');
                 setTimeout(() => {
-                     alertBox.classList.add('hidden');
+                    alertBox.classList.add('hidden');
                 }, 300); // CSS geçişi bitene kadar bekle
             }, 3000);
         }
@@ -111,25 +91,25 @@
         // Fiyat Paketi Satın Alma İşlevi - 1.5 saniye sonra yönlendiriyor
         function purchasePackage(packageName, price) {
             // Kullanıcıyı bilgilendir
-            showAlert(`"${packageName}" paketi seçildi. Ödeme için Shopier sayfasına yönlendiriliyorsunuz...`);
+            showAlert(`"${packageName}" paketi seçildi. Ödeme için ${SHOPIER_URL} sayfasına yönlendiriliyorsunuz...`);
             
             // 1.5 saniye (1500ms) sonra yönlendirme yap
             setTimeout(() => {
                 window.location.href = SHOPIER_URL; // Yönlendirme komutu
-            }, 1500); // <-- Burası 1500 olarak değiştirildi (1.5 saniye)
+            }, 1500);
         }
 
-        // Tab Yönetimi Fonksiyonu
+        // Tab Yönetimi Fonksiyonu (Ana sayfaya uyumlu hale getirildi)
         function switchTab(tabId) {
             // Tüm içerikleri gizle
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.add('hidden');
-                content.classList.remove('section-fade-in'); // Animasyonu sıfırla
+                content.classList.remove('section-animate'); // Animasyonu sıfırla
             });
             // Tüm butonlardaki 'active' sınıfını kaldır
             document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active', 'primary-color');
-                button.classList.add('bg-gray-700', 'hover:bg-gray-600');
+                button.classList.remove('active', 'accent-color');
+                button.classList.add('bg-slate-700', 'hover:bg-slate-600');
             });
 
             // İstenen içeriği göster ve animasyonu ekle
@@ -138,15 +118,15 @@
                 targetContent.classList.remove('hidden');
                 // Animasyonu tetiklemek için gecikmeli olarak sınıf ekle
                 setTimeout(() => {
-                    targetContent.classList.add('section-fade-in');
+                    targetContent.classList.add('section-animate');
                 }, 10); 
             }
 
             // Tıklanan butonu aktif hale getir
             const targetButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
             if (targetButton) {
-                targetButton.classList.add('active', 'primary-color');
-                targetButton.classList.remove('bg-gray-700', 'hover:bg-gray-600');
+                targetButton.classList.add('active', 'accent-color');
+                targetButton.classList.remove('bg-slate-700', 'hover:bg-slate-600');
             }
             
             // Mevcut indeksi güncelle
@@ -169,9 +149,7 @@
 
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Alert kutusunun başlangıç animasyon sınıflarını ayarla
-            const alertBox = document.getElementById('alert-box');
-            alertBox.classList.add('opacity-0', 'scale-75');
+            document.getElementById('alert-box').classList.add('opacity-0');
 
             // Satın alma butonları için event listener
             document.querySelectorAll('.buy-button').forEach(button => {
@@ -203,31 +181,40 @@
 
             // Başlangıçta ilk tab'ı aktif et
             switchTab('instagram');
+            
+            // İletişim Formu Simülasyonu
+            const contactForm = document.getElementById('contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    showAlert('Mesajınız başarıyla iletildi! Ana sayfa üzerinden geri dönüş yapılacaktır.');
+                    this.reset();
+                });
+            }
         });
     </script>
     
-    <div id="alert-box" class="hidden bg-green-600 text-white p-4 rounded-lg shadow-2xl transition-element duration-300 ease-out">
+    <div id="alert-box" class="hidden accent-color text-white p-4 rounded-xl shadow-2xl transition-element duration-300 ease-out">
         <p id="alert-message" class="font-semibold"></p>
     </div>
 
-    <header class="bg-gray-800 shadow-lg sticky top-0 z-10">
+    <header class="primary-light shadow-xl sticky top-0 z-20 border-b border-gray-700/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <a href="#" class="flex items-center space-x-2 transition-element hover:opacity-70 button-press">
-                    <svg class="h-8 w-8 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                    <span class="text-xl font-bold text-gray-100">SOSYAL HUB</span>
+                <a href="index.html" class="flex items-center space-x-2 transition-element hover:opacity-80 button-press">
+                    <svg class="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span class="text-xl font-extrabold text-white tracking-wider">SOSYAL PRO</span>
                 </a>
                 
                 <nav class="hidden md:flex space-x-8">
-                    <a href="#fiyatlar" class="text-indigo-400 font-medium transition-element button-press">Fiyatlar (Aktif)</a>
-                    <a href="#avantajlar" class="text-gray-300 hover:text-indigo-400 font-medium transition-element button-press">Avantajlar</a>
-                    <a href="#iletisim" class="text-white primary-color px-4 py-2 rounded-lg font-semibold hover:primary-hover transition-element shadow-md transform hover:scale-105 button-press">İletişim</a>
+                    <a href="index.html#hizmetler" class="text-gray-300 hover:text-green-400 font-medium transition-element button-press">Ana Sayfa & Hizmetler</a>
+                    <a href="#fiyatlar" class="text-green-400 font-bold transition-element button-press border-b-2 border-green-500">Fiyat & Paketler (Aktif)</a> 
+                    <a href="#avantajlar" class="text-gray-300 hover:text-green-400 font-medium transition-element button-press">Avantajlar</a>
+                    <a href="#iletisim" class="accent-color text-white px-4 py-2 rounded-lg font-semibold hover:accent-hover transition-element shadow-md transform hover:scale-105 button-press">İletişime Geç</a>
                 </nav>
                 
                 <div class="md:hidden">
-                    <button type="button" class="text-gray-300 hover:text-indigo-400 focus:outline-none transition-element button-press">
+                    <button type="button" class="text-gray-300 hover:text-green-400 focus:outline-none transition-element button-press p-2 rounded-md" aria-label="Mobil Menü">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                     </button>
                 </div>
@@ -235,51 +222,50 @@
         </div>
     </header>
 
-    <section id="hero" class="bg-gradient-to-br from-gray-800 to-gray-900 py-16 sm:py-24 border-b border-indigo-700 section-fade-in" style="animation-delay: 0.1s;">
+    <section id="hero" class="bg-gradient-to-br from-slate-900 to-slate-800 py-20 sm:py-32 border-b border-green-600/20 section-animate">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl sm:text-6xl font-extrabold text-white leading-tight mb-4">
-                En Uygun <span class="text-amber-400">Fiyat Paketleri</span>
+            <h1 class="text-5xl sm:text-7xl font-extrabold text-white leading-tight mb-4">
+                En Uygun <span class="text-orange-400">Fiyat & Paketleri</span>
             </h1>
-            <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-                Bütçenize ve hedeflerinize uygun, garantili sosyal medya hizmetlerini keşfedin.
+            <p class="text-xl text-gray-400 max-w-4xl mx-auto mb-10">
+                Hedefinize en uygun, garantili ve anlık teslimatlı sosyal medya paketlerini keşfedin.
             </p>
-            <a href="#fiyatlar" class="secondary-color hover:secondary-hover text-white font-bold py-3 px-8 rounded-xl text-lg shadow-xl transition-element transform hover:scale-105 hover:shadow-amber-500/40 cta-pulse button-press">
-                Paketleri İncele
+            <a href="#fiyatlar" class="accent-color hover:accent-hover text-white font-bold py-4 px-10 rounded-full text-xl shadow-2xl transition-element transform hover:scale-[1.03] cta-pulse-glow button-press focus:ring-4 focus:ring-green-500/50">
+                Hemen Paketleri Görüntüle
             </a>
         </div>
     </section>
 
-    <section id="fiyatlar" class="py-16 sm:py-24 bg-gray-900 section-fade-in" style="animation-delay: 0.3s;">
+    <section id="fiyatlar" class="py-16 sm:py-24 primary-dark section-animate" style="animation-delay: 0.3s;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center text-indigo-400 mb-6">Hangi Platform İçin Paket Arıyorsunuz?</h2>
+            <h2 class="text-4xl font-extrabold text-center text-green-400 mb-10">Platforma Göre Paketleri Seçin</h2>
             
-            <div class="flex flex-wrap justify-center items-center mb-10">
-                <button id="nav-prev" class="nav-arrow primary-color hover:primary-hover text-white p-3 rounded-full transition-element button-press mx-2 shadow-lg" title="Önceki Platform">
+            <div class="flex flex-wrap justify-center items-center mb-16">
+                <button id="nav-prev" class="nav-arrow accent-color hover:accent-hover text-white p-3 rounded-full transition-element button-press mx-2 shadow-lg transform hover:scale-110" title="Önceki Platform">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
 
                 <div id="tab-buttons-container" class="flex flex-wrap justify-center space-x-2 sm:space-x-4">
-                    <button data-tab="instagram" class="tab-button bg-gray-700 hover:bg-gray-600 text-gray-100 font-semibold py-2 px-6 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0">
+                    <button data-tab="instagram" class="tab-button bg-slate-700 hover:bg-slate-600 text-gray-100 font-semibold py-3 px-8 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0 transform hover:scale-105">
                         <span class="text-xl mr-2">📸</span> Instagram
                     </button>
-                    <button data-tab="tiktok" class="tab-button bg-gray-700 hover:bg-gray-600 text-gray-100 font-semibold py-2 px-6 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0">
+                    <button data-tab="tiktok" class="tab-button bg-slate-700 hover:bg-slate-600 text-gray-100 font-semibold py-3 px-8 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0 transform hover:scale-105">
                         <span class="text-xl mr-2">🎶</span> TikTok
                     </button>
-                    <button data-tab="youtube" class="tab-button bg-gray-700 hover:bg-gray-600 text-gray-100 font-semibold py-2 px-6 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0">
+                    <button data-tab="youtube" class="tab-button bg-slate-700 hover:bg-slate-600 text-gray-100 font-semibold py-3 px-8 rounded-full transition-element button-press flex items-center mb-2 sm:mb-0 transform hover:scale-105">
                         <span class="text-xl mr-2">▶️</span> YouTube
                     </button>
                 </div>
 
-                <button id="nav-next" class="nav-arrow primary-color hover:primary-hover text-white p-3 rounded-full transition-element button-press mx-2 shadow-lg" title="Sonraki Platform">
+                <button id="nav-next" class="nav-arrow accent-color hover:accent-hover text-white p-3 rounded-full transition-element button-press mx-2 shadow-lg transform hover:scale-110" title="Sonraki Platform">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
 
-
             <div id="instagram" class="tab-content grid grid-cols-1 lg:grid-cols-3 gap-8 hidden">
                 
-                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-indigo-500/50" style="animation-delay: 0.4s;">
-                    <h3 class="text-2xl font-bold text-indigo-400 mb-2">Başlangıç Paketi</h3>
+                <div class="primary-light p-8 rounded-3xl shadow-2xl border border-slate-700 border-t-8 border-green-500 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-green-500/30">
+                    <h3 class="text-2xl font-bold text-green-400 mb-2">Başlangıç Paketi</h3>
                     <p class="text-gray-400 mb-6">Küçük hesaplar ve deneme amaçlı idealdir.</p>
                     <div class="text-4xl font-extrabold text-white mb-6 border-b border-gray-700 pb-4">
                         99 <span class="text-xl font-medium">TL</span>
@@ -290,33 +276,33 @@
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> 30 Gün Garantili</li>
                         <li class="flex items-center"><span class="mr-2 text-red-400">❌</span> Anlık Teslimat Yok</li>
                     </ul>
-                    <button data-name="Instagram Başlangıç Paketi" data-price="99 TL" class="buy-button w-full primary-color hover:primary-hover text-white font-bold py-3 rounded-lg transition-element transform hover:scale-105 button-press">
+                    <button data-name="Instagram Başlangıç Paketi" data-price="99 TL" class="buy-button w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl transition-element transform hover:scale-105 button-press">
                         Paketi Satın Al
                     </button>
                 </div>
 
-                <div class="bg-gray-700 p-8 rounded-2xl shadow-2xl border-4 border-amber-500 flex flex-col transition-element transform scale-[1.05] hover:scale-[1.08] hover:shadow-amber-500/70" style="animation-delay: 0.5s;">
+                <div class="primary-light p-8 rounded-3xl shadow-2xl border-4 border-orange-500 flex flex-col transition-element transform scale-[1.05] hover:scale-[1.08] hover:shadow-orange-500/70">
                     <div class="text-center mb-4">
-                        <span class="inline-block bg-amber-500 text-gray-900 text-sm font-bold px-4 py-1 rounded-full uppercase transition-element transform hover:rotate-2">En Popüler</span>
+                        <span class="inline-block cta-special-color text-white text-sm font-bold px-4 py-1 rounded-full uppercase transition-element transform hover:rotate-2 shadow-xl">En Popüler</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-amber-400 mb-2">Profesyonel Büyüme</h3>
+                    <h3 class="text-3xl font-extrabold text-orange-400 mb-2">Profesyonel Büyüme</h3>
                     <p class="text-gray-300 mb-6">Keşfete çıkma potansiyeli için en ideal seçim.</p>
-                    <div class="text-5xl font-extrabold text-white mb-6 border-b border-gray-600 pb-4">
+                    <div class="text-5xl font-extrabold text-white mb-6 border-b border-slate-600 pb-4">
                         299 <span class="text-xl font-medium">TL</span>
                     </div>
                     <ul class="space-y-3 text-gray-100 flex-grow mb-8">
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> 5.000 Kaliteli Takipçi</li>
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> %80 Türk Kullanıcı</li>
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> 90 Gün Telafi Garantisi</li>
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> Anlık Yükleme Başlangıcı</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> 5.000 Kaliteli Takipçi</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> %80 Türk Kullanıcı</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> 90 Gün Telafi Garantisi</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> Anlık Yükleme Başlangıcı</li>
                     </ul>
-                    <button data-name="Instagram Profesyonel Paket" data-price="299 TL" class="buy-button w-full secondary-color hover:secondary-hover text-white font-bold py-4 rounded-xl shadow-lg transition-element transform hover:scale-100 button-press cta-pulse" style="animation-delay: 0.1s;">
+                    <button data-name="Instagram Profesyonel Paket" data-price="299 TL" class="buy-button w-full cta-special-color hover:cta-special-hover text-white font-bold py-4 rounded-xl shadow-lg transition-element transform hover:scale-100 button-press cta-pulse-glow">
                         Şimdi Satın Al!
                     </button>
                 </div>
 
-                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-indigo-500/50" style="animation-delay: 0.6s;">
-                    <h3 class="text-2xl font-bold text-indigo-400 mb-2">Kurumsal VIP</h3>
+                <div class="primary-light p-8 rounded-3xl shadow-2xl border border-slate-700 border-t-8 border-green-500 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-green-500/30">
+                    <h3 class="text-2xl font-bold text-green-400 mb-2">Kurumsal VIP</h3>
                     <p class="text-gray-400 mb-6">Büyük markalar ve fenomen adayları için çözümler.</p>
                     <div class="text-4xl font-extrabold text-white mb-6 border-b border-gray-700 pb-4">
                         749 <span class="text-xl font-medium">TL</span>
@@ -327,15 +313,15 @@
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> Ömür Boyu Telafi</li>
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> %10 Bonus Hediye</li>
                     </ul>
-                    <button data-name="Instagram VIP Paket" data-price="749 TL" class="buy-button w-full primary-color hover:primary-hover text-white font-bold py-3 rounded-lg transition-element transform hover:scale-105 button-press">
+                    <button data-name="Instagram VIP Paket" data-price="749 TL" class="buy-button w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl transition-element transform hover:scale-105 button-press">
                         Paketi Satın Al
                     </button>
                 </div>
             </div>
 
             <div id="tiktok" class="tab-content grid grid-cols-1 lg:grid-cols-3 gap-8 hidden">
-                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-indigo-500/50">
-                    <h3 class="text-2xl font-bold text-indigo-400 mb-2">Başlangıç Beğeni</h3>
+                <div class="primary-light p-8 rounded-3xl shadow-2xl border border-slate-700 border-t-8 border-green-500 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-green-500/30">
+                    <h3 class="text-2xl font-bold text-green-400 mb-2">Başlangıç Beğeni</h3>
                     <p class="text-gray-400 mb-6">Videolarınızın görünürlüğünü artırmak için.</p>
                     <div class="text-4xl font-extrabold text-white mb-6 border-b border-gray-700 pb-4">
                         79 <span class="text-xl font-medium">TL</span>
@@ -344,34 +330,35 @@
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> 5.000 Hızlı Beğeni</li>
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> 1 Saat Teslimat</li>
                         <li class="flex items-center"><span class="mr-2 text-red-400">❌</span> Yorum & Paylaşım Yok</li>
+                        <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> Tamamlanma Garantisi</li>
                     </ul>
-                    <button data-name="TikTok Başlangıç Beğeni" data-price="79 TL" class="buy-button w-full primary-color hover:primary-hover text-white font-bold py-3 rounded-lg transition-element transform hover:scale-105 button-press">
+                    <button data-name="TikTok Başlangıç Beğeni" data-price="79 TL" class="buy-button w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl transition-element transform hover:scale-105 button-press">
                         Paketi Satın Al
                     </button>
                 </div>
 
-                <div class="bg-gray-700 p-8 rounded-2xl shadow-2xl border-4 border-amber-500 flex flex-col transition-element transform scale-[1.05] hover:scale-[1.08] hover:shadow-amber-500/70">
+                <div class="primary-light p-8 rounded-3xl shadow-2xl border-4 border-orange-500 flex flex-col transition-element transform scale-[1.05] hover:scale-[1.08] hover:shadow-orange-500/70">
                     <div class="text-center mb-4">
-                        <span class="inline-block bg-amber-500 text-gray-900 text-sm font-bold px-4 py-1 rounded-full uppercase transition-element transform hover:rotate-2">KEŞFET GARANTİLİ</span>
+                        <span class="inline-block cta-special-color text-white text-sm font-bold px-4 py-1 rounded-full uppercase transition-element transform hover:rotate-2 shadow-xl">KEŞFET GARANTİLİ</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-amber-400 mb-2">Viral Etki Paketi</h3>
+                    <h3 class="text-3xl font-extrabold text-orange-400 mb-2">Viral Etki Paketi</h3>
                     <p class="text-gray-300 mb-6">TikTok'ta fenomen olma yolunda ilk adımınız.</p>
-                    <div class="text-5xl font-extrabold text-white mb-6 border-b border-gray-600 pb-4">
+                    <div class="text-5xl font-extrabold text-white mb-6 border-b border-slate-600 pb-4">
                         449 <span class="text-xl font-medium">TL</span>
                     </div>
                     <ul class="space-y-3 text-gray-100 flex-grow mb-8">
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> 50.000 İzlenme</li>
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> 10.000 Beğeni</li>
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> 200 Kaydetme (Save)</li>
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> Tamamlanma Garantisi</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> 50.000 İzlenme</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> 10.000 Beğeni</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> 200 Kaydetme (Save)</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> Tamamlanma Garantisi</li>
                     </ul>
-                    <button data-name="TikTok Viral Etki Paketi" data-price="449 TL" class="buy-button w-full secondary-color hover:secondary-hover text-white font-bold py-4 rounded-xl shadow-lg transition-element transform hover:scale-100 button-press cta-pulse" style="animation-delay: 0.1s;">
+                    <button data-name="TikTok Viral Etki Paketi" data-price="449 TL" class="buy-button w-full cta-special-color hover:cta-special-hover text-white font-bold py-4 rounded-xl shadow-lg transition-element transform hover:scale-100 button-press cta-pulse-glow">
                         Şimdi Satın Al!
                     </button>
                 </div>
                 
-                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-indigo-500/50">
-                    <h3 class="text-2xl font-bold text-indigo-400 mb-2">TikTok Takipçi</h3>
+                <div class="primary-light p-8 rounded-3xl shadow-2xl border border-slate-700 border-t-8 border-green-500 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-green-500/30">
+                    <h3 class="text-2xl font-bold text-green-400 mb-2">TikTok Takipçi</h3>
                     <p class="text-gray-400 mb-6">Hızlı takipçi artışı ile hesabınızı büyütün.</p>
                     <div class="text-4xl font-extrabold text-white mb-6 border-b border-gray-700 pb-4">
                         149 <span class="text-xl font-medium">TL</span>
@@ -380,16 +367,17 @@
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> 2.500 Aktif Takipçi</li>
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> Türk & Global Karışık</li>
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> Hızlı Yükleme</li>
+                        <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> Düşüş Garantisi</li>
                     </ul>
-                    <button data-name="TikTok Takipçi Paketi" data-price="149 TL" class="buy-button w-full primary-color hover:primary-hover text-white font-bold py-3 rounded-lg transition-element transform hover:scale-105 button-press">
+                    <button data-name="TikTok Takipçi Paketi" data-price="149 TL" class="buy-button w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl transition-element transform hover:scale-105 button-press">
                         Paketi Satın Al
                     </button>
                 </div>
             </div>
 
             <div id="youtube" class="tab-content grid grid-cols-1 lg:grid-cols-3 gap-8 hidden">
-                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-indigo-500/50">
-                    <h3 class="text-2xl font-bold text-indigo-400 mb-2">Kısa İzlenme</h3>
+                <div class="primary-light p-8 rounded-3xl shadow-2xl border border-slate-700 border-t-8 border-green-500 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-green-500/30">
+                    <h3 class="text-2xl font-bold text-green-400 mb-2">Kısa İzlenme</h3>
                     <p class="text-gray-400 mb-6">Yeni başlayan kanallar için ilk izlenme desteği.</p>
                     <div class="text-4xl font-extrabold text-white mb-6 border-b border-gray-700 pb-4">
                         129 <span class="text-xl font-medium">TL</span>
@@ -398,34 +386,35 @@
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> 10.000 İzlenme (Shorts/Normal)</li>
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> Yüksek Retantion (Tutma Oranı)</li>
                         <li class="flex items-center"><span class="mr-2 text-red-400">❌</span> Abone Hediyesi Yok</li>
+                        <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> 60 Gün Garantili</li>
                     </ul>
-                    <button data-name="YouTube Kısa İzlenme Paketi" data-price="129 TL" class="buy-button w-full primary-color hover:primary-hover text-white font-bold py-3 rounded-lg transition-element transform hover:scale-105 button-press">
+                    <button data-name="YouTube Kısa İzlenme Paketi" data-price="129 TL" class="buy-button w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl transition-element transform hover:scale-105 button-press">
                         Paketi Satın Al
                     </button>
                 </div>
 
-                <div class="bg-gray-700 p-8 rounded-2xl shadow-2xl border-4 border-amber-500 flex flex-col transition-element transform scale-[1.05] hover:scale-[1.08] hover:shadow-amber-500/70">
+                <div class="primary-light p-8 rounded-3xl shadow-2xl border-4 border-orange-500 flex flex-col transition-element transform scale-[1.05] hover:scale-[1.08] hover:shadow-orange-500/70">
                     <div class="text-center mb-4">
-                        <span class="inline-block bg-amber-500 text-gray-900 text-sm font-bold px-4 py-1 rounded-full uppercase transition-element transform hover:rotate-2">EN ÇOK SATAN</span>
+                        <span class="inline-block cta-special-color text-white text-sm font-bold px-4 py-1 rounded-full uppercase transition-element transform hover:rotate-2 shadow-xl">EN ÇOK SATAN</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-amber-400 mb-2">Abone & İzlenme</h3>
+                    <h3 class="text-3xl font-extrabold text-orange-400 mb-2">Abone & İzlenme</h3>
                     <p class="text-gray-300 mb-6">Kanalınızı profesyonel seviyeye taşıyın.</p>
-                    <div class="text-5xl font-extrabold text-white mb-6 border-b border-gray-600 pb-4">
+                    <div class="text-5xl font-extrabold text-white mb-6 border-b border-slate-600 pb-4">
                         699 <span class="text-xl font-medium">TL</span>
                     </div>
                     <ul class="space-y-3 text-gray-100 flex-grow mb-8">
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> 50.000 İzlenme Garantili</li>
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> 1.000 Bonus Abone Hediye</li>
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> Yüksek SEO Katkısı</li>
-                        <li class="flex items-center"><span class="mr-2 text-amber-400">🌟</span> Ömür Boyu Destek</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> 50.000 İzlenme Garantili</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> 1.000 Bonus Abone Hediye</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> Yüksek SEO Katkısı</li>
+                        <li class="flex items-center"><span class="mr-2 text-orange-400">🌟</span> Ömür Boyu Destek</li>
                     </ul>
-                    <button data-name="YouTube Abone & İzlenme Paketi" data-price="699 TL" class="buy-button w-full secondary-color hover:secondary-hover text-white font-bold py-4 rounded-xl shadow-lg transition-element transform hover:scale-100 button-press cta-pulse" style="animation-delay: 0.1s;">
+                    <button data-name="YouTube Abone & İzlenme Paketi" data-price="699 TL" class="buy-button w-full cta-special-color hover:cta-special-hover text-white font-bold py-4 rounded-xl shadow-lg transition-element transform hover:scale-100 button-press cta-pulse-glow">
                         Şimdi Satın Al!
                     </button>
                 </div>
 
-                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-indigo-500/50">
-                    <h3 class="text-2xl font-bold text-indigo-400 mb-2">Yorum & Beğeni</h3>
+                <div class="primary-light p-8 rounded-3xl shadow-2xl border border-slate-700 border-t-8 border-green-500 flex flex-col transition-element transform hover:scale-[1.03] hover:shadow-green-500/30">
+                    <h3 class="text-2xl font-bold text-green-400 mb-2">Yorum & Beğeni</h3>
                     <p class="text-gray-400 mb-6">Videolarınızın etkileşimini hızla artırın.</p>
                     <div class="text-4xl font-extrabold text-white mb-6 border-b border-gray-700 pb-4">
                         199 <span class="text-xl font-medium">TL</span>
@@ -434,78 +423,79 @@
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> 50 Özel Yorum</li>
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> 2.000 Beğeni</li>
                         <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> Tamamlanma Garantisi</li>
+                        <li class="flex items-center"><span class="mr-2 text-green-400">✅</span> Hızlı Başlangıç</li>
                     </ul>
-                    <button data-name="YouTube Yorum & Beğeni Paketi" data-price="199 TL" class="buy-button w-full primary-color hover:primary-hover text-white font-bold py-3 rounded-lg transition-element transform hover:scale-105 button-press">
+                    <button data-name="YouTube Yorum & Beğeni Paketi" data-price="199 TL" class="buy-button w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl transition-element transform hover:scale-105 button-press">
                         Paketi Satın Al
                     </button>
                 </div>
             </div>
-            
         </div>
     </section>
 
-    <section id="avantajlar" class="primary-color py-16 sm:py-24 text-white section-fade-in" style="animation-delay: 1.8s;">
+    <section id="avantajlar" class="bg-slate-800 py-16 sm:py-24 text-white border-y border-gray-700/50 section-animate" style="animation-delay: 1.0s;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center mb-12">SOSYAL HUB Farkı ve Garantilerimiz</h2>
+            <h2 class="text-4xl font-extrabold text-center text-white mb-16">Neden Bizi Tercih Etmelisiniz?</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                <div class="p-6 rounded-lg bg-indigo-800 bg-opacity-70 shadow-lg border border-indigo-700 transition-element transform hover:-translate-y-2 hover:bg-indigo-700">
-                    <span class="text-4xl mb-4 block transition-element hover:scale-125">🛡️</span>
-                    <h4 class="text-xl font-semibold mb-2">Düşüş/Telafi Garantisi</h4>
-                    <p class="text-indigo-200">Paketlerimizin çoğunda belirlediğimiz süre boyunca telafi garantisi sunuyoruz.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+                <div class="p-8 rounded-xl primary-dark shadow-2xl transition-element transform hover:bg-slate-900/80 hover:ring-2 hover:ring-green-500">
+                    <span class="text-5xl mb-4 block text-green-400">🛡️</span>
+                    <h4 class="text-xl font-bold mb-2">Gizlilik ve Şifresiz İşlem</h4>
+                    <p class="text-slate-400">Hesap şifreniz asla istenmez. Gizliliğiniz %100 güvence altındadır.</p>
                 </div>
-                <div class="p-6 rounded-lg bg-indigo-800 bg-opacity-70 shadow-lg border border-indigo-700 transition-element transform hover:-translate-y-2 hover:bg-indigo-700">
-                    <span class="text-4xl mb-4 block transition-element hover:scale-125">💳</span>
-                    <h4 class="text-xl font-semibold mb-2">Güvenli Ödeme Çözümleri</h4>
-                    <p class="text-indigo-200">Tüm ödemeleriniz SSL sertifikalı altyapılar üzerinden korunmaktadır.</p>
+                <div class="p-8 rounded-xl primary-dark shadow-2xl transition-element transform hover:bg-slate-900/80 hover:ring-2 hover:ring-green-500">
+                    <span class="text-5xl mb-4 block text-green-400">🔁</span>
+                    <h4 class="text-xl font-bold mb-2">Telafi ve Garanti Süresi</h4>
+                    <p class="text-slate-400">Belirli paketlerde düşüşlere karşı 30, 90 gün veya ömür boyu telafi garantisi sunarız.</p>
                 </div>
-                <div class="p-6 rounded-lg bg-indigo-800 bg-opacity-70 shadow-lg border border-indigo-700 transition-element transform hover:-translate-y-2 hover:bg-indigo-700">
-                    <span class="text-4xl mb-4 block transition-element hover:scale-125">📈</span>
-                    <h4 class="text-xl font-semibold mb-2">Yüksek Kaliteli Kaynaklar</h4>
-                    <p class="text-indigo-200">Hesabınızın güvenliğini riske atmayacak en kaliteli kaynakları kullanıyoruz.</p>
+                <div class="p-8 rounded-xl primary-dark shadow-2xl transition-element transform hover:bg-slate-900/80 hover:ring-2 hover:ring-green-500">
+                    <span class="text-5xl mb-4 block text-green-400">🚀</span>
+                    <h4 class="text-xl font-bold mb-2">Anında Sipariş Başlatma</h4>
+                    <p class="text-slate-400">Siparişleriniz ortalama 1-5 dakika içinde otomatik olarak gönderime başlar.</p>
                 </div>
             </div>
         </div>
     </section>
-
     
-    <section id="iletisim" class="py-16 sm:py-24 bg-gray-800 section-fade-in" style="animation-delay: 1.9s;">
+    <section id="iletisim" class="primary-dark py-16 sm:py-24 section-animate" style="animation-delay: 1.4s;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="lg:flex lg:space-x-12">
                 
-                <div class="lg:w-1/2 mb-10 lg:mb-0">
-                    <h2 class="text-3xl font-bold text-indigo-400 mb-6">Bize Ulaşın</h2>
-                    <p class="text-gray-300 mb-8">Sorularınız, işbirliği teklifleriniz veya özel paket talepleriniz için bize yazabilirsiniz. 7/24 yanınızdayız.</p>
+                <div class="lg:w-1/3 mb-10 lg:mb-0">
+                    <h2 class="text-4xl font-extrabold text-green-400 mb-6">7/24 Destek Hattı</h2>
+                    <p class="text-gray-300 mb-8 text-lg">Özel paketler, işbirliği veya teknik destek talepleriniz için bize ulaşmaktan çekinmeyin.</p>
                     
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-3 transition-element hover:translate-x-1 button-press">
-                            <span class="text-indigo-400 text-2xl" role="img" aria-label="E-posta">✉️</span>
-                            <p class="text-lg font-medium text-white">Email: destek@sosyalhub.com</p>
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4 transition-element hover:translate-x-1">
+                            <span class="text-green-400 text-3xl">📧</span>
+                            <a href="mailto:destek@sosyalhub.com" class="text-lg font-medium text-white hover:text-green-300 transition-element">destek@sosyalpro.com</a>
                         </div>
-                        <div class="flex items-center space-x-3 transition-element hover:translate-x-1 button-press">
-                            <span class="text-indigo-400 text-2xl" role="img" aria-label="Telefon">📞</span>
-                            <p class="text-lg font-medium text-white">WhatsApp Destek: +90 (5XX) XXX XXXX</p>
+                        <div class="flex items-center space-x-4 transition-element hover:translate-x-1">
+                            <span class="text-green-400 text-3xl">📞</span>
+                            <p class="text-lg font-medium text-white">WhatsApp: **+90 (5XX) XXX XXXX**</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:w-1/2 bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-700">
+                <div class="lg:w-2/3 primary-light p-8 rounded-3xl shadow-2xl border border-slate-700">
                     <h3 class="text-2xl font-bold text-white mb-6">Hızlı Mesaj Gönderin</h3>
                     <form id="contact-form">
-                        <div class="mb-4">
-                            <label for="name" class="block text-gray-300 font-medium mb-2">Adınız Soyadınız</label>
-                            <input type="text" id="name" name="name" required class="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-lg focus:border-indigo-500 transition-element">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label for="name" class="block text-gray-400 font-medium mb-2">Adınız Soyadınız</label>
+                                <input type="text" id="name" name="name" required class="w-full p-3 border border-slate-700 bg-slate-900 text-white rounded-xl focus:ring-2 focus:ring-green-500 transition-element" placeholder="Adınız Soyadınız">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-gray-400 font-medium mb-2">E-posta Adresiniz</label>
+                                <input type="email" id="email" name="email" required class="w-full p-3 border border-slate-700 bg-slate-900 text-white rounded-xl focus:ring-2 focus:ring-green-500 transition-element" placeholder="ornek@mail.com">
+                            </div>
                         </div>
-                        <div class="mb-4">
-                            <label for="email" class="block text-gray-300 font-medium mb-2">E-posta Adresiniz</label>
-                            <input type="email" id="email" name="email" required class="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-lg focus:border-indigo-500 transition-element">
+                        <div class="mb-6">
+                            <label for="message" class="block text-gray-400 font-medium mb-2">Mesajınız</label>
+                            <textarea id="message" name="message" rows="4" required class="w-full p-3 border border-slate-700 bg-slate-900 text-white rounded-xl focus:ring-2 focus:ring-green-500 transition-element" placeholder="Hangi hizmetle ilgileniyorsunuz?"></textarea>
                         </div>
-                        <div class="mb-4">
-                            <label for="message" class="block text-gray-300 font-medium mb-2">Mesajınız</label>
-                            <textarea id="message" name="message" rows="4" required class="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-lg focus:border-indigo-500 transition-element"></textarea>
-                        </div>
-                        <button type="submit" class="w-full primary-color hover:primary-hover text-white font-bold py-3 rounded-lg transition-element transform hover:scale-[1.01] button-press shadow-md">
-                            Gönder
+                        <button type="submit" class="w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl shadow-lg transition-element transform hover:scale-[1.01] button-press focus:ring-4 focus:ring-green-500/50">
+                            Mesajı Gönder
                         </button>
                     </form>
                 </div>
@@ -513,10 +503,15 @@
         </div>
     </section>
 
-    <footer class="bg-gray-900 border-t border-gray-700 py-8">
+    <footer class="primary-dark text-white py-8 border-t border-gray-700/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p class="text-gray-400 text-sm">&copy; 2025 SOSYAL HUB. Tüm Hakları Saklıdır.</p>
+            <p class="text-sm text-gray-500">
+                &copy; 2025 SOSYAL PRO. Tüm Hakları Saklıdır. | 
+                <a href="#" class="text-green-400 hover:text-green-200 transition-element button-press">Gizlilik Politikası</a> |
+                <a href="#" class="text-green-400 hover:text-green-200 transition-element button-press">Kullanım Şartları</a>
+            </p>
         </div>
     </footer>
+
 </body>
 </html>
