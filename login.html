@@ -93,7 +93,7 @@
     }
 
     // ----------------------------------------------------------------------
-    // SUPABASE KAYIT İŞLEMİ (createUserWithEmailAndPassword yerine)
+    // SUPABASE KAYIT İŞLEMİ (DÜZELTİLMİŞ VERSİYON)
     // ----------------------------------------------------------------------
     window.handleRegister = async function() {
         const email = document.getElementById('registerEmail').value;
@@ -104,7 +104,7 @@
         }
 
         try {
-            // Supabase ile kayıt işlemi
+            // 1. Supabase Auth ile kayıt işlemi
             const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                 email: email,
                 password: password,
@@ -112,35 +112,43 @@
 
             if (authError) throw authError;
 
-            // Supabase'de kayıt başarılıysa, kullanıcı verilerini "customers" tablosuna ekle
+            // 2. Supabase'de Auth başarılıysa, kullanıcı verilerini "customers" tablosuna ekle
             const user = authData.user;
             
-            // 🔥 KRİTİK: Supabase "customers" tablosuna kayıt
+            // 🔥 KRİTİK DÜZELTME: createdAt alanı eklendi
             const { error: dbError } = await supabaseClient
                 .from('customers') 
                 .insert([
                     {
                         user_id: user.id, // Supabase user ID'yi kullan
                         email: user.email,
-                        // created_at alanı veritabanında otomatik atanıyor olmalı
                         balance: 0.0,
-                        serviceStatus: 'PENDING'
+                        serviceStatus: 'PENDING',
+                        createdAt: new Date().toISOString() // 🔴 KRİTİK: Kayıt tarihini ekle
                     }
                 ]);
 
             if (dbError) {
-                // Veritabanı kaydı başarısız olursa Auth kaydını da geri alabilirsiniz (gelişmiş)
+                // 3. DÜZELTME: Eğer veritabanı eklemesi BAŞARISIZ olursa kullanıcıyı bilgilendir
                 console.error("Müşteri kaydı veritabanına eklenemedi:", dbError);
+                let dbErrorMessage = "Veritabanı kaydı başarısız oldu. Lütfen Yöneticinize başvurun veya RLS ayarlarınızı kontrol edin.";
+                
+                // Hatanın detayını konsola yazdır
+                if (dbError.message) {
+                    console.error("Veritabanı Hata Mesajı:", dbError.message);
+                }
+                
+                // Başarısız olduğu için yönlendirmeyi durdur ve hata göster
+                return displayMessage(dbErrorMessage, true); 
             }
             
-            // Eğer kayıt olan e-posta yönetici ise admin paneline yönlendir
+            // 4. Kayıt başarılı, yönlendirmeye geç
             if (email === ADMIN_EMAIL) {
-                 displayMessage("Yönetici kaydı başarılı! Admin paneline yönlendiriliyorsunuz...", false);
-                 setTimeout(() => { window.location.href = 'admin.html'; }, 1500);
+                displayMessage("Yönetici kaydı başarılı! Admin paneline yönlendiriliyorsunuz...", false);
+                setTimeout(() => { window.location.href = 'admin.html'; }, 1500);
             } else {
-                 displayMessage("Kayıt başarılı! E-posta adresinize gelen aktivasyon linkini onaylayın.", false);
-                 setTimeout(() => { 
-                    // Müşteri dashboard'u varsa oraya yönlendir
+                displayMessage("Kayıt başarılı! E-posta adresinize gelen aktivasyon linkini onaylayın.", false);
+                setTimeout(() => { 
                     window.location.href = 'dashboard'; 
                 }, 1500); 
             }
@@ -148,7 +156,9 @@
         } catch (error) {
             let errorMessage = "Kayıt hatası: " + error.message;
             if (error.message.includes('User already registered')) {
-                 errorMessage = "Bu e-posta adresi zaten kayıtlı.";
+                errorMessage = "Bu e-posta adresi zaten kayıtlı.";
+            } else if (error.message.includes('Email not confirmed')) {
+                 errorMessage = "E-posta onaylanmadı. Lütfen gelen kutunuzu kontrol edin.";
             }
             displayMessage(errorMessage, true);
         }
@@ -181,9 +191,9 @@
                     window.location.href = 'admin.html'; 
                 }, 1000);
             } else {
-                 // Standart kullanıcı girişi
-                 displayMessage("Giriş başarılı! Müşteri paneline yönlendiriliyorsunuz...", false);
-                 setTimeout(() => { 
+                // Standart kullanıcı girişi
+                displayMessage("Giriş başarılı! Müşteri paneline yönlendiriliyorsunuz...", false);
+                setTimeout(() => { 
                     // Müşteri dashboard'una yönlendir
                     window.location.href = 'dashboard'; 
                 }, 1000); 
@@ -193,7 +203,7 @@
             // Supabase Auth hatalarını daha kullanıcı dostu göster
             let errorMessage = "Giriş hatası. Lütfen e-posta ve şifrenizi kontrol edin.";
             if (error.message.includes('Invalid login credentials')) {
-                 errorMessage = "Geçersiz giriş bilgileri. Lütfen e-posta veya şifrenizi kontrol edin.";
+                errorMessage = "Geçersiz giriş bilgileri. Lütfen e-posta veya şifrenizi kontrol edin.";
             }
             displayMessage(errorMessage, true);
         }
