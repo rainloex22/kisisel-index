@@ -7,7 +7,7 @@
     <meta name="description" content="Hesabınızı bir sonraki seviyeye taşıyın. Instagram, YouTube ve TikTok için profesyonel, şifresiz ve anlık hizmetler. Fiyatları incele.">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         /* Inter Font'u tüm sayfada kullan */
@@ -131,6 +131,20 @@
                     mobileMenu.classList.add('hidden');
                 });
             });
+
+            // **YENİ EKLEME: Giriş Yap / Kayıt Ol Butonu Listener'ı**
+            const loginButton = document.getElementById('login-button');
+            if (loginButton) {
+                loginButton.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const targetSection = document.getElementById('sosyal-yorumlar'); 
+                    if (targetSection) {
+                        // Formun olduğu bölüme yumuşak kaydırma
+                        targetSection.scrollIntoView({ behavior: 'smooth' }); 
+                        showAlert('Lütfen Giriş Yapın veya Kayıt Olun.');
+                    }
+                });
+            }
         });
     </script>
     
