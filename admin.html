@@ -442,6 +442,519 @@
         <thead>
             <tr>
                 <th onclick="sortCustomers('email')">E-posta / Site Adı <span id="sortEmail" class="sort-icon fas fa-sort"></span></th>
+                <th onclick="sortCustomers('createdAt')">Kayıt Tarihi <span id="sortCreatedAt" class="sort-icon fas fa-sort-down"></span></th>
+                <th onclick="sortCustomers('balance')">Bakiye (₺) <span id="sortBalance" class="sort-icon fas fa-sort"></span></th>
+                <th>Site Adresi (Öneri)</th>
+                <th onclick="sortCustomers('serviceStatus')">Durum <span id="sortStatus" class="sort-icon fas fa-sort"></span></th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody id="customerTableBody">
+        </tbody>
+    </table>
+    <div class="activity-area">
+        <h2><i class="fas fa-history"></i> Son Yönetici Aktivitesi (Duyurular)</h2>
+        <ul id="announcementList" class="activity-list">
+            <li>Aktivite yükleniyor...</li>
+        </ul>
+    </div>
+    </div>
+
+<div id="customModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 id="modalTitle">Mesaj</h3>
+        <p id="modalMessage"></p>
+        <div class="modal-buttons">
+            <button id="modalConfirmBtn" class="action-btn" style="background-color: var(--success-color);">Onayla</button>
+            <button id="modalCancelBtn" class="action-btn" style="background-color: var(--passive-color);">Kapat</button>
+        </div>
+    </div>
+</div>
+
+<div id="detailModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+        <h3><i class="fas fa-edit"></i> Müşteri Detaylarını Düzenle</h3>
+        <div class="modal-input-group">
+            <label for="detailEmail">E-posta:</label>
+            <input type="text" id="detailEmail" disabled>
+        </div>
+        <div class="modal-input-group">
+            <label for="detailSiteName">Site Adı:</label>
+            <input type="text" id="detailSiteName">
+        </div>
+        <div class="modal-input-group">
+            <label for="detailBalance">Bakiye (₺):</label>
+            <input type="number" id="detailBalance" step="0.01">
+        </div>
+        <div class="modal-input-group">
+            <label for="detailStatus">Durum:</label>
+            <select id="detailStatus">
+                <option value="ACTIVE">YAYINDA</option>
+                <option value="PENDING">Onay Bekliyor</option>
+                <option value="SUSPENDED">ASKIYA ALINDI</option>
+                <option value="PASSIVE">PASİF</option>
+                <option value="FILE_WAITING">Dosya Bekleniyor</option>
+            </select>
+        </div>
+        <div class="modal-input-group">
+            <label for="detailNotes">Yönetici Notları:</label>
+            <textarea id="detailNotes" rows="3" placeholder="Bu müşteriyle ilgili önemli notlarınızı buraya yazın."></textarea>
+        </div>
+        <p id="detailMessage" style="margin-top: 10px; color: var(--text-light);"></p>
+        <div class="modal-buttons">
+            <button id="saveDetailsBtn" class="action-btn" style="background-color: var(--primary-color);">Kaydet</button>
+            <button id="closeDetailModalBtn" class="action-btn" style="background-color: var(--passive-color);">İptal</button>
+        </div>
+    </div>
+</div>
+<script type="module">
+    // ----------------------------------------------------------------------
+    // 🔥 ADIM 1: SUPABASE BAĞLANTI AYARLARI
+    // ----------------------------------------------------------------------
+    const SUPABASE_URL = 'https://rqbbxjuncwwgtkbcqtet.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxYmJ4anVuY3d3Z3RrYmNxdGV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0MzM1NjAsImV4cCI6MjA3ODAwOTU2MH0.8dzDoL8MEgbrL7b-ocJ79c9ts9qtSbFT3EashQZXyZQ'; 
+    
+    // CDN üzerinden global olarak eklenen Supabase client'ı başlat
+    const { createClient } = supabase; 
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: { 
+            persistSession: true // Oturumu tarayıcıda sakla
+        }
+    });
+
+    // YÖNETİCİ E-POSTASI
+    const ADMIN_EMAIL = "mehmeteminacan13@gmail.com"; 
+    
+    const loading = document.getElementById('loading');
+    const table = document.getElementById('customerTable');
+    const tableBody = document.getElementById('customerTableBody');
+    const errorMessage = document.getElementById('error-message');
+    
+    const totalCustomersSpan = document.getElementById('totalCustomers');
+    const activeCustomersSpan = document.getElementById('activeCustomers');
+    const pendingCustomersSpan = document.getElementById('pendingCustomers');
+    const announcementList = document.getElementById('announcementList');
+    
+    let allCustomers = [];
+    let currentEditingUser = null; 
+    let sortKey = 'createdAt'; 
+    let sortDirection = 'desc'; 
+
+    // ----------------------------------------------------------------------
+    // 1. ÖZEL MODAL İŞLEVLERİ (Aynı kaldı)
+    // ----------------------------------------------------------------------
+
+    /**
+     * Özel bir onay (confirm) veya bildirim (alert) penceresi gösterir.
+     */
+    function             min-height: 100vh;
+        }
+        .container {
+            max-width: 1600px; 
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-dark);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        
+        /* KONTROL ALANI VE ÖZET KARTLARI */
+        .controls-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Üst hizalama */
+            flex-wrap: wrap; /* Küçük ekranlarda alt alta gelme */
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-group {
+            display: flex;
+            gap: 20px; 
+            flex-wrap: wrap;
+        }
+        
+        .summary-card {
+            background-color: var(--bg-card);
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            border-left: 5px solid var(--primary-color);
+            box-shadow: var(--shadow);
+            min-width: 180px; 
+            transition: transform 0.3s;
+        }
+        .summary-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .summary-card strong {
+            font-size: 1.5em;
+            color: var(--primary-color);
+        }
+        
+        .summary-card.active-card { border-left-color: var(--success-color); }
+        .summary-card.pending-card { border-left-color: var(--warning-color); }
+
+
+        /* FİLTRE ALANI */
+        .filter-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        #statusFilter, #searchFilter {
+            padding: 10px;
+            border: 1px solid var(--border-dark);
+            border-radius: 4px;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        #statusFilter {
+            width: 200px;
+        }
+        #searchFilter {
+             width: 300px;
+        }
+
+
+        /* TABLO STİLLERİ */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: var(--bg-card);
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .admin-table th, .admin-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-dark);
+        }
+        .admin-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            cursor: pointer; 
+        }
+        .admin-table th .sort-icon {
+            margin-left: 5px;
+            font-size: 0.7em;
+            color: #d1c4e9;
+        }
+        .admin-table tr:hover td {
+            background-color: #2e3046;
+        }
+        .admin-table td {
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            min-width: 100px; 
+            text-align: center;
+        }
+        .status-pending { background-color: var(--warning-color); color: #333; }
+        .status-active { background-color: var(--success-color); color: white; }
+        .status-file { background-color: var(--info-color); color: white; }
+        .status-suspended { background-color: var(--suspend-color); color: white; }
+        .status-passive { background-color: var(--passive-color); color: white; }
+        .action-btn {
+            background-color: var(--info-color);
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            transition: background-color 0.3s;
+        }
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+        .action-btn.delete-btn {
+            background-color: var(--danger-color);
+        }
+        .action-btn.detail-btn {
+            background-color: #00bcd4;
+        }
+        .logout-btn {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            transition: background-color 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        #loading, #error-message {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: var(--text-secondary);
+        }
+        
+        /* DUYURU ALANI STİLLERİ */
+        .announcement-area {
+            margin-top: 40px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .announcement-area h2 {
+            color: var(--text-light);
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-dark);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+        }
+        #announcementText {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-dark);
+            border-radius: 4px;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            resize: vertical;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        #publishAnnouncementBtn {
+            background-color: var(--primary-color);
+            margin-top: 10px;
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        #publishAnnouncementBtn:hover {
+            background-color: #7b578c;
+        }
+
+        /* AKTİVİTE ALANI STİLLERİ */
+        .activity-area {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .activity-area h2 {
+            color: var(--text-light);
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-dark);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .activity-list li {
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-dark);
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+        .activity-meta {
+            color: var(--text-secondary);
+            font-size: 0.8em;
+            margin-left: 10px;
+            min-width: 120px; /* Tarih/saat için yer ayır */
+            text-align: right;
+        }
+        .activity-text {
+            flex-grow: 1;
+            text-align: left;
+            padding-right: 10px;
+        }
+
+        /* MODAL (Özel Pencere) STİLLERİ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none; /* Varsayılan olarak gizli */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: var(--bg-card);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 500px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-dark);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .modal-input-group label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+        }
+        .modal-input-group input, .modal-input-group select, .modal-input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-dark);
+            border-radius: 4px;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            box-sizing: border-box;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Tasarım */
+        @media (max-width: 900px) {
+            .controls-area {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .summary-group, .filter-group {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+            .summary-card {
+                width: 100%;
+                min-width: unset;
+            }
+            #statusFilter, #searchFilter {
+                 width: 100%;
+            }
+            .admin-table thead {
+                display: none; 
+            }
+            .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
+                display: block;
+                width: 100%;
+            }
+            .admin-table tr {
+                margin-bottom: 15px;
+                border: 1px solid var(--border-dark);
+                border-radius: 8px;
+            }
+            .admin-table td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+                border-bottom: none;
+            }
+            .admin-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: 600;
+                color: var(--primary-color);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="logout-btn" onclick="handleLogout()">Çıkış Yap</button>
+    <h1><i class="fas fa-user-shield"></i> Yönetici Paneli - Müşteriler</h1>
+
+    <div class="controls-area">
+        <div class="summary-group">
+            <div class="summary-card total-card">
+                Toplam Müşteri: <strong id="totalCustomers">0</strong>
+            </div>
+            <div class="summary-card active-card">
+                Aktif/Yayında: <strong id="activeCustomers">0</strong>
+            </div>
+            <div class="summary-card pending-card">
+                Onay Bekleyen: <strong id="pendingCustomers">0</strong>
+            </div>
+        </div>
+        <div class="filter-group">
+            <select id="statusFilter" onchange="filterCustomers()">
+                 <option value="ALL">Tüm Durumlar</option>
+                 <option value="ACTIVE">YAYINDA</option>
+                 <option value="PENDING">Onay Bekliyor</option>
+                 <option value="SUSPENDED">ASKIYA ALINDI</option>
+                 <option value="PASSIVE">PASİF</option>
+                 <option value="FILE_WAITING">Dosya Bekleniyor</option>
+            </select>
+            <input type="text" id="searchFilter" placeholder="E-posta veya kullanıcı adı ile ara..." onkeyup="filterCustomers()">
+        </div>
+    </div>
+    <div class="announcement-area">
+        <h2><i class="fas fa-bullhorn"></i> Yeni Duyuru Yayınla</h2>
+        <div class="announcement-card">
+            <textarea id="announcementText" placeholder="Müşterilerinize göndermek istediğiniz duyuru metnini buraya yazın..." rows="3"></textarea>
+            <button id="publishAnnouncementBtn" class="action-btn">Duyuruyu Yayınla</button>
+            <p id="announcementMessage" style="margin-top: 10px; color: var(--text-light);"></p>
+        </div>
+    </div>
+    <div id="loading">Müşteri verileri yükleniyor...</div>
+    <div id="error-message" style="display:none;"></div>
+    
+    <table class="admin-table" id="customerTable" style="display:none;">
+        <thead>
+            <tr>
+                <th onclick="sortCustomers('email')">E-posta / Site Adı <span id="sortEmail" class="sort-icon fas fa-sort"></span></th>
                 <th onclick="sortCustomers('created_at')">Kayıt Tarihi <span id="sortCreated_at" class="sort-icon fas fa-sort-down"></span></th> 
                 <th onclick="sortCustomers('balance')">Bakiye (₺) <span id="sortBalance" class="sort-icon fas fa-sort"></span></th>
                 <th>Site Adresi (Öneri)</th>
