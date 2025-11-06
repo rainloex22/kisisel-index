@@ -42,7 +42,7 @@
             <label for="loginPassword">Şifre</label>
             <input type="password" id="loginPassword" placeholder="En az 6 karakter">
         </div>
-        <button class="auth-btn" onclick="handleLogin()">Giriş Yap</button>
+        <button class="auth-btn" onclick="handleLogin()">Giriş Yapp</button>
     </div>
 
     <div id="register" class="tab-content hidden">
@@ -93,68 +93,70 @@
     // ----------------------------------------------------------------------
     // SUPABASE KAYIT İŞLEMİ (SON ÇALIŞAN DÜZELTME)
     // ----------------------------------------------------------------------
-    window.handleRegister = async function() {
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
+    // login.html dosyanızda
+// window.handleRegister = async function() { ... } bloğu:
 
-        if (password.length < 6) {
-            return displayMessage("Şifre en az 6 karakter olmalıdır.", true);
-        }
+window.handleRegister = async function() {
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
 
-        try {
-            // 1. Supabase Auth ile kayıt işlemi
-            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-            });
-
-            if (authError) throw authError;
-
-            // 2. Auth başarılıysa, kullanıcı verilerini "customers" tablosuna ekle
-            const user = authData.user;
-            
-            // 🔥 KRİTİK DÜZELTME: Sadece veritabanının istediği zorunlu alanlar gönderiliyor.
-            const { error: dbError } = await supabaseClient
-                .from('customers') 
-                .insert([
-                    {
-                        user_id: user.id, // Supabase user ID
-                        email: user.email,
-                        balance: 0.0,
-                        serviceStatus: 'PENDING',
-                        // createdAt alanı veritabanı tarafından otomatik atanacak.
-                    }
-                ]);
-
-            if (dbError) {
-                // Veritabanı hatası durumunda hata mesajını konsola yazdır.
-                console.error("Müşteri kaydı veritabanına eklenemedi:", dbError);
-                return displayMessage("Veritabanı kaydı başarısız oldu. RLS ayarlarınızı kontrol edin.", true); 
-            }
-            
-            // 3. Kayıt başarılı, yönlendirmeye geç
-            if (email === ADMIN_EMAIL) {
-                displayMessage("Yönetici kaydı başarılı! Admin paneline yönlendiriliyorsunuz...", false);
-                setTimeout(() => { window.location.href = 'admin.html'; }, 1500);
-            } else {
-                displayMessage("Kayıt başarılı! E-posta adresinize gelen aktivasyon linkini onaylayın.", false);
-                setTimeout(() => { 
-                    window.location.href = 'dashboard'; 
-                }, 1500); 
-            }
-
-        } catch (error) {
-            let errorMessage = "Kayıt hatası: " + error.message;
-            if (error.message.includes('User already registered')) {
-                errorMessage = "Bu e-posta adresi zaten kayıtlı.";
-            } else if (error.message.includes('rate limit exceeded')) {
-                 errorMessage = "E-posta hız sınırı aşıldı. Lütfen bir dakika sonra tekrar deneyin.";
-            } else if (error.message.includes('Email not confirmed')) {
-                 errorMessage = "E-posta onaylanmadı. Lütfen gelen kutunuzu kontrol edin.";
-            }
-            displayMessage(errorMessage, true);
-        }
+    if (password.length < 6) {
+        return displayMessage("Şifre en az 6 karakter olmalıdır.", true);
     }
+
+    try {
+        // 1. Supabase Auth ile kayıt işlemi
+        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+            email: email,
+            password: password,
+        });
+
+        if (authError) throw authError;
+
+        // 2. Auth başarılıysa, kullanıcı verilerini "customers" tablosuna ekle
+        const user = authData.user;
+        
+        // 🔥 KRİTİK DÜZELTME: Sadece veritabanının istediği TEMEL alanlar gönderiliyor.
+        const { error: dbError } = await supabaseClient
+            .from('customers') 
+            .insert([
+                {
+                    user_id: user.id, // Supabase user ID
+                    email: user.email,
+                    balance: 0.0,
+                    // serviceStatus ve createdAt alanları veritabanı tarafından otomatik atanmalı.
+                }
+            ]);
+
+        if (dbError) {
+            // Veritabanı hatası durumunda hata mesajını konsola yazdır.
+            console.error("Müşteri kaydı veritabanına eklenemedi:", dbError);
+            return displayMessage("Veritabanı kaydı başarısız oldu. RLS ayarlarınızı ve Zorunlu Sütunları kontrol edin.", true); 
+        }
+        
+        // 3. Kayıt başarılı, yönlendirmeye geç
+        if (email === ADMIN_EMAIL) {
+            displayMessage("Yönetici kaydı başarılı! Admin paneline yönlendiriliyorsunuz...", false);
+            setTimeout(() => { window.location.href = 'admin.html'; }, 1500);
+        } else {
+            displayMessage("Kayıt başarılı! E-posta adresinize gelen aktivasyon linkini onaylayın.", false);
+            setTimeout(() => { 
+                window.location.href = 'dashboard'; 
+            }, 1500); 
+        }
+
+    } catch (error) {
+        let errorMessage = "Kayıt hatası: " + error.message;
+        if (error.message.includes('User already registered')) {
+            errorMessage = "Bu e-posta adresi zaten kayıtlı.";
+        } else if (error.message.includes('rate limit exceeded')) {
+             errorMessage = "E-posta hız sınırı aşıldı. Lütfen bir dakika sonra tekrar deneyin.";
+        } else if (error.message.includes('Email not confirmed')) {
+             errorMessage = "E-posta onaylanmadı. Lütfen gelen kutunuzu kontrol edin.";
+        }
+        displayMessage(errorMessage, true);
+    }
+}
 
     // ----------------------------------------------------------------------
     // SUPABASE GİRİŞ İŞLEMİ
