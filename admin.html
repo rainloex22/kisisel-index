@@ -831,7 +831,7 @@
             // Supabase'den son 5 duyuruyu çek
             const { data: announcements, error } = await supabaseClient
                 .from('announcements')
-                .select('text, created_t') // Sadece metin ve oluşturulma tarihi
+                .select('text, created_at') // Sadece metin ve oluşturulma tarihi
                 .order('created_at', { ascending: false })
                 .limit(5);
 
