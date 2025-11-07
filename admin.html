@@ -519,7 +519,6 @@
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: { 
             // Geçici olarak Auth persistSession özelliğini kapatıyoruz. 
-            // Yönetici girişi için bu kısım sonradan Supabase Auth ile değiştirilmelidir.
             persistSession: false 
         }
     });
@@ -543,7 +542,7 @@
     let sortDirection = 'desc'; 
 
     // ----------------------------------------------------------------------
-    // 1. ÖZEL MODAL İŞLEVLERİ (Aynı kaldı)
+    // 1. ÖZEL MODAL İŞLEVLERİ 
     // ----------------------------------------------------------------------
 
     /**
@@ -653,7 +652,6 @@
         let iconId = '';
         if (sortKey === 'created_at') {
             iconId = 'sortCreated_at';
-        // 🔥 DÜZELTME: servicestatus için özel eşleştirme
         } else if (sortKey === 'servicestatus') {
             iconId = 'sortServicestatus'; 
         } else {
@@ -677,7 +675,6 @@
             const username = userEmail.split('@')[0];
             const siteUrl = `bakikara.xyz/${user.site_adi || username}`; 
             const regDate = user.created_at ? new Date(user.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Bilinmiyor';
-            // 🔥 DÜZELTME: user.servicestatus kullanılıyor
             const status = user.servicestatus || 'FILE_WAITING'; 
             const balance = (user.balance || 0).toFixed(2); 
 
@@ -727,7 +724,6 @@
             const userEmail = (user.email || '').toLowerCase();
             const username = userEmail.split('@')[0].toLowerCase();
             const siteAdi = (user.site_adi || '').toLowerCase();
-            // 🔥 DÜZELTME: user.servicestatus kullanılıyor
             const status = (user.servicestatus || 'FILE_WAITING');
             
             const textMatch = userEmail.includes(searchText) || username.includes(searchText) || siteAdi.includes(searchText);
@@ -780,7 +776,6 @@
             }));
 
             // Özet Kartları Güncelle
-            // 🔥 DÜZELTME: u.servicestatus kullanılıyor
             const activeCount = allCustomers.filter(u => u.servicestatus === 'ACTIVE').length;
             const pendingCount = allCustomers.filter(u => u.servicestatus === 'PENDING' || u.servicestatus === 'FILE_WAITING').length; 
             
@@ -936,7 +931,6 @@
                     try {
                         const { error } = await supabaseClient
                             .from('customers')
-                            // 🔥 DÜZELTME: servicestatus kullanılıyor
                             .update({ servicestatus: newStatus, last_updated: new Date().toISOString() }) 
                             .eq('user_id', userId); 
 
@@ -1000,7 +994,6 @@
         document.getElementById('detailEmail').value = user.email || '';
         document.getElementById('detailSiteName').value = user.site_adi || '';
         document.getElementById('detailBalance').value = (user.balance || 0); 
-        // 🔥 DÜZELTME: user.servicestatus kullanılıyor
         document.getElementById('detailStatus').value = user.servicestatus || 'FILE_WAITING';
         document.getElementById('detailNotes').value = user.admin_notes || '';
         document.getElementById('detailMessage').innerText = ''; 
@@ -1026,7 +1019,6 @@
                 .from('customers')
                 .update({
                     site_adi: document.getElementById('detailSiteName').value.trim(),
-                    // 🔥 DÜZELTME: servicestatus kullanılıyor
                     servicestatus: document.getElementById('detailStatus').value,
                     admin_notes: document.getElementById('detailNotes').value.trim(),
                     balance: newBalance,
@@ -1061,16 +1053,15 @@
     document.getElementById('saveDetailsBtn').addEventListener('click', saveCustomerDetails);
 
     // ----------------------------------------------------------------------
-    // 7. YETKİLENDİRME ve BAŞLATMA
+    // 7. YETKİLENDİRME ve BAŞLATMA (DÜZELTİLDİ)
     // ----------------------------------------------------------------------
 
     /**
-     * Çıkış Yapma İşlemi
+     * Çıkış Yapma İşlemi (Modalı Kaldırıp Doğrudan Yönlendirme Yapar)
      */
     window.handleLogout = function() {
-        showModal("GÜVENSİZ KULLANIM", "Şu anda yönetici yetkilendirme sistemi (Auth) devre dışıdır. Çıkış yapmak için login.html sayfasına yönlendiriliyorsunuz.", 'alert', () => {
-             window.location.href = 'login.html';
-        });
+        // Doğrudan login sayfasına yönlendir.
+        window.location.href = 'login.html';
     }
 
     // Başlangıç fonksiyonlarını çağır
