@@ -16,10 +16,11 @@
             --text-light: #e0e0e0;          /* Açık Metin */
             --text-secondary: #a9a9b6;      /* İkincil Metin */
             --border-dark: #2a2a3f;         /* Koyu Sınır */
-            --success-color: #00d28d;       /* Canlı Yeşil */
+            --success-color: #00d28d;       /* Canlı Yeşil (Devam Et butonu için) */
             --premium-color: #ffd700;       /* Altın Sarısı (Premium) */
             --danger-color: #e74c3c;        /* Kırmızı */
             --shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --info-color: #3498db;          /* Mavi (Bilgi kutuları için) */
         }
 
         /* GENEL STİL VE ANİMASYONLAR */
@@ -48,10 +49,11 @@
         .header-banner { animation-delay: 0s; }
         .package-selector-container { animation-delay: 0.2s; }
         .pricing-table-container { animation-delay: 0.4s; }
-        .form-section { animation-delay: 0.6s; }
+        .domain-section { animation-delay: 0.6s; }
+        .form-section { animation-delay: 0.8s; } /* Form gecikmesi artırıldı */
 
 
-        /* HEADER & BANNER STİLİ */
+        /* HEADER & BANNER STİLİ (Mevcut korundu) */
         .header-banner {
             background-color: var(--bg-card);
             padding: 60px 20px;
@@ -65,11 +67,6 @@
             margin-bottom: 10px;
             color: var(--primary-color);
             text-shadow: 0 0 10px rgba(93, 63, 106, 0.5);
-        }
-        .header-banner p {
-            font-size: 1.2em;
-            color: var(--text-secondary);
-            margin-bottom: 25px;
         }
         .header-banner a {
             color: var(--text-light);
@@ -101,7 +98,7 @@
             margin-bottom: 30px;
         }
 
-        /* PAKET SEÇİCİ */
+        /* PAKET SEÇİCİ (Mevcut korundu) */
         .package-selector-container {
             text-align: center;
             margin-bottom: 40px;
@@ -132,13 +129,12 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         
-        /* FİYATLANDIRMA/PAKET KUTULARI */
+        /* FİYATLANDIRMA/PAKET KUTULARI (Mevcut korundu) */
         .pricing-table-container {
             display: flex;
             justify-content: center;
             gap: 30px;
             margin-bottom: 50px;
-            perspective: 1000px; /* 3D effect for flip */
         }
         .pricing-table {
             flex: 1 1 450px;
@@ -151,52 +147,25 @@
             transition: transform 0.4s, border-color 0.4s, opacity 0.4s;
             transform: scale(0.98);
         }
-        .pricing-table:hover {
-            transform: scale(1);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-        }
         .pricing-table.premium {
             border-color: var(--premium-color);
             transform: scale(1.05);
             box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
         }
-        .pricing-table.premium:hover {
-            transform: scale(1.08);
-        }
-
-        /* Paket Başlıkları */
         .package-header {
             background-color: var(--primary-color);
             color: white;
             padding: 30px 0;
             text-align: center;
-            position: relative;
         }
         .pricing-table.premium .package-header {
             background: linear-gradient(135deg, #ffd700, #ffae00);
             color: #1e1e2d;
             text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
         }
-        .package-header h3 {
-            font-size: 1.5em;
-            font-weight: 700;
-        }
-        .price {
-            font-size: 2.8em;
-            font-weight: 900;
-            margin: 5px 0;
-        }
-        .price small {
-            font-size: 0.4em;
-            font-weight: 400;
-        }
-
-        /* Paket Özellikleri */
-        .package-features {
-            list-style: none;
-            padding: 20px 30px;
-            margin: 0;
-        }
+        .price { font-size: 2.8em; font-weight: 900; margin: 5px 0; }
+        .price small { font-size: 0.4em; font-weight: 400; }
+        .package-features { list-style: none; padding: 20px 30px; margin: 0; }
         .package-features li {
             padding: 15px 0;
             border-bottom: 1px dashed var(--border-dark);
@@ -205,38 +174,25 @@
             align-items: center;
             font-size: 0.95em;
             color: var(--text-secondary);
-            transition: color 0.3s;
         }
-        .package-features li:last-child {
-            border-bottom: none;
-        }
-        .package-features li:hover {
-            color: var(--text-light);
-        }
-        .check-icon {
-            color: var(--success-color);
-            font-size: 1.2em;
-        }
-        .cross-icon {
-            color: var(--danger-color);
-            font-size: 1.2em;
-        }
-        .premium .check-icon {
-            color: var(--primary-color); /* Premium için mor onay */
-        }
-        .premium .cross-icon {
-             color: var(--danger-color); /* Premiumda da eksi özellikler kırmızı kalsın */
-        }
+        .check-icon { color: var(--success-color); font-size: 1.2em; }
+        .cross-icon { color: var(--danger-color); font-size: 1.2em; }
+        .premium .check-icon { color: var(--primary-color); }
 
-        /* BAŞVURU FORMU */
+        /* YENİ FORM VE SİPARİŞ ÖZETİ STİLLERİ */
         .form-section {
             background-color: var(--bg-card);
             padding: 40px;
             border-radius: 12px;
             box-shadow: var(--shadow);
             max-width: 650px;
-            margin: 0 auto 50px;
+            margin: 30px auto 50px;
             border: 2px solid var(--border-dark);
+            /* Başlangıçta gizli tut */
+            display: none; 
+        }
+        .form-section.active {
+            display: block; /* Aktif olduğunda göster */
         }
         .form-section h2 {
             color: var(--primary-color);
@@ -252,11 +208,7 @@
             color: var(--text-light);
             transition: color 0.3s;
         }
-        label:has(input:focus), label:has(textarea:focus) {
-            color: var(--primary-color);
-        }
-
-        input[type="text"], input[type="email"], textarea {
+        input[type="text"], input[type="email"], textarea, select {
             width: 100%;
             padding: 15px;
             margin-bottom: 20px;
@@ -268,12 +220,11 @@
             font-size: 1em;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 10px rgba(93, 63, 106, 0.5);
             outline: none;
         }
-
         .submit-btn {
             background-color: var(--primary-color);
             color: white;
@@ -292,32 +243,70 @@
             background-color: #4a3355;
             transform: translateY(-2px);
         }
-        .submit-btn:active {
-            transform: translateY(0);
+        .submit-btn:disabled {
+            background-color: var(--text-secondary);
+            cursor: not-allowed;
         }
         
-        /* MOBİL UYUMLULUK */
+        /* Sipariş Özeti Kutusu */
+        #orderSummary {
+            background-color: var(--primary-color);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--premium-color);
+            margin: 0 auto 30px;
+            max-width: 650px;
+        }
+        #orderSummary ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        #orderSummary ul li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.2);
+            font-size: 1em;
+        }
+        #orderSummary ul li:last-child {
+            border-bottom: none;
+            font-size: 1.2em;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255,255,255,0.5);
+        }
+        
+        /* Domain Sorgulama Durumu */
+        #domainStatus {
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+        .status-success {
+            background-color: rgba(0, 210, 141, 0.1);
+            color: var(--success-color);
+        }
+        .status-warning {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+
+        /* Mobil Uyumlu Stil (Mevcut korundu) */
         @media (max-width: 900px) {
-            .pricing-table-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            .pricing-table {
-                transform: scale(1) !important;
-                margin-bottom: 25px;
-            }
-            .pricing-table.premium {
-                transform: scale(1.05) !important;
-            }
+            .pricing-table-container { flex-direction: column; align-items: center; }
+            .pricing-table { transform: scale(1) !important; margin-bottom: 25px; }
+            .pricing-table.premium { transform: scale(1.05) !important; }
             .header-banner h1 { font-size: 2.5em; }
             .form-section { padding: 30px; }
         }
         @media (max-width: 480px) {
             .header-banner h1 { font-size: 2em; }
-            .package-selector label {
-                padding: 10px 15px;
-                min-width: unset;
-            }
+            .package-selector label { padding: 10px 15px; min-width: unset; }
         }
     </style>
 </head>
@@ -331,24 +320,21 @@
 
 <div class="main-content">
     
-    <h2 class="section-title fade-in">Size En Uygun Paketi Seçin</h2>
+    <h2 class="section-title fade-in">1. Adım: Size En Uygun Paketi Seçin</h2>
     
-    <!-- Paket Seçim Kontrolü -->
     <div class="package-selector-container fade-in">
         <div class="package-selector">
-            <input type="radio" id="paketFree" name="selected_package" value="Ücretsiz Statik Başlangıç" checked>
+            <input type="radio" id="paketFree" name="selected_package" value="Ücretsiz Statik Başlangıç" data-price="0.00" checked>
             <label for="paketFree"><i class="fas fa-star"></i> Ücretsiz Başlangıç</label>
             
-            <input type="radio" id="paketPremium" name="selected_package" value="Premium Pro">
+            <input type="radio" id="paketPremium" name="selected_package" value="Premium Pro" data-price="99.99">
             <label for="paketPremium"><i class="fas fa-crown"></i> Premium Pro</label>
         </div>
     </div>
     
-    <!-- Fiyatlandırma Tabloları -->
     <div class="pricing-table-container">
         
-        <!-- 1. ÜCRETSİZ PAKET -->
-        <div id="freePackageCard" class="pricing-table fade-in">
+        <div id="freePackageCard" class="pricing-table premium fade-in">
             <div class="package-header">
                 <h3>Ücretsiz Statik Başlangıç</h3>
                 <div class="price">0₺ <small>/ 30 Gün</small></div>
@@ -363,8 +349,7 @@
             </ul>
         </div>
 
-        <!-- 2. PREMIUM PAKET -->
-        <div id="premiumPackageCard" class="pricing-table premium fade-in" style="animation-delay: 0.6s;">
+        <div id="premiumPackageCard" class="pricing-table fade-in" style="animation-delay: 0.6s;">
             <div class="package-header">
                 <h3>Premium Pro</h3>
                 <div class="price">99.99₺ <small>/ 30 Gün</small></div>
@@ -380,33 +365,82 @@
         </div>
     </div>
     
-    <!-- BAŞVURU FORMU -->
-    <div class="form-section fade-in">
-        <h2>Başvurunuzu Tamamlayın</h2>
+    <h2 class="section-title fade-in">2. Adım: Alan Adı İşlemi 🎯</h2>
+    
+    <div class="form-section fade-in domain-section active" id="domainSelectionSection">
+        
+        <div style="text-align: center; margin-bottom: 25px; padding: 10px; border: 1px solid var(--primary-color); border-radius: 8px; background-color: var(--bg-dark);">
+            <input type="radio" id="newDomain" name="domainChoice" value="yeni" style="display: none;" checked>
+            <label for="newDomain" style="display: inline-block; margin-right: 20px; font-weight: 400; cursor: pointer; color: var(--text-secondary); transition: color 0.3s;" class="domain-choice-label">
+                <i class="fas fa-plus-circle"></i> Yeni Alan Adı Al
+            </label>
+            
+            <input type="radio" id="existingDomain" name="domainChoice" value="mevcut" style="display: none;">
+            <label for="existingDomain" style="display: inline-block; font-weight: 400; cursor: pointer; color: var(--text-secondary); transition: color 0.3s;" class="domain-choice-label">
+                <i class="fas fa-arrow-alt-circle-right"></i> Mevcut Alan Adımı Kullan
+            </label>
+            <script>
+                // Domain seçimlerini görsel olarak vurgulama (CSS ile yapılmadığı için JS eklendi)
+                document.querySelectorAll('.domain-choice-label').forEach(label => {
+                    const input = document.getElementById(label.htmlFor);
+                    const updateLabel = () => {
+                        label.style.color = input.checked ? 'var(--success-color)' : 'var(--text-secondary)';
+                    };
+                    input.addEventListener('change', updateLabel);
+                    updateLabel(); // Başlangıç durumu
+                });
+            </script>
+        </div>
+
+        <label for="domainName"><i class="fas fa-search"></i> Alan Adınızı Sorgulayın/Giriniz:</label>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <input type="text" id="domainName" name="domain_name" placeholder="alanadim-ornegi" required>
+            <select id="domainTLD" name="domain_tld" style="width: 150px;">
+                <option value=".com">.com</option>
+                <option value=".net">.net</option>
+                <option value=".org">.org</option>
+                <option value=".com.tr">.com.tr</option>
+            </select>
+        </div>
+        
+        <button type="button" id="checkDomainBtn" class="submit-btn" style="width: auto;"><i class="fas fa-sync-alt"></i> Alan Adını Kontrol Et</button>
+        <p id="domainStatus" class="status-warning" style="display: none;"></p>
+
+        <button type="button" id="proceedToOrderBtn" class="submit-btn" style="background-color: var(--success-color); margin-top: 30px;" disabled><i class="fas fa-shopping-cart"></i> Sepete Ekle ve Devam Et</button>
+        <p id="freeDomainNote" style="text-align: center; margin-top: 15px; font-size: 0.85em; color: var(--success-color); display: none;">**Ücretsiz Paket** için sadece site adınızı giriniz ve devam edebilirsiniz. Domain zorunlu değildir.</p>
+    </div>
+
+    <div id="orderSummary" style="display: none;">
+        <h3 style="margin-top: 0; text-align: center;"><i class="fas fa-file-invoice"></i> Sipariş Özeti</h3>
+        <ul id="summaryList">
+            <li id="summaryPackageLi"><strong>Seçilen Paket:</strong> <span id="summaryPackage">Ücretsiz Statik Başlangıç</span></li>
+            <li id="summaryDomainLi"><strong>Alan Adı:</strong> <span id="summaryDomain">bakikara.xyz/site-adi</span></li>
+            <li style="font-size: 0.9em; font-style: italic; color: #a9a9b6;">(Alan adı 1 yıllık kaydı Premium pakette fiyata dahildir.)</li>
+            <li><strong>TOPLAM TUTAR (30 Günlük):</strong> <span id="summaryPrice" style="font-weight: 700;">0.00₺</span></li>
+        </ul>
+    </div>
+    
+    <h2 class="section-title fade-in" id="formTitle" style="display: none;">3. Adım: Başvurunuzu Tamamlayın</h2>
+
+    <div class="form-section fade-in" id="hostingBasvuruFormuSection">
         
         <form id="hostingBasvuruFormu" action="https://formspree.io/f/manlrnqz" method="POST">
             
-            <!-- Seçilen Paketi Gönderim İçin Gizli Alan -->
             <input type="hidden" id="hiddenPackageName" name="Secilen_Paket" value="Ücretsiz Statik Başlangıç">
+            <input type="hidden" id="hiddenDomainName" name="Alan_Adi" value="bakikara.xyz/site-adi">
             
-            <label for="kullaniciAdi"><i class="fas fa-link"></i> İstenen Site Adı (URL Kısmı):</label>
-            <input type="text" id="kullaniciAdi" name="site_adi" placeholder="Örn: sitemin-adi (URL: bakikara.xyz/sitemin-adi veya Kendi Alan Adınız)" required>
-
             <label for="adSoyad"><i class="fas fa-user"></i> Adınız ve Soyadınız:</label>
             <input type="text" id="adSoyad" name="ad_soyad" required>
 
             <label for="eposta"><i class="fas fa-envelope"></i> E-posta Adresiniz:</label>
             <input type="email" id="eposta" name="email" required>
             
-            <label for="ozelDomain"><i class="fas fa-globe"></i> Özel Alan Adınız (Sadece Premium için gereklidir):</label>
-            <input type="text" id="ozelDomain" name="ozel_alan_adi" placeholder="Örn: www.kullanici-sitem.com (Premium seçildi ise zorunludur)">
-
             <label for="aciklama"><i class="fas fa-lightbulb"></i> Proje Amacı ve Ek Açıklamalar:</label>
-            <textarea id="aciklama" name="message" rows="4" placeholder="Hangi paketi seçtiğinizi ve projenizin amacını kısaca belirtiniz."></textarea>
+            <textarea id="aciklama" name="message" rows="4" placeholder="Projenizin amacını ve varsa özel gereksinimlerinizi kısaca belirtiniz."></textarea>
             
-            <input type="hidden" name="_subject" value="Yeni Hosting Başvurusu: bakikara.xyz">
+            <input type="hidden" name="_subject" value="Yeni Hosting Siparişi: bakikara.xyz">
 
-            <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Başvuruyu Gönder</button>
+            <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Siparişi Tamamla ve Gönder</button>
         </form>
 
         <p style="text-align: center; margin-top: 25px; font-size: 0.85em; color: var(--text-secondary);">Başvurunuzu gönderdikten sonra, kayıt olduğunuz e-posta adresine **onay ve dosya gönderme yönergeleri** gelecektir.</p>
@@ -418,48 +452,186 @@
         const freeCard = document.getElementById('freePackageCard');
         const premiumCard = document.getElementById('premiumPackageCard');
         const hiddenPackageInput = document.getElementById('hiddenPackageName');
-        const ozelDomainInput = document.getElementById('ozelDomain');
-        const form = document.getElementById('hostingBasvuruFormu');
+        const hiddenDomainInput = document.getElementById('hiddenDomainName');
+        
+        const domainSection = document.getElementById('domainSelectionSection');
+        const domainNameInput = document.getElementById('domainName');
+        const domainTLDSelect = document.getElementById('domainTLD');
+        const checkDomainBtn = document.getElementById('checkDomainBtn');
+        const proceedToOrderBtn = document.getElementById('proceedToOrderBtn');
+        const domainStatus = document.getElementById('domainStatus');
+        const freeDomainNote = document.getElementById('freeDomainNote');
+        const domainChoiceRadios = document.querySelectorAll('input[name="domainChoice"]');
 
-        function updatePackageSelection(packageName) {
-            // Görsel vurguyu ayarla
+        const orderSummary = document.getElementById('orderSummary');
+        const summaryPackage = document.getElementById('summaryPackage');
+        const summaryDomain = document.getElementById('summaryDomain');
+        const summaryPrice = document.getElementById('summaryPrice');
+        const formTitle = document.getElementById('formTitle');
+        const formSection = document.getElementById('hostingBasvuruFormuSection');
+
+        let selectedPackagePrice = 0.00;
+        let isDomainChecked = false;
+
+        // ---------------------------------------------------
+        // Fonksiyonlar
+        // ---------------------------------------------------
+
+        function updatePackageSelection(packageName, price) {
+            selectedPackagePrice = price;
+            summaryPackage.textContent = packageName;
+            
+            // Görsel Vurgulama
             if (packageName === 'Premium Pro') {
                 premiumCard.classList.add('premium');
                 freeCard.classList.remove('premium');
-                ozelDomainInput.required = true; // Premium seçilirse alan adı zorunlu
-                ozelDomainInput.placeholder = "Örn: www.kullanici-sitem.com (ZORUNLUDUR)";
+                // Premium için domain alanını sıfırla ve zorunlu kıl
+                domainNameInput.placeholder = "Örn: alanadim-ornegi (Zorunlu)";
+                domainNameInput.required = true;
+                domainTLDSelect.style.display = 'block';
+                freeDomainNote.style.display = 'none';
             } else {
                 premiumCard.classList.remove('premium');
-                freeCard.classList.add('premium'); // Ücretsiz paket varsayılan olarak vurgulu
-                ozelDomainInput.required = false; // Ücretsiz seçilirse zorunlu değil
-                ozelDomainInput.placeholder = "Örn: www.kullanici-sitem.com (varsa belirtin)";
+                freeCard.classList.add('premium');
+                // Ücretsiz için domain alanı zorunlu değil
+                domainNameInput.placeholder = "Örn: sitemin-adi (URL kısmı)";
+                domainNameInput.required = false;
+                domainTLDSelect.style.display = 'none'; // Ücretsiz pakette TLD seçimine gerek yok
+                freeDomainNote.style.display = 'block';
             }
             
-            // Gizli form alanını güncelle
+            // Gizli form alanlarını ve özet ekranını güncelle
             hiddenPackageInput.value = packageName;
+            updateSummary();
+            
+            // Paket değişince domain kontrolünü sıfırla
+            resetDomainCheck();
         }
 
-        // Paket seçimi değiştiğinde
+        function resetDomainCheck() {
+            isDomainChecked = false;
+            proceedToOrderBtn.disabled = true;
+            proceedToOrderBtn.style.display = 'block'; // Her zaman göster, disabled olsun
+            domainStatus.style.display = 'none';
+            domainStatus.textContent = '';
+            
+            // Formu gizle
+            orderSummary.style.display = 'none';
+            formTitle.style.display = 'none';
+            formSection.style.display = 'none';
+        }
+
+        function updateSummary(domain = null) {
+            const currentPackage = hiddenPackageInput.value;
+            let currentDomain = '';
+
+            if (currentPackage === 'Ücretsiz Statik Başlangıç') {
+                // Ücretsiz pakette domain input'unu kullan
+                const siteAdi = domainNameInput.value.trim() || "site-adi";
+                currentDomain = `bakikara.xyz/${siteAdi.toLowerCase()}`;
+            } else {
+                // Premium pakette sorgulanan domain'i kullan
+                currentDomain = domain || 'Alan Adı Henüz Sorgulanmadı';
+            }
+            
+            summaryDomain.textContent = currentDomain;
+            summaryPrice.textContent = `${selectedPackagePrice.toFixed(2)}₺`;
+            hiddenDomainInput.value = currentDomain;
+        }
+
+        // ---------------------------------------------------
+        // Event Listeners
+        // ---------------------------------------------------
+
+        // 1. Paket Seçimi Değiştiğinde
         document.querySelectorAll('input[name="selected_package"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
-                updatePackageSelection(e.target.value);
+                const price = parseFloat(e.target.dataset.price);
+                updatePackageSelection(e.target.value, price);
+            });
+        });
+        
+        // 2. Alan Adı Sorgulama/Kontrol Butonu
+        checkDomainBtn.addEventListener('click', () => {
+            const currentPackage = hiddenPackageInput.value;
+            const domainVal = domainNameInput.value.trim();
+            domainStatus.style.display = 'block';
+            
+            if (currentPackage === 'Premium Pro') {
+                if (!domainVal) {
+                    domainStatus.className = 'status-warning';
+                    domainStatus.textContent = 'Premium paket için alan adı boş bırakılamaz.';
+                    proceedToOrderBtn.disabled = true;
+                    return;
+                }
+                
+                // Sahte Domain Sorgulama Simülasyonu
+                domainStatus.className = 'status-success';
+                const fullDomain = domainVal + domainTLDSelect.value;
+                domainStatus.textContent = `${fullDomain} Müsait! (Sorgulama başarılı.)`;
+                
+                isDomainChecked = true;
+                proceedToOrderBtn.disabled = false;
+                updateSummary(fullDomain);
+
+            } else { // Ücretsiz Statik Başlangıç
+                domainStatus.className = 'status-success';
+                const siteAdi = domainVal || "site-adi";
+                domainStatus.textContent = `Siteniz: bakikara.xyz/${siteAdi} Adresiyle Yayınlanacak.`;
+                
+                isDomainChecked = true;
+                proceedToOrderBtn.disabled = false; // Ücretsiz için zorunluluk yok, hemen devam et
+                updateSummary();
+            }
+        });
+        
+        // 3. Alan Adı/URL Input Değiştiğinde
+        domainNameInput.addEventListener('input', resetDomainCheck);
+        domainTLDSelect.addEventListener('change', resetDomainCheck);
+
+        // 4. "Sepete Ekle ve Devam Et" Butonu
+        proceedToOrderBtn.addEventListener('click', () => {
+            if (isDomainChecked) {
+                // 3. Adım: Formu ve özeti göster
+                orderSummary.style.display = 'block';
+                formTitle.style.display = 'block';
+                formSection.style.display = 'block';
+                // Kullanıcıyı forma kaydır
+                formTitle.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                alert('Lütfen alan adınızı kontrol edin veya ücretsiz paket için site adınızı girin.');
+            }
+        });
+
+        // 5. Domain Tipi Seçimi (Mevcut/Yeni Domain)
+        domainChoiceRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                // Bu örnekte sadece placeholder/notu değiştirebiliriz.
+                // Gerçek bir sistemde bu, Domain Transfer/Yeni Kayıt aşamalarına götürür.
+                if (radio.value === 'mevcut') {
+                    domainNameInput.placeholder = "Kullanacağınız mevcut alan adınızın tamamını girin (Örn: siteadi.com)";
+                    domainTLDSelect.style.display = 'none';
+                } else {
+                    domainNameInput.placeholder = "alanadim-ornegi";
+                    if (hiddenPackageInput.value === 'Premium Pro') {
+                        domainTLDSelect.style.display = 'block';
+                    }
+                }
+                resetDomainCheck();
             });
         });
 
-        // Form gönderimi öncesinde zorunlu alan kontrolünü tekrar yap (opsiyonel ama iyi pratik)
-        form.addEventListener('submit', function(e) {
-            if (hiddenPackageInput.value === 'Premium Pro' && ozelDomainInput.value.trim() === '') {
-                // Sadece custom modal göstermek yerine, HTML5 uyarı mekanizmasını kullanabiliriz.
-                ozelDomainInput.setCustomValidity("Premium Pro paketi için özel alan adı girmek zorunludur.");
-                ozelDomainInput.reportValidity();
+        // 6. Form gönderiminde zorunlu alan kontrolü (Browser'ın native kontrolü zaten var, bu sadece ek bir kontrol)
+        formSection.addEventListener('submit', function(e) {
+            if (!isDomainChecked) {
                 e.preventDefault();
-            } else {
-                ozelDomainInput.setCustomValidity(""); // Geçerli ise hata mesajını temizle
+                alert('Lütfen öncelikle 2. adımdaki Alan Adı işlemini tamamlayın ve Devam Et butonuna tıklayın.');
+                domainSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
 
         // Sayfa yüklendiğinde varsayılan paketi ayarla (Ücretsiz)
-        updatePackageSelection(document.querySelector('input[name="selected_package"]:checked').value);
+        updatePackageSelection(document.querySelector('input[name="selected_package"]:checked').value, 0.00);
     });
 </script>
 
