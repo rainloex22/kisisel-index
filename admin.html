@@ -445,7 +445,7 @@
                 <th onclick="sortCustomers('created_at')">Kayıt Tarihi <span id="sortCreated_at" class="sort-icon fas fa-sort-down"></span></th> 
                 <th onclick="sortCustomers('balance')">Bakiye (₺) <span id="sortBalance" class="sort-icon fas fa-sort"></span></th>
                 <th>Site Adresi (Öneri)</th>
-                <th onclick="sortCustomers('serviceStatus')">Durum <span id="sortStatus" class="sort-icon fas fa-sort"></span></th>
+                <th onclick="sortCustomers('servicestatus')">Durum <span id="sortServicestatus" class="sort-icon fas fa-sort"></span></th>
                 <th>İşlemler</th>
             </tr>
         </thead>
@@ -539,7 +539,7 @@
     
     let allCustomers = [];
     let currentEditingUser = null; 
-    let sortKey = 'created_at'; // 🔥 DÜZELTME: Başlangıç sıralama anahtarı created_at olarak değiştirildi
+    let sortKey = 'created_at'; 
     let sortDirection = 'desc'; 
 
     // ----------------------------------------------------------------------
@@ -626,12 +626,12 @@
             let aVal = a[sortKey];
             let bVal = b[sortKey];
 
-            // 🔥 DÜZELTME: created_at kullanılıyor
+            // created_at için tarih sıralaması
             if (sortKey === 'created_at') { 
-                // Supabase'den gelen tarih string'ini Date nesnesine çevir
                 aVal = aVal ? new Date(aVal).getTime() : 0;
                 bVal = bVal ? new Date(bVal).getTime() : 0;
             }
+            // balance için sayısal sıralama
             if (sortKey === 'balance') {
                 aVal = parseFloat(aVal) || 0;
                 bVal = parseFloat(bVal) || 0;
@@ -649,10 +649,13 @@
             icon.classList.remove('fa-sort-up', 'fa-sort-down');
             icon.classList.add('fa-sort');
         });
-        // 🔥 DÜZELTME: Sadece created_at'i ayrı ele al
+        
         let iconId = '';
         if (sortKey === 'created_at') {
             iconId = 'sortCreated_at';
+        // 🔥 DÜZELTME: servicestatus için özel eşleştirme
+        } else if (sortKey === 'servicestatus') {
+            iconId = 'sortServicestatus'; 
         } else {
             iconId = `sort${sortKey.charAt(0).toUpperCase() + sortKey.slice(1)}`;
         }
@@ -665,7 +668,6 @@
         }
 
         if (customers.length === 0) {
-            // Tablo sütun sayısı 6 oldu (E-posta, Tarih, Bakiye, Adres, Durum, İşlemler)
             tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--warning-color);">Filtreye uyan müşteri bulunamadı.</td></tr>`;
             return;
         }
@@ -673,11 +675,11 @@
         customers.forEach(user => {
             const userEmail = user.email || 'Bilinmiyor';
             const username = userEmail.split('@')[0];
-            const siteUrl = `bakikara.xyz/${user.site_adi || username}`; // Site adı varsa onu kullan
-            // 🔥 DÜZELTME: user.created_at kullanılıyor
+            const siteUrl = `bakikara.xyz/${user.site_adi || username}`; 
             const regDate = user.created_at ? new Date(user.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Bilinmiyor';
-            const status = user.serviceStatus || 'FILE_WAITING'; 
-            const balance = (user.balance || 0).toFixed(2); // Bakiye değeri
+            // 🔥 DÜZELTME: user.servicestatus kullanılıyor
+            const status = user.servicestatus || 'FILE_WAITING'; 
+            const balance = (user.balance || 0).toFixed(2); 
 
             const row = tableBody.insertRow();
             
@@ -709,7 +711,6 @@
         } else {
             sortKey = key;
             sortDirection = 'asc'; 
-            // 🔥 DÜZELTME: created_at kullanılıyor
             if (key === 'created_at' || key === 'balance') sortDirection = 'desc'; 
         }
         filterCustomers(); // Veriyi yeniden render et
@@ -720,18 +721,16 @@
      */
     window.filterCustomers = function() {
         const searchText = document.getElementById('searchFilter').value.toLowerCase();
-        const statusFilter = document.getElementById('statusFilter').value; // Yeni filtre
+        const statusFilter = document.getElementById('statusFilter').value; 
 
         const filtered = allCustomers.filter(user => {
             const userEmail = (user.email || '').toLowerCase();
             const username = userEmail.split('@')[0].toLowerCase();
             const siteAdi = (user.site_adi || '').toLowerCase();
-            const status = (user.serviceStatus || 'FILE_WAITING');
+            // 🔥 DÜZELTME: user.servicestatus kullanılıyor
+            const status = (user.servicestatus || 'FILE_WAITING');
             
-            // Metin araması kontrolü
             const textMatch = userEmail.includes(searchText) || username.includes(searchText) || siteAdi.includes(searchText);
-            
-            // Durum filtresi kontrolü
             const statusMatch = statusFilter === 'ALL' || status === statusFilter;
 
             return textMatch && statusMatch;
@@ -745,17 +744,15 @@
     // ----------------------------------------------------------------------
 
     /**
-     * Veriyi bir kez çeken ana fonksiyon (Firestore'daki getDocs'a karşılık gelir)
+     * Veriyi bir kez çeken ana fonksiyon
      */
     async function fetchAndRenderCustomers() {
         loading.style.display = 'block';
 
         try {
-            // Supabase'den tüm müşterileri çek
             const { data: customers, error } = await supabaseClient
-                .from('customers') // Oluşturduğumuz tablo adı
+                .from('customers') 
                 .select('*') 
-                // 🔥 DÜZELTME: created_at kullanılıyor
                 .order('created_at', { ascending: false }); 
 
             if (error) {
@@ -777,21 +774,20 @@
                 return;
             }
 
-            // user_id Firestore'da doc.id iken, Supabase'de tablo sütun adımızdır
             allCustomers = customers.map(doc => ({
-                userId: doc.user_id, // Firestore'daki userId yerine Supabase'deki user_id sütunu
+                userId: doc.user_id, 
                 ...doc
             }));
 
             // Özet Kartları Güncelle
-            const activeCount = allCustomers.filter(u => u.serviceStatus === 'ACTIVE').length;
-            const pendingCount = allCustomers.filter(u => u.serviceStatus === 'PENDING' || u.serviceStatus === 'FILE_WAITING').length; 
+            // 🔥 DÜZELTME: u.servicestatus kullanılıyor
+            const activeCount = allCustomers.filter(u => u.servicestatus === 'ACTIVE').length;
+            const pendingCount = allCustomers.filter(u => u.servicestatus === 'PENDING' || u.servicestatus === 'FILE_WAITING').length; 
             
             totalCustomersSpan.innerText = allCustomers.length;
             activeCustomersSpan.innerText = activeCount;
             pendingCustomersSpan.innerText = pendingCount; 
 
-            // Mevcut filtre ve sıralama ayarlarını kullanarak tabloyu yeniden çiz
             filterCustomers();
 
         } catch (error) {
@@ -811,38 +807,33 @@
         table.style.display = 'none';
         errorMessage.style.display = 'none';
         
-        // Supabase Realtime Dinleyicisini Başlat
         const channel = supabaseClient
             .channel('customer_changes') 
             .on(
                 'postgres_changes',
-                { event: '*', schema: 'public', table: 'customers' }, // customers tablosundaki her değişikliği dinle
+                { event: '*', schema: 'public', table: 'customers' }, 
                 (payload) => {
                     console.log('Gerçek Zamanlı Veri Değişikliği Algılandı:', payload);
-                    // Değişiklik olduğunda tüm listeyi yeniden çekip render et
                     fetchAndRenderCustomers();
                 }
             )
             .subscribe(); 
 
-        // İlk veriyi çekme fonksiyonunu çağır
         fetchAndRenderCustomers();
 
         return channel;
     };
     
     /**
-     * En son yayınlanan duyuruları (aktivite) çeker ve dinler. (Şimdilik sadece çeker)
+     * En son yayınlanan duyuruları (aktivite) çeker.
      */
     async function listenForRecentActivity() {
         console.log("Aktivite dinleyicisi başlatıldı...");
         
         try {
-            // Supabase'den son 5 duyuruyu çek
             const { data: announcements, error } = await supabaseClient
-                // 🔥 DÜZELTME: created_at kullanılıyor
                 .from('announcements')
-                .select('text, created_at') // Sadece metin ve oluşturulma tarihi
+                .select('text, created_at') 
                 .order('created_at', { ascending: false })
                 .limit(5);
 
@@ -856,7 +847,6 @@
             }
 
             announcements.forEach(announcement => {
-                // 🔥 DÜZELTME: announcement.created_at kullanılıyor
                 const date = announcement.created_at ? new Date(announcement.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Bilinmiyor';
                 
                 const listItem = document.createElement('li');
@@ -897,13 +887,11 @@
         btn.disabled = true;
 
         try {
-            // Supabase ile Duyuru Ekleme
             const { error } = await supabaseClient
-                .from('announcements') // announcements tablosuna ekle
+                .from('announcements') 
                 .insert([
                     {
                         text: announcementText,
-                        // createdAt alanı Supabase'de otomatik eklenebilir
                         publishedBy: ADMIN_EMAIL 
                     }
                 ]);
@@ -914,7 +902,6 @@
             messageElement.innerText = '✅ Duyuru başarıyla yayınlandı! (Müşteri sitelerinde görünecek)';
             textElement.value = ''; 
             
-            // Yayın başarılı olduğunda aktivite listesini güncelle
             listenForRecentActivity();
 
         } catch (error) {
@@ -947,12 +934,11 @@
             async (isConfirmed) => {
                 if (isConfirmed) {
                     try {
-                        // Supabase ile Güncelleme
                         const { error } = await supabaseClient
-                            // Supabase'in otomatik last_updated alanını kullanmak için burada lastUpdated yerine last_updated kullanılması gerekebilir.
                             .from('customers')
-                            .update({ serviceStatus: newStatus, lastUpdated: new Date().toISOString() }) 
-                            .eq('user_id', userId); // user_id'si eşleşeni bul
+                            // 🔥 DÜZELTME: servicestatus kullanılıyor
+                            .update({ servicestatus: newStatus, last_updated: new Date().toISOString() }) 
+                            .eq('user_id', userId); 
 
                         if (error) throw error;
 
@@ -977,11 +963,10 @@
             async (isConfirmed) => {
                 if (isConfirmed) {
                     try {
-                        // Supabase ile Silme
                         const { error } = await supabaseClient
                             .from('customers')
                             .delete()
-                            .eq('user_id', userId); // user_id'si eşleşeni sil
+                            .eq('user_id', userId); 
 
                         if (error) throw error;
                             
@@ -1007,7 +992,6 @@
     // ----------------------------------------------------------------------
     
     window.showCustomerDetailModal = function(userId) {
-        // userId artık Firestore doc.id yerine Supabase'deki user_id sütunudur
         const user = allCustomers.find(u => u.userId === userId); 
         if (!user) return;
 
@@ -1015,8 +999,9 @@
         
         document.getElementById('detailEmail').value = user.email || '';
         document.getElementById('detailSiteName').value = user.site_adi || '';
-        document.getElementById('detailBalance').value = (user.balance || 0); // Bakiye değeri
-        document.getElementById('detailStatus').value = user.serviceStatus || 'FILE_WAITING';
+        document.getElementById('detailBalance').value = (user.balance || 0); 
+        // 🔥 DÜZELTME: user.servicestatus kullanılıyor
+        document.getElementById('detailStatus').value = user.servicestatus || 'FILE_WAITING';
         document.getElementById('detailNotes').value = user.admin_notes || '';
         document.getElementById('detailMessage').innerText = ''; 
         
@@ -1034,7 +1019,6 @@
         messageElement.innerText = 'Kaydediliyor...';
 
         try {
-            // Bakiye alanını float olarak kaydetmek için parse et
             const newBalance = parseFloat(document.getElementById('detailBalance').value) || 0; 
             
             // Supabase ile Toplu Güncelleme
@@ -1042,12 +1026,13 @@
                 .from('customers')
                 .update({
                     site_adi: document.getElementById('detailSiteName').value.trim(),
-                    serviceStatus: document.getElementById('detailStatus').value,
+                    // 🔥 DÜZELTME: servicestatus kullanılıyor
+                    servicestatus: document.getElementById('detailStatus').value,
                     admin_notes: document.getElementById('detailNotes').value.trim(),
                     balance: newBalance,
-                    lastUpdated: new Date().toISOString() // Supabase timestamp formatı (Eğer tablonuzda bu isimde sütun yoksa hata verebilir, ama şimdilik bırakıyorum)
+                    last_updated: new Date().toISOString()
                 })
-                .eq('user_id', currentEditingUser.userId); // Doğru user_id ile eşleştir
+                .eq('user_id', currentEditingUser.userId); 
 
             if (error) throw error;
 
@@ -1076,24 +1061,22 @@
     document.getElementById('saveDetailsBtn').addEventListener('click', saveCustomerDetails);
 
     // ----------------------------------------------------------------------
-    // 7. YETKİLENDİRME ve BAŞLATMA (GEÇİCİ OLARAK GÜVENSİZ YÖNTEM)
+    // 7. YETKİLENDİRME ve BAŞLATMA
     // ----------------------------------------------------------------------
 
     /**
-     * Çıkış Yapma İşlemi (Şimdilik yönlendirme yapar)
+     * Çıkış Yapma İşlemi
      */
     window.handleLogout = function() {
         showModal("GÜVENSİZ KULLANIM", "Şu anda yönetici yetkilendirme sistemi (Auth) devre dışıdır. Çıkış yapmak için login.html sayfasına yönlendiriliyorsunuz.", 'alert', () => {
-             // Supabase Auth entegre edilene kadar yönlendirme yapar
              window.location.href = 'login.html';
         });
     }
 
-    // ⛔️ Güvenlik Uyarısı: Firebase Auth kaldırıldığı için, sayfa açılır açılmaz veri çekme başlatılır.
+    // Başlangıç fonksiyonlarını çağır
     listenForCustomers();
-    listenForRecentActivity(); // Aktivite loglarını başlat
+    listenForRecentActivity(); 
     
-    // Duyuru butonunu bağla
     document.getElementById('publishAnnouncementBtn').addEventListener('click', publishAnnouncement);
 </script>
 </body>
