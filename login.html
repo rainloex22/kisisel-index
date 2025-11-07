@@ -133,13 +133,11 @@
             if (email === ADMIN_EMAIL) {
                 displayMessage("Yönetici kaydı başarılı! Admin paneline yönlendiriliyorsunuz...", false);
                 setTimeout(() => { 
-                    // YÖNLENDİRME admin.html
                     window.location.href = 'admin.html'; 
                 }, 1500);
             } else {
                 displayMessage("Kayıt başarılı! E-posta adresinize gelen aktivasyon linkini onaylayın.", false);
                 setTimeout(() => { 
-                    // YÖNLENDİRME dashboard
                     window.location.href = 'dashboard'; 
                 }, 1500); 
             }
@@ -177,13 +175,11 @@
             if (user && user.email === ADMIN_EMAIL) {
                 displayMessage("Yönetici girişi başarılı! Admin paneline yönlendiriliyorsunuz...", false);
                 setTimeout(() => {
-                    // YÖNLENDİRME admin.html
                     window.location.href = 'admin.html'; 
                 }, 1000);
             } else {
                 displayMessage("Giriş başarılı! Müşteri paneline yönlendiriliyorsunuz...", false);
                 setTimeout(() => { 
-                    // YÖNLENDİRME dashboard
                     window.location.href = 'dashboard'; 
                 }, 1000); 
             }
@@ -197,8 +193,6 @@
         }
     }
     
-    // ❌ DİKKAT: Sayfa açıldığında otomatik yönlendirme yapan onAuthStateChange bloğu silinmiştir.
-
 </script>
 </body>
 </html>
