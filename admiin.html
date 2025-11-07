@@ -937,7 +937,7 @@
                         const { error } = await supabaseClient
                             .from('customers')
                             // 🔥 DÜZELTME: servicestatus kullanılıyor
-                            .update({ servicestatus: newStatus, lastUpdated: new Date().toISOString() }) 
+                            .update({ servicestatus: newStatus, last_updated: new Date().toISOString() }) 
                             .eq('user_id', userId); 
 
                         if (error) throw error;
@@ -1030,7 +1030,7 @@
                     servicestatus: document.getElementById('detailStatus').value,
                     admin_notes: document.getElementById('detailNotes').value.trim(),
                     balance: newBalance,
-                    lastUpdated: new Date().toISOString()
+                    last_updated: new Date().toISOString()
                 })
                 .eq('user_id', currentEditingUser.userId); 
 
