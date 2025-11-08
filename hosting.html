@@ -581,9 +581,10 @@
 
             if (!domainVal) {
                 domainStatus.className = 'status-warning';
-                domainStatus.textContent = currentPackage === 'Premium Pro' 
-                    ? 'Premium paket için alan adı boş bırakılamaz.'
-                    : 'Lütfen siteniz için bir URL takma adı girin (Örn: sitemin-adi).';
+                // **KALIN YAZI GÜNCELLEMESİ**
+                domainStatus.innerHTML = currentPackage === 'Premium Pro' 
+                    ? 'Premium paket için **alan adı boş bırakılamaz**.'
+                    : 'Lütfen siteniz için bir **URL takma adı girin** (Örn: sitemin-adi).';
                 return;
             }
 
@@ -594,19 +595,22 @@
 
                 if (!fullDomain.includes('.')) {
                     domainStatus.className = 'status-warning';
-                    domainStatus.textContent = 'Lütfen geçerli bir alan adı formatı girin (Örn: siteadi.com).';
+                    // **KALIN YAZI GÜNCELLEMESİ**
+                    domainStatus.innerHTML = 'Lütfen **geçerli bir alan adı formatı girin** (Örn: siteadi.com).';
                     return;
                 }
                 
                 domainStatus.className = 'status-warning';
-                domainStatus.textContent = `⏳ **${fullDomain}** alanı kontrol ediliyor...`;
+                // **KALIN YAZI GÜNCELLEMESİ**
+                domainStatus.innerHTML = `⏳ **${fullDomain}** alanı **kontrol ediliyor**...`;
                 
                 try {
                     await new Promise(resolve => setTimeout(resolve, 1500)); 
 
                     if (existingDomainRadio.checked) {
                         domainStatus.className = 'status-success';
-                        domainStatus.textContent = `✅ **${fullDomain}** alan adınızı kullanmaya hazırsınız. DNS ayarlarını tarafımıza yönlendirmeniz gerekecektir.`;
+                        // **KALIN YAZI GÜNCELLEMESİ**
+                        domainStatus.innerHTML = `✅ **${fullDomain}** alan adınızı **kullanmaya hazırsınız**. DNS ayarlarını tarafımıza yönlendirmeniz gerekecektir.`;
                         isDomainChecked = true;
                         proceedToOrderBtn.disabled = false;
                         updateSummary(fullDomain + " (Mevcut Alan Adı)");
@@ -617,20 +621,23 @@
                     
                     if (isAvailable) {
                         domainStatus.className = 'status-success';
-                        domainStatus.textContent = `Tebrikler! 🎉 **${fullDomain}** alan adı **MÜSAİTTİR**. Sepete ekleyip devam edebilirsiniz.`;
+                        // **KALIN YAZI GÜNCELLEMESİ**
+                        domainStatus.innerHTML = `Tebrikler! 🎉 **${fullDomain}** alan adı **MÜSAİTTİR**. Sepete ekleyip devam edebilirsiniz.`;
                         isDomainChecked = true;
                         proceedToOrderBtn.disabled = false;
                         updateSummary(fullDomain);
                     } else {
                         domainStatus.className = 'status-warning';
-                        domainStatus.textContent = `❌ Üzgünüz, **${fullDomain}** özel alan adı **KULLANILMAKTADIR**. Bu alan adı kaydedilemez. Lütfen başka bir alan adı veya uzantı deneyin.`;
+                        // **KALIN YAZI GÜNCELLEMESİ**
+                        domainStatus.innerHTML = `❌ Üzgünüz, **${fullDomain}** özel alan adı **KULLANILMAKTADIR**. Bu alan adı kaydedilemez. Lütfen başka bir alan adı veya uzantı deneyin.`;
                         isDomainChecked = false;
                         updateSummary(fullDomain + " (Müsait Değil)");
                     }
                 } catch (error) {
                     console.error('Domain sorgulama hatası:', error);
                     domainStatus.className = 'status-warning';
-                    domainStatus.textContent = 'Alan adı sorgulanırken teknik bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+                    // **KALIN YAZI GÜNCELLEMESİ**
+                    domainStatus.innerHTML = '**Alan adı sorgulanırken teknik bir hata oluştu**. Lütfen daha sonra tekrar deneyin.';
                     isDomainChecked = false;
                 }
 
@@ -641,14 +648,16 @@
                 // GÜNCELLENEN KISIM: Ayrılmış Takma Ad Kontrolü
                 if (RESERVED_SLUGS.includes(siteAdi) || siteAdi === '') {
                     domainStatus.className = 'status-warning';
-                    domainStatus.textContent = `❌ Üzgünüz, **${siteAdi || 'boş'}** takma adı (URL) ayrılmış veya kullanılamaz durumdadır. Lütfen başka bir isim girin.`;
+                    // **KALIN YAZI GÜNCELLEMESİ**
+                    domainStatus.innerHTML = `❌ Üzgünüz, **${siteAdi || 'boş'}** takma adı (URL) **ayrılmış veya kullanılamaz durumdadır**. Lütfen başka bir isim girin.`;
                     isDomainChecked = false;
                     proceedToOrderBtn.disabled = true;
                     return;
                 }
                 
                 domainStatus.className = 'status-success';
-                domainStatus.textContent = `✅ Siteniz: **bakikara.xyz/${siteAdi}** Adresiyle Yayınlanacak. Devam edebilirsiniz.`;
+                // **KALIN YAZI GÜNCELLEMESİ**
+                domainStatus.innerHTML = `✅ Siteniz: **bakikara.xyz/${siteAdi}** Adresiyle **Yayınlanacak**. Devam edebilirsiniz.`;
                 
                 isDomainChecked = true;
                 proceedToOrderBtn.disabled = false; 
