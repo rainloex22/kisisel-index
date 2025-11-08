@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profesyonel Web & Hosting Hizmeti</title>
+<style>
+  /* Genel Ayarlar */
+  body {
+    margin: 0;
+    background-color: #111;
+    color: #eee;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+  }
+  a {color:#4caf50; text-decoration:none;}
+  .container {width:90%; max-width:1000px; margin:0 auto; padding:20px;}
+
+  /* Header */
+  header {text-align:center; padding:50px 0;}
+  header h1 {font-size:2.5em; color:#fff;}
+  header p {color:#ccc;}
+
+  /* Paketler */
+  .services {display:grid; grid-template-columns:1fr; gap:20px; margin-top:30px;}
+  @media(min-width:768px){.services {grid-template-columns:repeat(3,1fr);}}
+  .service {
+    background-color:#222; padding:20px; border-radius:8px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .service:hover {transform:translateY(-5px); box-shadow:0 5px 15px rgba(0,0,0,0.5);}
+  .service h2 {margin-top:0; color:#fff;}
+  .service p {color:#ccc;}
+  .price {font-size:1.5em; color:#4caf50; margin-top:10px;}
+
+  /* Dinamik toplam */
+  .total {text-align:center; font-size:1.5em; margin:20px 0; color:#4caf50;}
+
+  /* CTA */
+  .cta {text-align:center; margin:40px 0;}
+  .cta button {
+    background-color:#4caf50; color:#fff; padding:15px 30px;
+    border:none; border-radius:5px; font-size:1em; cursor:pointer;
+    transition: background 0.3s;
+  }
+  .cta button:hover {background-color:#3e8e41;}
+
+  /* Footer */
+  footer {margin-top:60px; text-align:center; font-size:0.9em; color:#777;}
+
+  /* Bölümler */
+  section {margin-top:50px;}
+  section h2 {color:#fff;}
+  section p {color:#ccc;}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Profesyonel Web & Hosting Hizmeti</h1>
+    <p>Küçük işletmelere özel, güvenli ve hızlı çözümler.</p>
+  </header>
+
+  <div class="services">
+    <div class="service">
+      <h2>Paket A</h2>
+      <p>1 sayfalık site + hosting + temel SEO & Google Business</p>
+      <div class="price" data-price="250">250 TL</div>
+      <input type="checkbox" class="select-package"> Seç
+    </div>
+    <div class="service">
+      <h2>Paket B</h2>
+      <p>3 sayfa site + hosting (1 yıl) + aylık güncelleme</p>
+      <div class="price" data-price="400">400 TL</div>
+      <input type="checkbox" class="select-package"> Seç
+    </div>
+    <div class="service">
+      <h2>Abonelik</h2>
+      <p>Hosting+yedek+küçük değişiklikler</p>
+      <div class="price" data-price="50">50 TL/ay</div>
+      <input type="checkbox" class="select-package"> Seç
+    </div>
+  </div>
+
+  <div class="total">Toplam: 0 TL</div>
+
+  <div class="cta">
+    <button onclick="window.location.href='mailto:iletisim@ornek.com'">Hemen Başvur</button>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Tüm hakları saklıdır. | <a href="#privacy">Gizlilik Politikası</a> | <a href="#terms">Kullanım Şartları</a> | <a href="#refund">İade Süreci</a></p>
+  </footer>
+
+  <!-- Gizlilik, kullanım koşulları ve iade bölümü -->
+  <section id="privacy">
+    <h2>Gizlilik Politikası</h2>
+    <p>Müşteri verileri yalnızca hizmet için toplanır, güvenli bir şekilde saklanır ve üçüncü kişilerle paylaşılmaz.</p>
+  </section>
+  <section id="terms">
+    <h2>Kullanım Şartları</h2>
+    <p>Hizmeti kullanırken uyulması gereken kurallar ve müşterinin yükümlülükleri burada belirtilir. Sağlayıcı hizmeti gerektiği gibi sunar.</p>
+  </section>
+  <section id="refund">
+    <h2>İade Süreci</h2>
+    <p>Eğer hizmetten memnun kalmazsanız, siparişi iptal etmek için 7 gün içinde bildirin. İade işlemi ödeme yöntemine göre yapılır.</p>
+  </section>
+
+</div>
+
+<script>
+  // Dinamik toplam hesaplama
+  const checkboxes = document.querySelectorAll('.select-package');
+  const totalEl = document.querySelector('.total');
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', updateTotal);
+  });
+
+  function updateTotal(){
+    let total = 0;
+    checkboxes.forEach(cb => {
+      if(cb.checked){
+        total += parseInt(cb.parentElement.querySelector('.price').dataset.price);
+      }
+    });
+    totalEl.textContent = 'Toplam: ' + total + ' TL';
+  }
+</script>
+</body>
+</html>
