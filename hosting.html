@@ -451,14 +451,14 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const freeCard = document.getElementById('freePackageCard');
-        const premiumCard = document.getElementById('premiumPackageCard');
+        const freeCard = document.getElementById('paketFree');
+        const premiumCard = document.getElementById('paketPremium');
         const hiddenPackageInput = document.getElementById('hiddenPackageName');
         const hiddenDomainInput = document.getElementById('hiddenDomainName');
         
-        const step2Title = document.getElementById('step2Title'); // Yeni: Adım 2 Başlığı
+        const step2Title = document.getElementById('step2Title');
         const domainSelectionSection = document.getElementById('domainSelectionSection');
-        const domainChoiceContainer = document.getElementById('domainChoiceContainer'); // Yeni: Seçenekleri içeren div
+        const domainChoiceContainer = document.getElementById('domainChoiceContainer');
         const domainLabel = document.getElementById('domainLabel');
         const domainNameInput = document.getElementById('domainName');
         const domainTLDSelect = document.getElementById('domainTLD');
@@ -486,6 +486,12 @@
             'bakikara.com', 'gercek-alan.net', 'deneme-alınmış.org', 
             'trendyol.com', 'hepsiburada.com.tr', 'domain-kontrol.com'
         ];
+        
+        // YENİ: Ücretsiz Paket için Ayrılmış URL Takma Adlarını Tanımla
+        const RESERVED_SLUGS = [
+            'hosting', 'admin', 'login', 'signup', 'terms', 'privacy', 'panel', 'home', ''
+        ];
+
 
         // ---------------------------------------------------
         // Fonksiyonlar
@@ -497,8 +503,8 @@
             
             // Görsel Vurgulama
             if (packageName === 'Premium Pro') {
-                premiumCard.classList.add('premium');
-                freeCard.classList.remove('premium');
+                document.getElementById('premiumPackageCard').classList.add('premium');
+                document.getElementById('freePackageCard').classList.remove('premium');
                 
                 // PREMIUM AYARLARI
                 step2Title.textContent = '2. Adım: Alan Adı İşlemi 🎯';
@@ -511,23 +517,22 @@
                 freeDomainNote.style.display = 'none';
                 
             } else {
-                premiumCard.classList.remove('premium');
-                freeCard.classList.add('premium');
+                document.getElementById('premiumPackageCard').classList.remove('premium');
+                document.getElementById('freePackageCard').classList.add('premium');
                 
                 // ÜCRETSİZ AYARLARI
                 step2Title.textContent = '2. Adım: Sitenize URL Takma Adı Belirleyin 📝';
-                domainChoiceContainer.style.display = 'none'; // Alan adı seçeneklerini gizle
-                newDomainRadio.checked = true; // Varsayılan olarak "Yeni" seçili tut
-                existingDomainRadio.disabled = true; // Existing domain kullanılamaz
+                domainChoiceContainer.style.display = 'none';
+                newDomainRadio.checked = true;
+                existingDomainRadio.disabled = true;
                 domainLabel.innerHTML = '<i class="fas fa-link"></i> Sitenizin URL Takma Adı (Slug):';
                 domainNameInput.placeholder = "Örn: sitemin-adi (URL kısmı)";
-                domainNameInput.required = true; // Bir takma ad zorunlu
-                domainTLDSelect.style.display = 'none'; // TLD seçicisini gizle
+                domainNameInput.required = true;
+                domainTLDSelect.style.display = 'none';
                 freeDomainNote.style.display = 'block';
 
             }
 
-            // Seçim değiştiğinde domain inputunun durumunu güncelle
             domainChoiceRadios.forEach(radio => {
                 const label = document.querySelector(`label[for="${radio.id}"]`);
                 label.style.color = radio.checked ? 'var(--success-color)' : 'var(--text-secondary)';
@@ -587,7 +592,6 @@
                 const isNewDomain = newDomainRadio.checked;
                 let fullDomain = isNewDomain ? domainVal + domainTLDSelect.value : domainVal;
 
-                // Alan Adı Format Kontrolü (Basit bir kontrol)
                 if (!fullDomain.includes('.')) {
                     domainStatus.className = 'status-warning';
                     domainStatus.textContent = 'Lütfen geçerli bir alan adı formatı girin (Örn: siteadi.com).';
@@ -598,10 +602,8 @@
                 domainStatus.textContent = `⏳ **${fullDomain}** alanı kontrol ediliyor...`;
                 
                 try {
-                    // API Gecikmesi Simülasyonu
                     await new Promise(resolve => setTimeout(resolve, 1500)); 
 
-                    // Mevcut Domain Kontrolü (Sadece kullanıcıya bilgi amaçlı onay)
                     if (existingDomainRadio.checked) {
                         domainStatus.className = 'status-success';
                         domainStatus.textContent = `✅ **${fullDomain}** alan adınızı kullanmaya hazırsınız. DNS ayarlarını tarafımıza yönlendirmeniz gerekecektir.`;
@@ -611,7 +613,6 @@
                         return;
                     }
                     
-                    // Yeni Domain Sorgulama (Müsaitlik Simülasyonu)
                     const isAvailable = !UNAVAILABLE_DOMAINS.includes(fullDomain);
                     
                     if (isAvailable) {
@@ -637,6 +638,15 @@
                 // Ücretsiz Statik Başlangıç (URL Takma Adı)
                 const siteAdi = domainVal.replace(/[^a-z0-9-]/g, ''); // Sadece izin verilen karakterleri kullan
                 
+                // GÜNCELLENEN KISIM: Ayrılmış Takma Ad Kontrolü
+                if (RESERVED_SLUGS.includes(siteAdi) || siteAdi === '') {
+                    domainStatus.className = 'status-warning';
+                    domainStatus.textContent = `❌ Üzgünüz, **${siteAdi || 'boş'}** takma adı (URL) ayrılmış veya kullanılamaz durumdadır. Lütfen başka bir isim girin.`;
+                    isDomainChecked = false;
+                    proceedToOrderBtn.disabled = true;
+                    return;
+                }
+                
                 domainStatus.className = 'status-success';
                 domainStatus.textContent = `✅ Siteniz: **bakikara.xyz/${siteAdi}** Adresiyle Yayınlanacak. Devam edebilirsiniz.`;
                 
@@ -650,7 +660,6 @@
         // Diğer Event Listeners
         // ---------------------------------------------------
         
-        // Paket Seçimi Değiştiğinde
         document.querySelectorAll('input[name="selected_package"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const price = parseFloat(e.target.dataset.price);
@@ -659,12 +668,10 @@
             });
         });
         
-        // Alan Adı/URL Input Değiştiğinde
         domainNameInput.addEventListener('input', updateSummary);
         domainNameInput.addEventListener('input', resetDomainCheck);
         domainTLDSelect.addEventListener('change', resetDomainCheck);
 
-        // "Sepete Ekle ve Devam Et" Butonu
         proceedToOrderBtn.addEventListener('click', () => {
             if (isDomainChecked) {
                 orderSummary.style.display = 'block';
@@ -674,7 +681,6 @@
             }
         });
 
-        // Domain Tipi Seçimi (Sadece Premium Paket için aktif)
         domainChoiceRadios.forEach(radio => {
             const input = document.getElementById(radio.id);
             const label = document.querySelector(`label[for="${radio.id}"]`);
@@ -686,23 +692,22 @@
 
             radio.addEventListener('change', () => {
                 const currentPackage = hiddenPackageInput.value;
-                if (currentPackage !== 'Premium Pro') return; // Sadece Premium için çalışır
+                if (currentPackage !== 'Premium Pro') return; 
                 
                 if (radio.value === 'mevcut') {
                     domainNameInput.placeholder = "Kullanacağınız mevcut alan adınızın tamamını girin (Örn: siteadi.com)";
                     domainTLDSelect.style.display = 'none';
-                    domainNameInput.value = ''; // Inputu temizle
+                    domainNameInput.value = ''; 
                 } else {
                     domainNameInput.placeholder = "alanadim-ornegi";
                     domainTLDSelect.style.display = 'block';
-                    domainNameInput.value = ''; // Inputu temizle
+                    domainNameInput.value = ''; 
                 }
                 resetDomainCheck();
                 updateSummary();
             });
         });
 
-        // Form gönderiminde zorunlu alan kontrolü
         formSection.querySelector('form').addEventListener('submit', function(e) {
             if (!isDomainChecked) {
                 e.preventDefault();
@@ -714,7 +719,6 @@
         // Sayfa yüklendiğinde varsayılan paketi ayarla (Ücretsiz)
         updatePackageSelection(document.querySelector('input[name="selected_package"]:checked').value, 0.00);
         
-        // Sayfa yüklendiğinde domain tipini ayarla (Ücretsiz paket ayarlarını uygula)
         document.getElementById('newDomain').checked = true;
         updatePackageSelection('Ücretsiz Statik Başlangıç', 0.00); 
     });
