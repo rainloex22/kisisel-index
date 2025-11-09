@@ -1,313 +1,357 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Fiyat Listesi | Sosyal Medya Hizmet Paketleri</title>
-    <meta name="description" content="Instagram, TikTok ve YouTube için en güncel ve avantajlı fiyat paketlerini inceleyin.">
+// ==============================================================================
+// 🎯 Supabase Yapılandırması
+// ==============================================================================
+const SUPABASE_URL = 'https://pkwqrupzawkwnpkqijqw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrd3FydXB6YXdrd25wa3FpanF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2OTIxMTcsImV4cCI6MjA3ODI2ODExN30.YJ5j_qeUFyCbsoVcFhXzobRx4-wbjULbZBB3FRB1p2o';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ==============================================================================
+// 🚀 Yardımcı Fonksiyonlar
+// ==============================================================================
+
+// Global Alert fonksiyonu
+function showGlobalAlert(message, type = 'green') {
+    if (typeof window.showAlert === 'function') {
+        window.showAlert(message, type);
+    } else {
+        console.warn('showAlert fonksiyonu bulunamadı. Mesaj:', message);
+    }
+}
+
+// Oturum durumuna göre sayfa elementlerini günceller.
+function updateUI(user) {
+    const isUserLoggedIn = !!user;
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    // Genel Navigasyon Elementleri
+    const loginCta = document.getElementById('login-cta'); // Fiyatlar.html
+    const logoutCta = document.getElementById('logout-cta'); // Fiyatlar.html
+    const authButtons = document.getElementById('auth-buttons'); // Sosyal.html
+    const profileArea = document.getElementById('profile-area'); // Sosyal.html
+    const userInfo = document.getElementById('user-info'); // Sosyal.html
     
-    <style>
-        /* Inter Font'u tüm sayfada kullan */
-        body { font-family: 'Inter', sans-serif; }
-        
-        /* Temaya Uyumlu Renkler */
-        .primary-dark { background-color: #0f172a; } /* Slate-900 */
-        .primary-light { background-color: #1e293b; } /* Slate-800 */
-        .accent-color { background-color: #22c55e; } /* Green-500 (Vurgu) */
-        .accent-hover { background-color: #16a34a; } /* Green-600 */
-        .cta-special-color { background-color: #f97316; } /* Orange-600 (En Popüler Vurgu) */
-        .cta-special-hover { background-color: #ea580c; } /* Orange-700 */
-        
-        /* Akıcı Geçişler ve Buton Basma Efekti */
-        .transition-element { transition: all 0.3s ease; }
-        .button-press:active { transform: scale(0.98); } /* Butona basma efekti */
-
-        /* Navbar'da kaydırmada arkaplan değişimi için */
-        .navbar-scrolled { background-color: #0f172a; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); }
-
-        /* Modal'ı sayfa kaydırmasını engellemek için */
-        .overflow-hidden { overflow: hidden; }
-    </style>
-</head>
-<body class="primary-dark text-white">
-
-    <header class="sticky top-0 z-50 transition-element">
-        <nav id="main-nav" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-extrabold text-white flex items-center">
-                <span class="accent-color">SOSYAL</span> PRO ⚡
-            </a>
-            
-            <div class="hidden md:flex space-x-6 items-center">
-                <a href="sosyal.html" class="text-gray-300 hover:text-white font-medium transition-element button-press">Anasayfa</a>
-                <a href="fiyatlar.html" class="text-white hover:text-white font-bold transition-element button-press">Fiyatlar</a>
-                
-                <button id="login-cta" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-5 rounded-full shadow-md transition-element button-press focus:outline-none focus:ring-2 focus:ring-green-500/50">
-                    Giriş Yap
-                </button>
-
-                <div id="profile-area" class="hidden flex space-x-4 items-center primary-light rounded-xl px-3 py-1 border border-green-500/50 shadow-lg">
-                    <div id="user-info" class="text-green-400 font-semibold cursor-default text-sm">Kullanıcı</div>
-                    <button id="logout-cta" class="text-red-400 font-semibold hover:text-red-300 transition-element button-press text-sm">
-                        Çıkış Yap
-                    </button>
-                </div>
-                
-                </div>
-            
-            <button class="md:hidden text-white focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
-        </nav>
-    </header>
-
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 text-center">
-        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600">En Uygun</span> Fiyatlar
-        </h1>
-        <p class="text-xl text-gray-400 max-w-3xl mx-auto mb-16">
-            Hesabınızın türüne en uygun profesyonel paketleri seçin ve hemen büyümeye başlayın.
-        </p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-
-            <div class="primary-light p-8 rounded-2xl shadow-2xl transform hover:scale-[1.03] transition-element border border-slate-700">
-                <h3 class="text-2xl font-bold mb-4 text-gray-200">Başlangıç Paketi</h3>
-                <p class="text-gray-400 mb-6">Küçük hesaplar için ideal hızlandırma paketi.</p>
-                <div class="text-5xl font-extrabold mb-8">
-                    <span class="text-green-500">299</span>
-                    <span class="text-2xl text-gray-500 font-medium">TL / Ay</span>
-                </div>
-                <ul class="text-left space-y-3 mb-10">
-                    <li class="flex items-center text-gray-300">
-                        <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        1.000 Instagram Takipçi
-                    </li>
-                    <li class="flex items-center text-gray-300">
-                        <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        5.000 YouTube İzlenme
-                    </li>
-                    <li class="flex items-center text-gray-300 opacity-50">
-                        <svg class="w-5 h-5 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                        Özel Destek Hattı
-                    </li>
-                </ul>
-                <button class="w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl shadow-lg transition-element transform hover:scale-[1.01] button-press focus:ring-4 focus:ring-green-500/50">
-                    Hemen Başla
-                </button>
-            </div>
-            
-            <div class="primary-dark p-8 rounded-2xl shadow-2xl transform hover:scale-[1.03] transition-element border-4 border-orange-500 relative">
-                <span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 cta-special-color text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                    EN POPÜLER
-                </span>
-                <h3 class="text-2xl font-bold mb-4 text-white">Pro Paket</h3>
-                <p class="text-gray-400 mb-6">Orta ölçekli hesaplar için en hızlı büyüme çözümü.</p>
-                <div class="text-5xl font-extrabold mb-8">
-                    <span class="text-orange-500">699</span>
-                    <span class="text-2xl text-gray-500 font-medium">TL / Ay</span>
-                </div>
-                <ul class="text-left space-y-3 mb-10">
-                    <li class="flex items-center text-gray-300">
-                        <svg class="w-5 h-5 mr-2 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        10.000 Instagram Takipçi
-                    </li>
-                    <li class="flex items-center text-gray-300">
-                        <svg class="w-5 h-5 mr-2 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        50.000 YouTube İzlenme
-                    </li>
-                    <li class="flex items-center text-gray-300">
-                        <svg class="w-5 h-5 mr-2 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        Özel Destek Hattı
-                    </li>
-                </ul>
-                <button class="w-full cta-special-color hover:cta-special-hover text-white font-bold py-3 rounded-xl shadow-lg transition-element transform hover:scale-[1.01] button-press focus:ring-4 focus:ring-orange-500/50">
-                    En İyi Fırsat!
-                </button>
-            </div>
-
-            <div class="primary-light p-8 rounded-2xl shadow-2xl transform hover:scale-[1.03] transition-element border border-slate-700">
-                <h3 class="text-2xl font-bold mb-4 text-gray-200">Kurumsal Paket</h3>
-                <p class="text-gray-400 mb-6">Büyük şirketler ve ajanslar için sınırsız erişim.</p>
-                <div class="text-5xl font-extrabold mb-8">
-                    <span class="text-green-500">1499</span>
-                    <span class="text-2xl text-gray-500 font-medium">TL / Ay</span>
-                </div>
-                <ul class="text-left space-y-3 mb-10">
-                    <li class="flex items-center text-gray-300">
-                        <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        Limitsiz Takipçi / Beğeni
-                    </li>
-                    <li class="flex items-center text-gray-300">
-                        <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        Limitsiz İzlenme / Yorum
-                    </li>
-                    <li class="flex items-center text-gray-300">
-                        <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 13.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        7/24 Öncelikli Destek
-                    </li>
-                </ul>
-                <button class="w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl shadow-lg transition-element transform hover:scale-[1.01] button-press focus:ring-4 focus:ring-green-500/50">
-                    Teklif Al
-                </button>
-            </div>
-            
-        </div>
-    </section>
-
-    <section id="comments-section" class="py-16 primary-light">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-4xl font-bold text-center mb-12">Müşteri Yorumları</h2>
-
-            <div id="comments-list" class="space-y-6">
-                <div class="p-5 primary-dark rounded-xl border border-slate-700">
-                    <p class="text-sm font-semibold text-green-400">Can Yılmaz</p>
-                    <p class="text-gray-300 mt-1">Fiyatlar gerçekten çok makul. Hızlı ve güvenilir bir servis, tavsiye ederim.</p>
-                </div>
-                <div class="p-5 primary-dark rounded-xl border border-slate-700">
-                    <p class="text-sm font-semibold text-green-400">Ece Demir</p>
-                    <p class="text-gray-300 mt-1">Kurumsal paketi aldık, beklentimizin çok üstünde bir performans sundular. Teşekkürler!</p>
-                </div>
-            </div>
-
-            <div id="comment-form-container" class="mt-12 p-8 primary-dark rounded-xl border border-slate-700 shadow-xl">
-                <h3 class="text-2xl font-bold mb-4">Bir Yorum Bırakın</h3>
-                
-                <div id="comment-login-warning" class="text-red-400 bg-red-900/50 p-4 rounded-xl text-center mb-4">
-                    Yorum bırakmak için lütfen önce giriş yapın.
-                </div>
-                
-                <form id="yorum-gonder-formu" class="hidden">
-                    <div class="mb-4">
-                        <label for="comment-content" class="sr-only">Yorumunuz</label>
-                        <textarea id="comment-content" rows="3" required 
-                            class="w-full p-3 border border-slate-700 bg-slate-900 text-white rounded-xl focus:ring-2 focus:ring-green-500 transition-element" 
-                            placeholder="Bu sayfa hakkındaki düşüncelerinizi yazın..."></textarea>
-                    </div>
-                    <button type="submit" class="accent-color hover:accent-hover text-white font-bold py-2 px-6 rounded-xl transition-element button-press">
-                        Yorumu Gönder
-                    </button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="lg:flex lg:space-x-12">
-                <div class="lg:w-1/2 mb-10 lg:mb-0">
-                    <h2 class="text-4xl font-bold mb-4">Bize Ulaşın</h2>
-                    <p class="text-gray-400 text-lg mb-6">
-                        Her türlü soru, destek talebi veya özel paket teklifleri için bize ulaşmaktan çekinmeyin.
-                    </p>
-                    <div class="space-y-4">
-                        <div class="flex items-center text-gray-300">
-                            <svg class="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            <p>destek@sosyalpro.com</p>
-                        </div>
-                        <div class="flex items-center text-gray-300">
-                            <svg class="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.128a11.056 11.056 0 005.441 5.441l1.128-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                            <p>+90 (555) 555-5555</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:w-1/2 p-8 primary-light rounded-xl border border-slate-700 shadow-2xl">
-                    <form action="#" method="POST">
-                        <div class="mb-4">
-                            <label for="name" class="block text-gray-400 font-medium mb-2">Adınız Soyadınız</label>
-                            <input type="text" id="name" name="name" required class="w-full p-3 border border-slate-700 bg-slate-900 text-white rounded-xl focus:ring-2 focus:ring-green-500 transition-element" placeholder="Tam adınızı giriniz">
-                        </div>
-                        <div class="mb-4">
-                            <label for="email" class="block text-gray-400 font-medium mb-2">E-posta Adresiniz</label>
-                            <input type="email" id="email" name="email" required class="w-full p-3 border border-slate-700 bg-slate-900 text-white rounded-xl focus:ring-2 focus:ring-green-500 transition-element" placeholder="ornek@mail.com">
-                        </div>
-                        <div class="mb-6">
-                            <label for="message" class="block text-gray-400 font-medium mb-2">Mesajınız</label>
-                            <textarea id="message" name="message" rows="4" required class="w-full p-3 border border-slate-700 bg-slate-900 text-white rounded-xl focus:ring-2 focus:ring-green-500 transition-element" placeholder="Hangi hizmetle ilgileniyorsunuz?"></textarea>
-                        </div>
-                        <button type="submit" class="w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl shadow-lg transition-element transform hover:scale-[1.01] button-press focus:ring-4 focus:ring-green-500/50">
-                            Mesajı Gönder
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="primary-dark text-white py-8 border-t border-gray-700/50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p class="text-sm text-gray-500">
-                &copy; 2025 SOSYAL PRO. Tüm Hakları Saklıdır. | 
-                <a href="#" class="text-green-400 hover:text-green-200 transition-element button-press">Gizlilik Politikası</a> |
-                <a href="#" class="text-green-400 hover:text-green-200 transition-element button-press">Kullanım Şartları</a>
-            </p>
-        </div>
-    </footer>
-
-    <div id="auth-modal" class="hidden fixed inset-0 z-[60] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300">
-        <div class="primary-dark p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 border border-slate-700 relative transform transition-all duration-300 scale-100">
-            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-element">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-
-            <h3 class="text-3xl font-bold mb-4 text-white">Giriş Yap / Kayıt Ol</h3>
-            <p class="text-gray-400 mb-6">Şifresiz, anında erişim için e-posta adresinizi girin.</p>
-            
-            <form id="auth-form">
-                <div class="mb-4">
-                    <label for="auth-email" class="sr-only">E-posta Adresiniz</label>
-                    <input type="email" id="auth-email" name="email" required 
-                           class="w-full p-3 border border-slate-700 bg-slate-900 text-white rounded-xl focus:ring-2 focus:ring-green-500 transition-element" 
-                           placeholder="ornek@mail.com">
-                </div>
-                <button type="submit" class="w-full accent-color hover:accent-hover text-white font-bold py-3 rounded-xl shadow-lg transition-element button-press focus:ring-4 focus:ring-green-500/50">
-                    Giriş Bağlantısı Gönder
-                </button>
-            </form>
-
-            <p class="text-xs text-gray-500 mt-4 text-center">
-                Size özel bir giriş/kayıt bağlantısı e-posta adresinize gönderilecektir.
-            </p>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    // Yorum Bölümü Elementleri (Fiyatlar.html)
+    const commentLoginWarning = document.getElementById('comment-login-warning');
+    const yorumGonderFormuFiyatlar = document.getElementById('yorum-gonder-formu');
     
-    <script>
-        // 💡 CRITICAL FIX: Yorum gönderme işlevinin çalışması için 
-        // bu sayfanın slug'ını tanımlıyoruz.
-        window.CURRENT_PAGE_SLUG = 'fiyatlar';
+    // Yorum Bölümü Elementleri (Sosyal.html)
+    const authFormAreaSosyal = document.getElementById('auth-form-area');
+    const commentInputAreaSosyal = document.getElementById('comment-input-area');
+    
+    // Fiyatlar.html UI Güncelleme (Kullanıcı Adı Gözükmesi Düzeltildi)
+    if (loginCta && logoutCta) { 
+        loginCta.classList.toggle('hidden', isUserLoggedIn); 
+        // logoutCta'yı gizlemek yerine, profileArea'yı yönetelim
+    }
+    
+    if (profileArea) {
+         profileArea.classList.toggle('hidden', !isUserLoggedIn); // Profil alanını göster
+    }
+    
+    if (authButtons) {
+        authButtons.classList.toggle('hidden', isUserLoggedIn); // Giriş/Kayıt butonlarını gizle
+    }
 
-        // Alert gösterim fonksiyonu
-        function showAlert(message, type = 'green') {
-            const alertBox = document.createElement('div');
-            alertBox.textContent = message;
-            alertBox.className = `fixed bottom-5 right-5 p-4 rounded-xl text-white font-semibold shadow-2xl z-[100] transition-opacity duration-300 ${
-                type === 'red' ? 'bg-red-600' : 'bg-green-600'
-            }`;
-            document.body.appendChild(alertBox);
 
-            setTimeout(() => {
-                alertBox.classList.add('opacity-0');
-                setTimeout(() => alertBox.remove(), 300);
-            }, 4000);
+    if (isUserLoggedIn && userInfo) {
+        userInfo.textContent = user.email.split('@')[0]; // E-posta adının ilk kısmını göster
+    }
+    
+
+    // Yorum UI Güncelleme (Her iki sayfa için de geçerli)
+    if (commentLoginWarning && yorumGonderFormuFiyatlar) {
+        commentLoginWarning.classList.toggle('hidden', isUserLoggedIn);
+        yorumGonderFormuFiyatlar.classList.toggle('hidden', !isUserLoggedIn);
+    }
+
+    if (authFormAreaSosyal && commentInputAreaSosyal) {
+        authFormAreaSosyal.classList.toggle('hidden', isUserLoggedIn);
+        commentInputAreaSosyal.classList.toggle('hidden', !isUserLoggedIn);
+    }
+    
+    fetchComments();
+}
+
+// Yorumları Supabase'den çekme (Değişmedi)
+async function fetchComments() {
+    const commentsList = document.getElementById('comments-list');
+    if (!commentsList) return;
+    
+    const loadingMessage = document.getElementById('loading-message');
+    if (loadingMessage) loadingMessage.textContent = "Yorumlar yükleniyor...";
+    
+    const pageSlug = window.CURRENT_PAGE_SLUG; 
+    
+    try {
+        const { data: comments, error } = await supabase
+            .from('comments')
+            .select('content, user_email, created_at')
+            .eq('page_slug', pageSlug)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        if (pageSlug === 'fiyatlar') {
+            const staticComments = commentsList.querySelectorAll('.primary-dark:not(.dynamic-comment)');
+            commentsList.innerHTML = '';
+            staticComments.forEach(comment => commentsList.appendChild(comment));
+        } else {
+             commentsList.innerHTML = '';
+        }
+        
+        if (comments.length === 0 && pageSlug !== 'fiyatlar') {
+             commentsList.innerHTML = '<p class="text-center text-gray-500">Henüz yorum yapılmamış.</p>';
         }
 
-        // Navbar'da kaydırma efekti
-        document.addEventListener('DOMContentLoaded', () => {
-            const nav = document.getElementById('main-nav');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    nav.classList.add('navbar-scrolled');
-                } else {
-                    nav.classList.remove('navbar-scrolled');
-                }
-            });
+        comments.forEach(comment => {
+            const commentDiv = document.createElement('div');
+            commentDiv.className = 'p-5 primary-dark rounded-xl border border-slate-700 dynamic-comment';
+            
+            const userPart = comment.user_email ? comment.user_email.split('@')[0] : 'Anonim';
+            const timeAgo = new Date(comment.created_at).toLocaleDateString('tr-TR');
+
+            commentDiv.innerHTML = `
+                <p class="text-sm font-semibold text-green-400">${userPart}</p>
+                <p class="text-gray-500 text-xs mt-1">${timeAgo}</p>
+                <p class="text-gray-300 mt-2">${comment.content}</p>
+            `;
+            commentsList.appendChild(commentDiv);
         });
-    </script>
-    <script src="auth.js"></script>
-</body>
-</html>
+        
+    } catch (error) {
+        console.error('Yorumları çekerken hata:', error.message);
+    }
+}
+
+// ==============================================================================
+// 🔑 Auth İşlevleri
+// ==============================================================================
+
+// ⭐ Yeni: Oturum Açma / Kayıt Olma Modalı (Fiyatlar.html için - Şifre ile)
+async function handleAuthFormFiyatlar(event) {
+    event.preventDefault();
+    const email = document.getElementById('auth-email-modal').value;
+    const password = document.getElementById('auth-password-modal').value;
+    const isSignUpMode = document.getElementById('auth-submit-btn-modal').textContent.includes('Kayıt Ol');
+
+    try {
+        let response;
+        if (isSignUpMode) {
+            response = await supabase.auth.signUp({ email, password });
+        } else {
+            response = await supabase.auth.signInWithPassword({ email, password });
+        }
+        
+        const { data, error } = response;
+
+        if (error) throw error;
+        
+        showGlobalAlert(isSignUpMode ? 'Kayıt başarılı! Hesabınıza giriş yapıldı.' : 'Başarıyla giriş yapıldı!', 'green');
+        
+        // Modalı kapat
+        document.getElementById('auth-modal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+
+        // Şifre alanını temizle
+        document.getElementById('auth-password-modal').value = '';
+
+    } catch (error) {
+        showGlobalAlert('Hata: ' + error.message, 'red');
+        console.error('Auth Hatası:', error);
+    }
+}
+
+
+// Oturum Açma / Kayıt Olma Formu (Sosyal.html için - Şifre ile)
+async function handleAuthFormSosyal(event) {
+    event.preventDefault();
+    const form = event.target;
+    const email = form.querySelector('#auth-email').value;
+    const password = form.querySelector('#auth-password').value;
+    const isSignUpMode = form.querySelector('#auth-submit-btn').textContent.includes('Kayıt Ol');
+
+    try {
+        let response;
+        if (isSignUpMode) {
+            response = await supabase.auth.signUp({ 
+                email, 
+                password,
+            });
+        } else {
+            response = await supabase.auth.signInWithPassword({ email, password });
+        }
+        
+        const { data, error } = response;
+
+        if (error) throw error;
+        
+        showGlobalAlert(isSignUpMode ? 'Kayıt başarılı! Hesabınıza giriş yapıldı.' : 'Başarıyla giriş yapıldı!', 'green');
+        
+        form.querySelector('#auth-password').value = '';
+
+    } catch (error) {
+        showGlobalAlert('Hata: ' + error.message, 'red');
+        console.error('Auth Hatası:', error);
+    }
+}
+
+// Oturum Kapatma (Değişmedi)
+async function handleLogout() {
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        showGlobalAlert('Başarıyla çıkış yapıldı.', 'green');
+    } catch (error) {
+        showGlobalAlert('Çıkış yaparken hata oluştu: ' + error.message, 'red');
+        console.error('Çıkış Hatası:', error);
+    }
+}
+
+// Yorum Gönderme İşlevi (Değişmedi)
+async function handleCommentSubmit(event) {
+    event.preventDefault();
+    const content = event.target.querySelector('#comment-content').value;
+    const user = (await supabase.auth.getSession()).data.session?.user;
+
+    if (!user) {
+        showGlobalAlert('Yorum göndermek için lütfen önce giriş yapın.', 'red');
+        return;
+    }
+
+    try {
+        const { error } = await supabase
+            .from('comments')
+            .insert([
+                { 
+                    content: content, 
+                    user_id: user.id, 
+                    user_email: user.email,
+                    page_slug: window.CURRENT_PAGE_SLUG 
+                },
+            ]);
+
+        if (error) throw error;
+
+        showGlobalAlert('Yorumunuz başarıyla gönderildi!', 'green');
+        event.target.reset(); 
+        fetchComments();
+        
+    } catch (error) {
+        showGlobalAlert('Yorum gönderilirken hata oluştu: ' + error.message, 'red');
+        console.error('Yorum Gönderme Hatası:', error);
+    }
+}
+
+// ==============================================================================
+// 📌 Event Dinleyicileri
+// ==============================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Oturum Durumu Kontrolü ve UI Güncellemesi
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        updateUI(session?.user || null);
+    });
+    
+    supabase.auth.onAuthStateChange((event, session) => {
+        updateUI(session?.user || null);
+    });
+    
+    // --- Fiyatlar.html için Element Dinleyicileri ---
+    
+    // Auth Modal Açma
+    const loginCta = document.getElementById('login-cta');
+    const authModal = document.getElementById('auth-modal');
+    if (loginCta && authModal) {
+        loginCta.addEventListener('click', () => {
+            authModal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        });
+    }
+    
+    // Auth Modal Kapatma
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    if (closeModalBtn && authModal) {
+        closeModalBtn.addEventListener('click', () => {
+            authModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        });
+    }
+
+    // ⭐ Yeni: Auth Modal Formu Gönderimi (Fiyatlar.html)
+    const authFormModalFiyatlar = document.getElementById('auth-form-modal');
+    if (authFormModalFiyatlar) {
+        authFormModalFiyatlar.addEventListener('submit', handleAuthFormFiyatlar);
+    }
+    
+    // ⭐ Yeni: Kayıt Ol / Giriş Yap Modu Değiştirme (Fiyatlar.html Modal)
+    const toggleAuthModeModal = document.getElementById('toggle-auth-mode-modal');
+    const authSubmitBtnModal = document.getElementById('auth-submit-btn-modal');
+    const modalAuthTitle = document.getElementById('modal-auth-title');
+    const modalAuthDescription = document.getElementById('modal-auth-description');
+
+    if (toggleAuthModeModal && authSubmitBtnModal && modalAuthTitle && modalAuthDescription) {
+        toggleAuthModeModal.addEventListener('click', () => {
+            const isSignUp = authSubmitBtnModal.textContent.includes('Kayıt Ol');
+            
+            authSubmitBtnModal.textContent = isSignUp ? 'Giriş Yap' : 'Kayıt Ol';
+            toggleAuthModeModal.textContent = isSignUp ? 'Kayıt Ol' : 'Giriş Yap';
+            modalAuthTitle.textContent = isSignUp ? 'Giriş Yap' : 'Kayıt Ol';
+            modalAuthDescription.textContent = isSignUp 
+                ? 'Hesabınıza erişmek için e-posta ve şifrenizi girin.' 
+                : 'Yeni bir hesap oluşturmak için e-posta ve şifrenizi girin.';
+        });
+    }
+    
+    // Oturum Kapatma (Fiyatlar.html)
+    const logoutCta = document.getElementById('logout-cta');
+    if (logoutCta) {
+        logoutCta.addEventListener('click', handleLogout);
+    }
+    
+    // Yorum Gönderme Formu (Fiyatlar.html)
+    const yorumGonderFormuFiyatlar = document.getElementById('yorum-gonder-formu');
+    if (yorumGonderFormuFiyatlar) {
+        yorumGonderFormuFiyatlar.addEventListener('submit', handleCommentSubmit);
+    }
+    
+    // --- Sosyal.html için Element Dinleyicileri ---
+    
+    // Auth Formu Gönderimi (Sosyal.html)
+    const authFormSosyal = document.getElementById('auth-form');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const toggleAuthMode = document.getElementById('toggle-auth-mode');
+    const authTitle = document.getElementById('auth-title');
+    
+    if (authFormSosyal) {
+        authFormSosyal.addEventListener('submit', handleAuthFormSosyal);
+    }
+
+    // Oturum Kapatma (Sosyal.html)
+    const logoutButtonSosyal = document.getElementById('logout-button');
+    if (logoutButtonSosyal) {
+        logoutButtonSosyal.addEventListener('click', handleLogout);
+    }
+
+    // Kayıt Ol / Giriş Yap Modu Değiştirme (Sosyal.html)
+    if (toggleAuthMode && authSubmitBtn && authTitle) {
+        toggleAuthMode.addEventListener('click', () => {
+            const isSignUp = authSubmitBtn.textContent.includes('Kayıt Ol');
+            
+            authSubmitBtn.textContent = isSignUp ? 'Giriş Yap' : 'Kayıt Ol';
+            toggleAuthMode.textContent = isSignUp ? 'Kayıt Ol' : 'Giriş Yap';
+            authTitle.textContent = isSignUp ? 'Giriş Yap' : 'Kayıt Ol';
+        });
+    }
+
+    // Yorum Gönderme Formu (Sosyal.html)
+    const yorumGonderFormuSosyal = document.getElementById('yorum-gonder-formu');
+    if (yorumGonderFormuSosyal) {
+        yorumGonderFormuSosyal.addEventListener('submit', handleCommentSubmit);
+    }
+    
+    // Yorumlar sayfasının ilk yüklenişinde yorumları çek
+    if (document.getElementById('comments-list')) {
+        fetchComments();
+    }
+});
