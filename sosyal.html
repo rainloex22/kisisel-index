@@ -61,7 +61,6 @@
 </head>
 <body class="primary-dark text-gray-100 antialiased">
 
-    <!-- Supabase kütüphanesi auth.js'den önce yüklenmeli -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
@@ -140,6 +139,7 @@
             });
 
             // KRİTİK DÜZELTME: Giriş Yap / Kayıt Ol Butonu Listener'ı
+            // (Bu kısım auth.js'e taşınmıştır, ancak fallback olarak kalabilir.)
             const loginButton = document.getElementById('login-button');
             if (loginButton) {
                 loginButton.addEventListener('click', (event) => {
@@ -155,12 +155,10 @@
         });
     </script>
     
-    <!-- Alert Box -->
     <div id="alert-box" class="hidden text-white">
         <p id="alert-message" class="font-semibold"></p>
     </div>
 
-    <!-- 1. Header & Navbar -->
     <header class="primary-light shadow-xl sticky top-0 z-20 border-b border-gray-700/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -175,14 +173,12 @@
                     <a href="#nedenbiz" class="text-gray-300 hover:text-green-400 font-medium transition-element button-press">Neden Biz?</a>
                     <a href="#sosyal-yorumlar" class="text-gray-300 hover:text-green-400 font-medium transition-element button-press">Referanslar</a>
                     
-                    <!-- ⭐ GİRİŞ YAPILMADIĞINDA GÖRÜNÜR -->
                     <div id="auth-buttons" class="flex space-x-4 items-center">
                         <button id="login-button" class="accent-color text-white px-4 py-2 rounded-lg font-semibold hover:accent-hover transition-element shadow-md transform hover:scale-105 button-press">
                             Giriş Yap / Kayıt Ol
                         </button>
                     </div>
 
-                    <!-- ⭐ GİRİŞ YAPILDIĞINDA GÖRÜNÜR (Varsayılan olarak 'hidden') -->
                     <div id="profile-area" class="hidden flex space-x-4 items-center primary-dark rounded-xl px-3 py-1 border border-green-500/50 shadow-lg">
                         <div id="user-info" class="text-green-400 font-semibold cursor-default text-sm">Kullanıcı</div>
                         <button id="logout-button" class="text-red-400 font-semibold hover:text-red-300 transition-element button-press text-sm">
@@ -208,7 +204,6 @@
         </div>
     </header>
 
-    <!-- 2. Hero Section -->
     <section id="hero" class="bg-gradient-to-br from-slate-900 to-slate-800 py-20 sm:py-32 border-b border-green-600/20 section-animate">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <span class="text-sm font-semibold text-green-400 mb-4 inline-block tracking-widest uppercase border border-green-500/50 px-3 py-1 rounded-full bg-slate-800/50">PROFESYONEL BÜYÜME ÇÖZÜMLERİ</span>
@@ -224,7 +219,6 @@
         </div>
     </section>
 
-    <!-- 3. Hizmetler Section -->
     <section id="hizmetler" class="py-16 sm:py-28 primary-dark section-animate" style="animation-delay: 0.1s;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 id="fiyatlar" class="text-4xl font-extrabold text-center text-green-400 mb-16">Popüler Hizmet Kategorilerimiz</h2>
@@ -262,7 +256,6 @@
         </div>
     </section>
 
-    <!-- 4. Neden Biz Section -->
     <section id="nedenbiz" class="bg-slate-800 py-16 sm:py-24 text-white border-y border-gray-700/50 section-animate" style="animation-delay: 0.6s;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-4xl font-extrabold text-center text-white mb-16">Fark Yaratan Güvenilir Özelliklerimiz</h2>
@@ -287,12 +280,10 @@
         </div>
     </section>
 
-    <!-- 5. Yorumlar ve AUTH Formu Section -->
     <section id="sosyal-yorumlar" class="py-16 sm:py-28 primary-dark section-animate" style="animation-delay: 1.0s;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-4xl font-extrabold text-center text-green-400 mb-12">Ziyaretçi Yorumları</h2>
             
-            <!-- GİRİŞ YAP / KAYIT OL FORMU (Oturum Kapalıyken Görünür) -->
             <div id="auth-form-area" class="primary-light p-8 rounded-3xl shadow-2xl border border-slate-700 max-w-lg mx-auto mb-12">
                 <h3 class="text-2xl font-bold text-white mb-6 text-center" id="auth-title">Giriş Yap</h3>
                 <form id="auth-form">
@@ -313,7 +304,6 @@
                 </form>
             </div>
             
-            <!-- YORUM GÖNDERME FORMU (Oturum Açıkken Görünür) -->
             <div id="comment-input-area" class="hidden primary-light p-8 rounded-3xl shadow-2xl border border-slate-700 max-w-lg mx-auto mb-12">
                 <h3 class="text-2xl font-bold text-white mb-6 text-center">Yorumunuzu Ekleyin</h3>
                 <form id="yorum-gonder-formu">
@@ -327,14 +317,12 @@
                 </form>
             </div>
 
-            <!-- YORUM LİSTESİ -->
             <div id="comments-list" class="space-y-6 max-w-3xl mx-auto">
                 <p class="text-center text-gray-500" id="loading-message">Yorumlar yükleniyor...</p>
                 </div>
         </div>
     </section>
     
-    <!-- 6. İletişim Section -->
     <section id="iletisim" class="bg-slate-800 py-16 sm:py-24 border-t border-gray-700/50 section-animate" style="animation-delay: 1.4s;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="lg:flex lg:space-x-12">
@@ -381,7 +369,6 @@
         </div>
     </section>
 
-    <!-- 7. Footer -->
     <footer class="primary-dark text-white py-8 border-t border-gray-700/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p class="text-sm text-gray-500">
@@ -396,7 +383,6 @@
         // auth.js'nin bu sayfaya ait yorumları çekerken kullanacağı benzersiz kimlik.
         window.CURRENT_PAGE_SLUG = 'sosyal-sayfasi'; 
     </script>
-    <!-- auth.js bu scriptten sonra çağrılmalı -->
     <script src="auth.js"></script>
 
 </body>
