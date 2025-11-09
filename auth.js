@@ -27,36 +27,39 @@ function updateUI(user) {
     const loginCta = document.getElementById('login-cta'); // Fiyatlar.html
     const logoutCta = document.getElementById('logout-cta'); // Fiyatlar.html
     const authButtons = document.getElementById('auth-buttons'); // Sosyal.html
-    const profileArea = document.getElementById('profile-area'); // Sosyal.html
-    const userInfo = document.getElementById('user-info'); // Sosyal.html
+    const profileArea = document.getElementById('profile-area'); // Sosyal & Fiyatlar.html
+    const userInfo = document.getElementById('user-info'); // Sosyal & Fiyatlar.html
     
-    // Yorum Bölümü Elementleri (Fiyatlar.html)
+    // Yorum Bölümü Elementleri
     const commentLoginWarning = document.getElementById('comment-login-warning');
-    const yorumGonderFormuFiyatlar = document.getElementById('yorum-gonder-formu');
+    const yorumGonderFormu = document.getElementById('yorum-gonder-formu');
     
     // Yorum Bölümü Elementleri (Sosyal.html)
     const authFormAreaSosyal = document.getElementById('auth-form-area');
     const commentInputAreaSosyal = document.getElementById('comment-input-area');
     
-    // ⭐ İstenen Güncelleme: Giriş Yap/Kayıt Ol butonları kalksın, profil kartı gözüksün
-    
-    if (loginCta && logoutCta) { // Fiyatlar.html UI Güncelleme
-        loginCta.classList.toggle('hidden', isUserLoggedIn); // Giriş/Kayıt CTA'sını gizle
-        logoutCta.classList.toggle('hidden', !isUserLoggedIn); // Çıkış CTA'sını göster
+    // Navbar UI Güncelleme (Fiyatlar.html ve Sosyal.html'deki aynı ID'ler)
+    if (loginCta) { 
+        loginCta.classList.toggle('hidden', isUserLoggedIn); // Giriş/Kayıt butonunu gizle
     }
     
-    if (authButtons && profileArea) { // Sosyal.html UI Güncelleme
-        authButtons.classList.toggle('hidden', isUserLoggedIn); // Giriş/Kayıt butonlarını gizle
-        profileArea.classList.toggle('hidden', !isUserLoggedIn); // Profil alanını göster
-        if (isUserLoggedIn && userInfo) {
-            userInfo.textContent = user.email.split('@')[0]; // E-posta adının ilk kısmını göster
-        }
+    if (authButtons) {
+        authButtons.classList.toggle('hidden', isUserLoggedIn); // Giriş/Kayıt butonlarını gizle (Sosyal.html)
     }
 
-    // Yorum UI Güncelleme (Her iki sayfa için de geçerli)
-    if (commentLoginWarning && yorumGonderFormuFiyatlar) {
+    if (profileArea) {
+         profileArea.classList.toggle('hidden', !isUserLoggedIn); // Profil alanını göster
+    }
+    
+    // Kullanıcı Adını Göster
+    if (isUserLoggedIn && userInfo && user.email) {
+        userInfo.textContent = user.email.split('@')[0]; // E-posta adının ilk kısmını göster
+    }
+    
+    // Yorum UI Güncelleme
+    if (commentLoginWarning && yorumGonderFormu) {
         commentLoginWarning.classList.toggle('hidden', isUserLoggedIn);
-        yorumGonderFormuFiyatlar.classList.toggle('hidden', !isUserLoggedIn);
+        yorumGonderFormu.classList.toggle('hidden', !isUserLoggedIn);
     }
 
     if (authFormAreaSosyal && commentInputAreaSosyal) {
@@ -72,9 +75,6 @@ async function fetchComments() {
     const commentsList = document.getElementById('comments-list');
     if (!commentsList) return;
     
-    const loadingMessage = document.getElementById('loading-message');
-    if (loadingMessage) loadingMessage.textContent = "Yorumlar yükleniyor...";
-    
     const pageSlug = window.CURRENT_PAGE_SLUG; 
     
     try {
@@ -86,7 +86,7 @@ async function fetchComments() {
 
         if (error) throw error;
         
-        // Yorum listesi temizleme ve statik yorumları koruma mantığı
+        // ... (Yorumları işleme mantığı - Değişmedi)
         if (pageSlug === 'fiyatlar') {
             const staticComments = commentsList.querySelectorAll('.primary-dark:not(.dynamic-comment)');
             commentsList.innerHTML = '';
@@ -116,7 +116,6 @@ async function fetchComments() {
         
     } catch (error) {
         console.error('Yorumları çekerken hata:', error.message);
-        // Hata mesajı UI'da gösterilebilir
     }
 }
 
@@ -124,33 +123,50 @@ async function fetchComments() {
 // 🔑 Auth İşlevleri
 // ==============================================================================
 
-// Oturum Açma / Kayıt Olma Modalı (Fiyatlar.html için - Sadece E-posta ile OTP)
-// OTP'de e-posta onayı devre dışı bırakılsa bile, bağlantı gönderilmesi gerekir.
-async function handleAuthModal(event) {
+// ⭐ DÜZELTİLDİ: Oturum Açma / Kayıt Olma Modalı (Fiyatlar.html için)
+async function handleAuthFormFiyatlar(event) {
     event.preventDefault();
-    const email = document.getElementById('auth-email').value;
+    const form = event.target;
+    // Element erişimini form üzerinden yap
+    const email = form.querySelector('#auth-email-modal').value;
+    const password = form.querySelector('#auth-password-modal').value;
+    const isSignUpMode = form.querySelector('#auth-submit-btn-modal').textContent.includes('Kayıt Ol');
 
     try {
-        const { error } = await supabase.auth.signInWithOtp({ 
-            email,
-            options: {
-                emailRedirectTo: window.location.href,
-            } 
-        });
+        let response;
+        if (isSignUpMode) {
+            response = await supabase.auth.signUp({ email, password });
+        } else {
+            response = await supabase.auth.signInWithPassword({ email, password });
+        }
+        
+        const { data, error } = response;
 
         if (error) throw error;
-
-        showGlobalAlert('Giriş bağlantınız e-posta adresinize gönderildi! Lütfen kontrol edin.', 'green');
+        
+        showGlobalAlert(isSignUpMode ? 'Kayıt başarılı! Hesabınıza giriş yapıldı.' : 'Başarıyla giriş yapıldı!', 'green');
+        
+        // Modalı kapat
         document.getElementById('auth-modal').classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
 
+        // Şifre alanını temizle
+        form.querySelector('#auth-password-modal').value = '';
+
+        // ⭐ KRİTİK DÜZELTME: UI'yı manuel olarak güncelle
+        // Bu, onAuthStateChange tetiklenmese bile profil kartının hemen gözükmesini sağlar.
+        if (data.user) {
+             updateUI(data.user); 
+        }
+
     } catch (error) {
         showGlobalAlert('Hata: ' + error.message, 'red');
-        console.error('Giriş Hatası:', error);
+        console.error('Auth Hatası:', error);
     }
 }
 
-// Oturum Açma / Kayıt Olma Formu (Sosyal.html için - Şifre ile)
+
+// Oturum Açma / Kayıt Olma Formu (Sosyal.html için - Değişmedi)
 async function handleAuthFormSosyal(event) {
     event.preventDefault();
     const form = event.target;
@@ -164,7 +180,6 @@ async function handleAuthFormSosyal(event) {
             response = await supabase.auth.signUp({ 
                 email, 
                 password,
-                // ⭐ Kayıt başarılıysa kullanıcıyı otomatik oturum açar (E-posta onayı kapalıysa bu çalışır)
             });
         } else {
             response = await supabase.auth.signInWithPassword({ email, password });
@@ -174,18 +189,11 @@ async function handleAuthFormSosyal(event) {
 
         if (error) throw error;
         
-        if (isSignUpMode) {
-             // E-posta onayı kapatıldığı varsayıldığı için hemen başarılı mesajı gösterilir
-             showGlobalAlert('Kayıt başarılı! Hesabınıza giriş yapıldı.', 'green'); 
-        } else {
-             showGlobalAlert('Başarıyla giriş yapıldı!', 'green');
-        }
+        showGlobalAlert(isSignUpMode ? 'Kayıt başarılı! Hesabınıza giriş yapıldı.' : 'Başarıyla giriş yapıldı!', 'green');
         
-        // UI, authStateChange event'i ile güncellenecek
         form.querySelector('#auth-password').value = '';
 
     } catch (error) {
-        // Supabase'den gelen hatalar (örneğin kullanıcı zaten mevcut, yanlış şifre vb.)
         showGlobalAlert('Hata: ' + error.message, 'red');
         console.error('Auth Hatası:', error);
     }
@@ -197,7 +205,6 @@ async function handleLogout() {
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
         showGlobalAlert('Başarıyla çıkış yapıldı.', 'green');
-        // UI, authStateChange event'i ile güncellenecek
     } catch (error) {
         showGlobalAlert('Çıkış yaparken hata oluştu: ' + error.message, 'red');
         console.error('Çıkış Hatası:', error);
@@ -240,7 +247,7 @@ async function handleCommentSubmit(event) {
 }
 
 // ==============================================================================
-// 📌 Event Dinleyicileri (Değişmedi)
+// 📌 Event Dinleyicileri
 // ==============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -250,24 +257,29 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUI(session?.user || null);
     });
     
-    // Auth durumundaki her değişiklikte (Giriş, Kayıt, Çıkış) UI'yı otomatik güncelle
     supabase.auth.onAuthStateChange((event, session) => {
         updateUI(session?.user || null);
     });
     
     // --- Fiyatlar.html için Element Dinleyicileri ---
     
-    // Auth Modal Açma/Kapatma
+    // Auth Modal Açma
     const loginCta = document.getElementById('login-cta');
     const authModal = document.getElementById('auth-modal');
-    const closeModalBtn = document.getElementById('close-modal-btn');
-
     if (loginCta && authModal) {
         loginCta.addEventListener('click', () => {
             authModal.classList.remove('hidden');
             document.body.classList.add('overflow-hidden');
+            // Mod açılırken varsayılan olarak Giriş Yap moduna ayarla
+            const isSignUp = document.getElementById('auth-submit-btn-modal').textContent.includes('Kayıt Ol');
+            if (isSignUp) {
+                document.getElementById('toggle-auth-mode-modal').click();
+            }
         });
     }
+    
+    // Auth Modal Kapatma
+    const closeModalBtn = document.getElementById('close-modal-btn');
     if (closeModalBtn && authModal) {
         closeModalBtn.addEventListener('click', () => {
             authModal.classList.add('hidden');
@@ -276,9 +288,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Auth Modal Formu Gönderimi (Fiyatlar.html)
-    const authFormModal = document.getElementById('auth-form');
-    if (authFormModal) {
-        authFormModal.addEventListener('submit', handleAuthModal);
+    const authFormModalFiyatlar = document.getElementById('auth-form-modal');
+    if (authFormModalFiyatlar) {
+        authFormModalFiyatlar.addEventListener('submit', handleAuthFormFiyatlar);
+    }
+    
+    // Kayıt Ol / Giriş Yap Modu Değiştirme (Fiyatlar.html Modal)
+    const toggleAuthModeModal = document.getElementById('toggle-auth-mode-modal');
+    const authSubmitBtnModal = document.getElementById('auth-submit-btn-modal');
+    const modalAuthTitle = document.getElementById('modal-auth-title');
+    const modalAuthDescription = document.getElementById('modal-auth-description');
+
+    if (toggleAuthModeModal && authSubmitBtnModal && modalAuthTitle && modalAuthDescription) {
+        toggleAuthModeModal.addEventListener('click', () => {
+            const isSignUp = authSubmitBtnModal.textContent.includes('Kayıt Ol');
+            
+            authSubmitBtnModal.textContent = isSignUp ? 'Giriş Yap' : 'Kayıt Ol';
+            toggleAuthModeModal.textContent = isSignUp ? 'Kayıt Ol' : 'Giriş Yap';
+            modalAuthTitle.textContent = isSignUp ? 'Giriş Yap' : 'Kayıt Ol';
+            modalAuthDescription.textContent = isSignUp 
+                ? 'Hesabınıza erişmek için e-posta ve şifrenizi girin.' 
+                : 'Yeni bir hesap oluşturmak için e-posta ve şifrenizi girin.';
+        });
     }
     
     // Oturum Kapatma (Fiyatlar.html)
