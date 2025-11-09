@@ -1,13 +1,14 @@
 // ==============================================================================
-// 🎯 Supabase Yapılandırması
+// 🎯 Supabase Yapılandırması (Kullanıcının Verdiği Anahtarlar Doğrulanmıştır)
 // ==============================================================================
 const SUPABASE_URL = 'https://pkwqrupzawkwnpkqijqw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrd3FydXB6YXdrd25wa3FijqwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2OTIxMTcsImV4cCI6MjA3ODI2ODExN30.YJ5j_qeUFyCbsoVcFhXzobRx4-wbjULbZBB3FRB1p2o';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrd3FydXB6YXdrd25wa3FpanF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2OTIxMTcsImV4cCI6MjA3ODI2ODExN30.YJ5j_qeUFyCbsoVcFhXzobRx4-wbjULbZBB3FRB1p2o';
 
+// Supabase istemcisini oluştur
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ==============================================================================
-// 🚀 Yardımcı Fonksiyonlar
+// 🚀 Yardımcı Fonksiyonlar (Önceki Adımdaki Tüm Fonksiyonlar Korunmuştur)
 // ==============================================================================
 
 // Sayfadaki global showAlert fonksiyonunu kullanır (sosyal.html ve fiyatlar.html'de tanımlı)
@@ -78,6 +79,7 @@ async function fetchComments() {
     const pageSlug = window.CURRENT_PAGE_SLUG; 
     
     try {
+        // Hatanın oluşabileceği Supabase çağrısı
         const { data: comments, error } = await supabase
             .from('comments') // 'comments' tablosu varsayılıyor
             .select('content, user_email, created_at')
@@ -116,6 +118,8 @@ async function fetchComments() {
         });
         
     } catch (error) {
+        // Hata mesajını kullanıcıya göster
+        showGlobalAlert(`Veri yükleme hatası: ${error.message}`, 'red');
         console.error('Yorumları çekerken hata:', error.message);
         commentsList.innerHTML = '<p class="text-center text-red-400">Yorumlar yüklenemedi.</p>';
     }
@@ -131,6 +135,7 @@ async function handleAuthModal(event) {
     const email = document.getElementById('auth-email').value;
 
     try {
+        // Hatanın oluşabileceği Supabase çağrısı
         const { error } = await supabase.auth.signInWithOtp({ 
             email,
             options: {
@@ -160,8 +165,10 @@ async function handleAuthFormSosyal(event) {
     try {
         let response;
         if (isSignUpMode) {
+            // Hatanın oluşabileceği Supabase çağrısı
             response = await supabase.auth.signUp({ email, password });
         } else {
+            // Hatanın oluşabileceği Supabase çağrısı
             response = await supabase.auth.signInWithPassword({ email, password });
         }
         
@@ -187,6 +194,7 @@ async function handleAuthFormSosyal(event) {
 // Oturum Kapatma
 async function handleLogout() {
     try {
+        // Hatanın oluşabileceği Supabase çağrısı
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
         showGlobalAlert('Başarıyla çıkış yapıldı.', 'green');
@@ -209,6 +217,7 @@ async function handleCommentSubmit(event) {
     }
 
     try {
+        // Hatanın oluşabileceği Supabase çağrısı
         const { error } = await supabase
             .from('comments')
             .insert([
